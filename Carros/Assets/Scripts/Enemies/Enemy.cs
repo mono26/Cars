@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Enemy : Entity
 {
+    // State machine
+    // Current action
+    // IsExecutingAction
+
     protected override void Awake()
     {
         return;

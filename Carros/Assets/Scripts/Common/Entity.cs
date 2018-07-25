@@ -4,14 +4,23 @@ using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
+    public enum EntityType { Playable, AIControlled}
+
     [SerializeField]
     protected AudioSource audioSource;
     [SerializeField]
     protected Rigidbody body;
+    public Rigidbody Body { get { return body; } }
+    [SerializeField]
+    protected ExternalInput input;
+    public ExternalInput Input { get { return input; } }
+    [SerializeField]
+    protected Mesh mesh;
     [SerializeField]
     protected MeshCollider meshCollider;
     [SerializeField]
-    protected Mesh mesh;
+    protected EntityType type = EntityType.AIControlled;
+    public EntityType Type { get { return type; } }
 
     protected EntityComponent[] components;
 
