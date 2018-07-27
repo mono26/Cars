@@ -6,22 +6,25 @@ public class Entity : MonoBehaviour
 {
     public enum EntityType { Playable, AIControlled}
 
+    [Header("Entity components")]
     [SerializeField]
     protected AudioSource audioSource;
     [SerializeField]
     protected Rigidbody body;
     public Rigidbody Body { get { return body; } }
     [SerializeField]
+    protected Collider hitBox;
+    [SerializeField]
     protected ExternalInput input;
     public ExternalInput Input { get { return input; } }
     [SerializeField]
-    protected Mesh mesh;
-    [SerializeField]
-    protected MeshCollider meshCollider;
+    protected MeshRenderer model;
+
     [SerializeField]
     protected EntityType type = EntityType.AIControlled;
     public EntityType Type { get { return type; } }
 
+    [Header("Editor debugging")]
     protected EntityComponent[] components;
 
     protected virtual void Awake()
@@ -30,10 +33,10 @@ public class Entity : MonoBehaviour
             audioSource = GetComponent<AudioSource>();
         if (body == null)
             body = GetComponent<Rigidbody>();
-        if (meshCollider == null)
-            meshCollider = GetComponent<MeshCollider>();
-        if (mesh == null)
-            mesh = GetComponent<Mesh>();
+        if (hitBox == null)
+            hitBox = GetComponent<Collider>();
+        if (model == null)
+            model = GetComponent<MeshRenderer>();
 
         components = GetComponents<EntityComponent>();
 

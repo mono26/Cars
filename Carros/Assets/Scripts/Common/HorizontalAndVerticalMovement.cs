@@ -7,12 +7,20 @@ public class HorizontalAndVerticalMovement : EntityComponent
     [Header("Horizontal and Vertical settings")]
     [SerializeField]
     protected float acceleration; // m / s2 (meters per second)
-    [SerializeField]
-    protected float horizontalFactor; // How much acceleration can be used to move horizontaly
+    [SerializeField][Range(0,1.0f)]
+    protected float horizontalFactor = 0.3f; // How much acceleration can be used to move horizontaly
     [SerializeField]
     protected float maxSpeed; // m / s
 
-    protected Vector3 movementDirection;
+    protected Vector3 movementDirection; // It must be a normalized Vector3
+
+    public void SetMovementValues(float _acceleration, float _maxSpeed)
+    {
+        maxSpeed = _maxSpeed;
+        acceleration = _acceleration;
+
+        return;
+    }
 
     public override void FixedFrame()
     {
