@@ -16,24 +16,28 @@ public class AIState : ScriptableObject
 
     private void DoActions(Entity controller)
     {
+        if (actions.Length == 0) { return; }
+
         for (int i = 0; i < actions.Length; i++)
-        {
             actions[i].DoAction(controller);
-        }
+
+        return;
     }
 
     private void CheckTransitions(Entity _entity)
     {
-        if (transitions.Length > 0)
+        if (transitions.Length == 0) { return; }
+
+        Enemy enemy = _entity as Enemy;
+        if(enemy == null) { return; }
+
+        for (int i = 0; i < transitions.Length; i++)
         {
-            for (int i = 0; i < transitions.Length; i++)
-            {
-                bool decisionState = transitions[i].decision.Decide(_entity);
-                /*if (decisionState)
-                    //_entity._stateHandler.TransitionToState(transitions[i].trueState);
-                else
-                    //_entity._stateHandler.TransitionToState(transitions[i].falseState);*/
-            }
+            bool decisionState = transitions[i].decision.Decide(_entity);
+            if (decisionState)
+                enemy.StateMachine.ChangeState(transitions[i].trueState);
+            else
+                enemy.StateMachine.ChangeState(transitions[i].falseState);
         }
 
         return;

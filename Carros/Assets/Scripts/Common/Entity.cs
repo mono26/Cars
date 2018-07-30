@@ -26,6 +26,9 @@ public class Entity : MonoBehaviour
 
     [Header("Editor debugging")]
     protected EntityComponent[] components;
+    [SerializeField]
+    protected Transform target;
+    public Transform Target { get { return target; } }
 
     protected virtual void Awake()
     {
@@ -45,12 +48,11 @@ public class Entity : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (components != null)
+        if (components == null) { return; }
+
+        foreach (EntityComponent component in components)
         {
-            foreach (EntityComponent component in components)
-            {
-                component.EveryFrame();
-            }
+            component.EveryFrame();
         }
 
         return;
@@ -58,12 +60,11 @@ public class Entity : MonoBehaviour
 
     protected virtual void FixedUpdate()
     {
-        if (components != null)
+        if (components == null) { return; }
+
+        foreach (EntityComponent component in components)
         {
-            foreach (EntityComponent component in components)
-            {
-                component.FixedFrame();
-            }
+            component.FixedFrame();
         }
 
         return;
@@ -71,12 +72,11 @@ public class Entity : MonoBehaviour
 
     protected virtual void LateUpdate()
     {
-        if (components != null)
+        if (components == null) { return; }
+
+        foreach (EntityComponent component in components)
         {
-            foreach (EntityComponent component in components)
-            {
-                component.LateFrame();
-            }
+            component.LateFrame();
         }
 
         return;

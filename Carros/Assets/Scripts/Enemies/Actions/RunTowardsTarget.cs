@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "AIComponents/Actions/Enemy/RunTowardsTarget")]
 public class RunTowardsTarget : AIAction
@@ -15,12 +13,11 @@ public class RunTowardsTarget : AIAction
     protected void MakeEnemyRun(Entity _entity)
     {
         Enemy enemy = _entity as Enemy;
+        if (enemy == null) { return; }
+
         Vector3 directionToTarget = Vector3.zero;
-        if (enemy != null)
-        {
-            directionToTarget = enemy.Target.position - enemy.transform.position;
-            enemy.Movement.SetMoveDirection(directionToTarget.normalized);
-        }
+        directionToTarget = enemy.Target.position - enemy.transform.position;
+        enemy.Movement.SetMoveDirection(directionToTarget.normalized);
 
 
         return;

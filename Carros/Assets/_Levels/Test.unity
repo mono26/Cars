@@ -345,6 +345,10 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!4 &949750981 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 400050, guid: 0e7ee4df08df88c4880f43398f9ad2c2, type: 2}
+  m_PrefabInternal: {fileID: 1719597588}
 --- !u!1 &1709566139
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,8 +365,9 @@ GameObject:
   - component: {fileID: 1709566142}
   - component: {fileID: 1709566141}
   - component: {fileID: 1709566140}
+  - component: {fileID: 1709566149}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Velociraptor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -383,6 +388,7 @@ MonoBehaviour:
   acceleration: 32
   horizontalFactor: 0.3
   maxSpeed: 64
+  movementDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &1709566141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -394,6 +400,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82727059b60ea134f93a90872c1eb780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aiEntity: {fileID: 1709566142}
+  currentState: {fileID: 0}
 --- !u!114 &1709566142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -411,14 +419,15 @@ MonoBehaviour:
   input: {fileID: 0}
   model: {fileID: 1709566146}
   type: 1
+  target: {fileID: 949750981}
   stats:
-    acceleration: 32
+    acceleration: 1
     maxHealth: 10
     maxSpeed: 64
   movement: {fileID: 1709566140}
   stateMachine: {fileID: 1709566141}
-  startingState: {fileID: 0}
-  target: {fileID: 0}
+  startingState: {fileID: 11400000, guid: 2a1717594b4814c4083b5cf48ee18d6e, type: 2}
+  nextAbility: {fileID: 0}
 --- !u!82 &1709566143
 AudioSource:
   m_ObjectHideFlags: 0
@@ -486,7 +495,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -574,12 +583,26 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1709566139}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.4, y: 0.5, z: 20.1}
+  m_LocalPosition: {x: -18.1, y: 0.5, z: 18.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1709566149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1709566139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0185df980c43c343b812604962028a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entity: {fileID: 1709566142}
+  range: 2.5
+  ramForce: 100
 --- !u!1001 &1719597588
 Prefab:
   m_ObjectHideFlags: 0

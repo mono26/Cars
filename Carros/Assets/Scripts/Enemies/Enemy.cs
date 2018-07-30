@@ -28,20 +28,33 @@ public class Enemy : Entity
     public EnemyMovement Movement { get { return movement; } }
     [SerializeField]
     protected AIStateMachine stateMachine;
+    public AIStateMachine StateMachine { get { return stateMachine; } }
 
     [Header("Editor debugging")]
+    protected Ability[] abilities;
+    public Ability[] Abilities { get { return abilities; } }
     [SerializeField]
     protected AIState startingState;
     [SerializeField]
-    protected Transform target;
-    public Transform Target { get { return target; } }
+    protected Ability nextAbility;
+    public Ability NextAbility { get { return nextAbility; } }
+
+    /// <summary>
+    /// The next ability to cast.
+    /// </summary>
+    /// <param name="_nextAbility"> The next ability to cast, can be NULL.</param>
+    public void SetNextAbility(Ability _nextAbility) { nextAbility = _nextAbility; }
 
     protected override void Awake()
     {
+        base.Awake();
+
         if (movement == null)
             GetComponent<HorizontalAndVerticalMovement>();
         if (stateMachine == null)
             GetComponent<AIStateMachine>();
+
+        abilities = GetComponents<Ability>();
 
         return;
     }
@@ -56,6 +69,8 @@ public class Enemy : Entity
 
     protected override void Update()
     {
+        base.Update();
+
         if(stateMachine == null) { return; }
 
         stateMachine.UpdateState();
@@ -65,11 +80,15 @@ public class Enemy : Entity
 
     protected override void FixedUpdate()
     {
+        base.FixedUpdate();
+
         return;
     }
 
     protected override void LateUpdate()
     {
+        base.LateUpdate();
+
         return;
     }
 }
