@@ -5,21 +5,22 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "AIComponents/State")]
 public class AIState : ScriptableObject
 {
+    public string stateName;
     public AIAction[] actions;
     public AITransition[] transitions;
 
-    public void UpdateState(Entity controller)
+    public void UpdateState(Entity _entity)
     {
-        DoActions(controller);
-        CheckTransitions(controller);
+        DoActions(_entity);
+        CheckTransitions(_entity);
     }
 
-    private void DoActions(Entity controller)
+    private void DoActions(Entity _entity)
     {
         if (actions.Length == 0) { return; }
 
         for (int i = 0; i < actions.Length; i++)
-            actions[i].DoAction(controller);
+            actions[i].DoAction(_entity);
 
         return;
     }
@@ -34,7 +35,7 @@ public class AIState : ScriptableObject
         for (int i = 0; i < transitions.Length; i++)
         {
             bool decisionState = transitions[i].decision.Decide(_entity);
-            if (decisionState)
+            if (decisionState == true)
                 enemy.StateMachine.ChangeState(transitions[i].trueState);
             else
                 enemy.StateMachine.ChangeState(transitions[i].falseState);

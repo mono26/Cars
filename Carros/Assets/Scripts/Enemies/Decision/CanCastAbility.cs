@@ -3,29 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "AIComponents/Decision/CanCastAbility")]
-public class CanCastAbility : Decision
+public class CanCastAbility : AIDecision
 {
     public override bool Decide(Entity _entity)
     {
         bool decision = false;
+        decision = CanCast(_entity);
+
         return decision; 
     }
 
-    protected void CanCast(Entity _entity)
+    protected bool CanCast(Entity _entity)
     {
         Enemy enemy = _entity as Enemy;
-        if(enemy == null) { return; }
+        if(enemy == null) { return false; }
 
+        Debug.Log(enemy.gameObject.name + "checking abilities");
         foreach (Ability ability in enemy.Abilities)
         {
-            if (ability.IsInRange() == true)
+            if (ability.IsInRange() == true && ability.IsInCooldown() == false)
             {
+                Debug.Log(enemy.gameObject.name + "Can cast" + ability.ToString());
                 enemy.SetNextAbility(ability);
-                break;
+                return true;
             }
-            // Is not in Range do nothing
         }
 
-        return;
+        return false;
     }
 }

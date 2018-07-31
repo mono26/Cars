@@ -11,9 +11,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5080e473b531e1140bdc131a255204cb, type: 3}
   m_Name: Moving
   m_EditorClassIdentifier: 
+  stateName: Moving
   actions:
   - {fileID: 11400000, guid: 38447dba260ef7547bd14158189fdfdb, type: 2}
   transitions:
   - decision: {fileID: 11400000, guid: 3f2cb94da5198974c86fa5d56d5f86c4, type: 2}
     trueState: {fileID: 11400000, guid: 0cfd6a8f71a5bb6418e6a6a66b2b8f11, type: 2}
-    falseState: {fileID: 11400000}
+    falseState: {fileID: 11400000, guid: 19ab18f277b8491419235f0fcdc58f1c, type: 2}

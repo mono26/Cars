@@ -1,11 +1,22 @@
 ﻿using UnityEngine;
 
-public abstract class Ability : EntityComponent
+public class Ability : EntityComponent
 {
     [Header("Ability settings")]
     [SerializeField]
+    protected float cooldown;
+    [SerializeField]
     protected float range;
     public float Range { get { return range; } }
+
+    protected float lastCast = 0;
+
+    protected virtual void Start()
+    {
+        lastCast = Time.timeSinceLevelLoad - cooldown;
+
+        return;
+    }
 
     protected virtual void OnDrawGizmos()
     {
@@ -14,7 +25,12 @@ public abstract class Ability : EntityComponent
         return;
     }
 
-    public abstract void Cast();
+    public virtual void Cast()
+    {
+        lastCast = Time.timeSinceLevelLoad;
+
+        return;
+    }
 
     public bool IsInRange()
     {
@@ -23,5 +39,14 @@ public abstract class Ability : EntityComponent
             isInRange = true;
 
         return isInRange; 
+    }
+
+    public bool IsInCooldown()
+    {
+        bool isInCooldown = true;
+        if (Time.timeSinceLevelLoad > lastCast + cooldown)
+            isInCooldown = false;
+
+        return isInCooldown;
     }
 }

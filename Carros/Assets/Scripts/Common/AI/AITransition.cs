@@ -1,7 +1,7 @@
 ﻿[System.Serializable]
 public class AITransition
 {
-    public Decision decision;
+    public AIDecision decision;
     public AIState trueState;
     public AIState falseState;
 }

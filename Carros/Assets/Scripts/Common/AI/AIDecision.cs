@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public abstract class Decision : ScriptableObject
+public abstract class AIDecision : ScriptableObject
 {
     public abstract bool Decide(Entity _entity);
 }
