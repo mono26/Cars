@@ -13,12 +13,12 @@ public class Entity : MonoBehaviour
     protected Rigidbody body;
     public Rigidbody Body { get { return body; } }
     [SerializeField]
-    protected Collider hitBox;
+    protected Collider[] hitBox;
     [SerializeField]
     protected ExternalInput input;
     public ExternalInput Input { get { return input; } }
     [SerializeField]
-    protected MeshRenderer model;
+    protected SkinnedMeshRenderer model;
 
     [SerializeField]
     protected EntityType type = EntityType.AIControlled;
@@ -37,9 +37,9 @@ public class Entity : MonoBehaviour
         if (body == null)
             body = GetComponent<Rigidbody>();
         if (hitBox == null)
-            hitBox = GetComponent<Collider>();
+            hitBox = transform.GetComponentsInChildren<Collider>();
         if (model == null)
-            model = GetComponent<MeshRenderer>();
+            model = GetComponent<SkinnedMeshRenderer>();
 
         components = GetComponents<EntityComponent>();
 
