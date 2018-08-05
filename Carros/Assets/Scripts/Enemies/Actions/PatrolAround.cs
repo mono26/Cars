@@ -1,0 +1,19 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[CreateAssetMenu(menuName = "AIComponents/Actions/Enemy/PatrolAround")]
+public class PatrolAround : AIAction
+{
+    public override void DoAction(Entity _entity)
+    {
+        Patrol(_entity);
+
+        return;
+    }
+
+    protected void Patrol(Entity _entity)
+    {
+        return;
+    }
+}

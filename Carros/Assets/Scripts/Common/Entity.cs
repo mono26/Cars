@@ -26,9 +26,6 @@ public class Entity : MonoBehaviour
 
     [Header("Editor debugging")]
     protected EntityComponent[] components;
-    [SerializeField]
-    protected Transform target;
-    public Transform Target { get { return target; } }
 
     protected virtual void Awake()
     {

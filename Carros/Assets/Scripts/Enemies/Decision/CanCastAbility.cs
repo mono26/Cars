@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "AIComponents/Decision/CanCastAbility")]
 public class CanCastAbility : AIDecision
@@ -18,7 +16,6 @@ public class CanCastAbility : AIDecision
         Enemy enemy = _entity as Enemy;
         if(enemy == null) { return false; }
 
-        Debug.Log(enemy.gameObject.name + "checking abilities");
         foreach (Ability ability in enemy.Abilities)
         {
             if (ability.IsInRange() == true && ability.IsInCooldown() == false)

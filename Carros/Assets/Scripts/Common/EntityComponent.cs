@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EntityComponent : MonoBehaviour
 {
+    [Header("Entity Component settings")]
     [SerializeField]
     protected Entity entity;
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Ability : EntityComponent
+public class Ability : AIEntityComponent
 {
     [Header("Ability settings")]
     [SerializeField]
@@ -11,16 +11,17 @@ public class Ability : EntityComponent
 
     protected float lastCast = 0;
 
-    protected virtual void Start()
+    protected virtual void OnDrawGizmos()
     {
-        lastCast = Time.timeSinceLevelLoad - cooldown;
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(entity.transform.position, range);
 
         return;
     }
 
-    protected virtual void OnDrawGizmos()
+    protected virtual void Start()
     {
-        Gizmos.DrawWireSphere(entity.transform.position, range);
+        lastCast = Time.timeSinceLevelLoad - cooldown;
 
         return;
     }
@@ -35,7 +36,10 @@ public class Ability : EntityComponent
     public bool IsInRange()
     {
         bool isInRange = false;
-        if (Vector3.Distance(entity.transform.position, entity.Target.position) <= range)
+
+        if(aiEntity.Targetter == null || aiEntity.Targetter.CurrentTarget == null) { return isInRange; }
+
+        if (Vector3.Distance(entity.transform.position, aiEntity.Targetter.CurrentTarget.GetSlotPosition(aiEntity.Targetter.CurrentTargetSlot)) <= range)
             isInRange = true;
 
         return isInRange; 

@@ -46,8 +46,8 @@ public class HorizontalAndVerticalMovement : EntityComponent
     protected void ApplyVerticalAndHorizontalMovement(float _horizontalValue, float _verticalValue)
     {
         // TODO check for the correct way to move a rigidbody: velocity or addForce.
-        Vector3 horizontalSpeed = transform.right * _horizontalValue * acceleration * horizontalFactor;
-        Vector3 verticalSpeed = transform.forward * _verticalValue * acceleration;
+        Vector3 horizontalSpeed = Vector3.right * _horizontalValue * acceleration * horizontalFactor;
+        Vector3 verticalSpeed = Vector3.forward * _verticalValue * acceleration;
         entity.Body.velocity += (horizontalSpeed + verticalSpeed);
 
         return;

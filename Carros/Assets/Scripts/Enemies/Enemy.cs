@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine))]
@@ -21,6 +20,8 @@ public class Enemy : Entity
     [Header("Enemy settings")]
     [SerializeField]
     protected EnemyStats stats; // Set in the editor.
+    [SerializeField]
+    protected float stateUpdateRate = 2.0f; // Updates per second
 
     [Header("Enemy components")]
     [SerializeField]
@@ -29,12 +30,17 @@ public class Enemy : Entity
     [SerializeField]
     protected AIStateMachine stateMachine;
     public AIStateMachine StateMachine { get { return stateMachine; } }
+    [SerializeField]
+    protected Targetter targetter;
+    public Targetter Targetter { get { return targetter; } }
 
     [Header("Editor debugging")]
     protected Ability[] abilities;
     public Ability[] Abilities { get { return abilities; } }
     [SerializeField]
     protected AIState startingState;
+    [SerializeField]
+    protected Coroutine updateStateRoutine;
     [SerializeField]
     protected Ability nextAbility;
     public Ability NextAbility { get { return nextAbility; } }
@@ -53,6 +59,8 @@ public class Enemy : Entity
             GetComponent<HorizontalAndVerticalMovement>();
         if (stateMachine == null)
             GetComponent<AIStateMachine>();
+        if (targetter == null)
+            GetComponent<Targetter>();
 
         abilities = GetComponents<Ability>();
 
@@ -63,17 +71,7 @@ public class Enemy : Entity
     {
         movement.SetMovementValues(stats.Acceleration, stats.MaxSpeed);
         stateMachine.ChangeState(startingState);
-
-        return;
-    }
-
-    protected override void Update()
-    {
-        base.Update();
-
-        if(stateMachine == null) { return; }
-
-        stateMachine.UpdateState();
+        updateStateRoutine = StartCoroutine(UpdateState());
 
         return;
     }
@@ -90,5 +88,14 @@ public class Enemy : Entity
         base.LateUpdate();
 
         return;
+    }
+
+    protected IEnumerator UpdateState()
+    {
+        stateMachine.UpdateState();
+
+        yield return new WaitForSeconds(1 / stateUpdateRate);
+
+        updateStateRoutine = StartCoroutine(UpdateState());
     }
 }

@@ -17,6 +17,10 @@ public class Ram : Ability
 
     protected void PerformRam()
     {
+        Debug.Log(entity.gameObject.name + "Casting Ram");
+
+        entity.Body.velocity = Vector3.zero;
+        entity.Body.AddForce(transform.up * ramForce * 0.9f, ForceMode.Impulse);
         entity.Body.AddForce(transform.right * ramForce, ForceMode.Impulse);
 
         return;
