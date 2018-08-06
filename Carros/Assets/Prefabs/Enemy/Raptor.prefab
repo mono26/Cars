@@ -964,7 +964,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4146875072022618}
   - component: {fileID: 135882763816781542}
-  - component: {fileID: 114133104605930896}
+  - component: {fileID: 114130686985338072}
   m_Layer: 0
   m_Name: Targetter
   m_TagString: Untagged
@@ -2869,7 +2869,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aiEntity: {fileID: 114489460927426014}
   currentState: {fileID: 0}
---- !u!114 &114133104605930896
+--- !u!114 &114130686985338072
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -2888,7 +2888,6 @@ MonoBehaviour:
   targetableTags:
   - Player
   currentTarget: {fileID: 0}
-  currentTargetSlot: 0
   nearTargets: []
 --- !u!114 &114489460927426014
 MonoBehaviour:
@@ -2901,6 +2900,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d975ebd84fa09ff40b6701a1a8b94ac2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 1
   audioSource: {fileID: 82159779150795614}
   body: {fileID: 54958318596336042}
   hitBox:
@@ -2910,16 +2910,17 @@ MonoBehaviour:
   - {fileID: 65092936889067060}
   input: {fileID: 0}
   model: {fileID: 137496178252355792}
-  type: 1
+  components: []
   stats:
-    acceleration: 16
+    acceleration: 4
     maxHealth: 10
-    maxSpeed: 32
+    maxSpeed: 16
   stateUpdateRate: 2
   navigation: {fileID: 195181851878292462}
   movement: {fileID: 114736692605747454}
   stateMachine: {fileID: 114019163273655812}
-  targetter: {fileID: 114133104605930896}
+  targetter: {fileID: 114130686985338072}
+  abilities: []
   startingState: {fileID: 11400000, guid: b1d918f057b934441930358644f948c5, type: 2}
   nextAbility: {fileID: 0}
 --- !u!114 &114736692605747454

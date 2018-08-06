@@ -19,8 +19,8 @@ public class Targetter : AIEntityComponent
     protected SlotManager currentTarget;
     public SlotManager CurrentTarget { get { return currentTarget; } }
     [SerializeField]
-    protected int currentTargetSlot = -1;
-    public int CurrentTargetSlot { get { return currentTargetSlot; } }
+    protected SlotManager.Slot currentSlot = null;
+    public SlotManager.Slot CurrentSlot { get { return currentSlot; } }
     [SerializeField]
     protected List<SlotManager> nearTargets;
     [SerializeField]
@@ -99,7 +99,7 @@ public class Targetter : AIEntityComponent
                 if (!currentTarget)
                 {
                     currentTarget = isSlot;
-                    currentTargetSlot = currentTarget.Reserve(aiEntity.gameObject);
+                    currentSlot = currentTarget.Reserve(aiEntity.gameObject);
                 }
 
                 nearTargets.Add(isSlot);
@@ -122,11 +122,11 @@ public class Targetter : AIEntityComponent
 
                 if (currentTarget.Equals(isSlot))
                 {
-                    currentTarget.Release(currentTargetSlot);
+                    currentTarget.Release(currentSlot);
                     SlotManager newTarget = GetNearestTarget();
                     currentTarget = newTarget;
                     if(newTarget)
-                        currentTargetSlot = newTarget.Reserve(aiEntity.gameObject);
+                        currentSlot = newTarget.Reserve(aiEntity.gameObject);
                 }
 
                 nearTargets.Remove(isSlot);
@@ -146,10 +146,10 @@ public class Targetter : AIEntityComponent
 
         else
         {
-            if (!currentTarget.Equals(nearestTarget)) { currentTarget.Release(currentTargetSlot); }
+            if (!currentTarget.Equals(nearestTarget)) { currentTarget.Release(currentSlot); }
 
             currentTarget = nearestTarget;
-            currentTargetSlot = nearestTarget.Reserve(aiEntity.gameObject);
+            currentSlot = nearestTarget.Reserve(aiEntity.gameObject);
 
             yield return new WaitForSeconds(1 / detectionRate);
         }

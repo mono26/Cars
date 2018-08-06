@@ -6,6 +6,11 @@ public class Entity : MonoBehaviour
 {
     public enum EntityType { Playable, AIControlled}
 
+    [Header("Entity settings")]
+    [SerializeField]
+    protected EntityType type = EntityType.AIControlled;
+    public EntityType Type { get { return type; } }
+
     [Header("Entity components")]
     [SerializeField]
     protected AudioSource audioSource;
@@ -20,11 +25,8 @@ public class Entity : MonoBehaviour
     [SerializeField]
     protected SkinnedMeshRenderer model;
 
-    [SerializeField]
-    protected EntityType type = EntityType.AIControlled;
-    public EntityType Type { get { return type; } }
-
     [Header("Editor debugging")]
+    [SerializeField]
     protected EntityComponent[] components;
 
     protected virtual void Awake()

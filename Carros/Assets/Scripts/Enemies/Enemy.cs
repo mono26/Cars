@@ -39,6 +39,7 @@ public class Enemy : Entity
     public Targetter Targetter { get { return targetter; } }
 
     [Header("Editor debugging")]
+    [SerializeField]
     protected Ability[] abilities;
     public Ability[] Abilities { get { return abilities; } }
     [SerializeField]
@@ -59,13 +60,13 @@ public class Enemy : Entity
     {
         base.Awake();
 
-        if (!navigation)
+        if (navigation == null)
             GetComponent<NavMeshAgent>();
-        if (!movement)
+        if (movement == null)
             GetComponent<EnemyMovement>();
-        if (!stateMachine)
+        if (stateMachine == null)
             GetComponent<AIStateMachine>();
-        if (!targetter)
+        if (targetter == null)
             GetComponent<Targetter>();
 
         abilities = GetComponents<Ability>();

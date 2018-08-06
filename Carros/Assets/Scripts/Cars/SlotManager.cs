@@ -1,25 +1,56 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SlotManager : EntityComponent
 {
-    [SerializeField]
-    protected float distaceToEntity;
-    [SerializeField]
-    protected int numberOfSlots = 10;
-    [SerializeField]
-    protected GameObject[] slots;
-
-	protected void OnDrawGizmosSelected()
+    [System.Serializable]
+    public class Slot
     {
-        for (int index = 0; index < numberOfSlots; ++index)
+        public enum Type { Waiting, Attacking }
+
+        public Type type = Type.Waiting;
+        public int index = -1;
+
+        public Slot(Type _type = Type.Waiting, int _index = -1)
         {
-            if (slots == null || slots.Length <= index || slots[index] == null)
+            type = _type;
+            index = _index;
+        }
+    }
+
+    [Header("Slot Manager settings")]
+    [SerializeField]
+    protected float attackingDistaceToEntity = 1.5f;
+    [SerializeField]
+    protected float waitingDistaceToEntity = 5.0f;
+    [SerializeField]
+    protected int numberOfAttackingSlots = 3;
+    [SerializeField]
+    protected int numberOfWaitingSlots = 10;
+
+    [Header("Edittor debugging")]
+    [SerializeField]
+    protected GameObject[] attackingSlots;
+    [SerializeField]
+    protected GameObject[] waitingSlots;
+
+    protected void OnDrawGizmosSelected()
+    {
+        for (int index = 0; index < numberOfWaitingSlots; ++index)
+        {
+            if (waitingSlots == null || waitingSlots.Length <= index || waitingSlots[index] == null)
                 Gizmos.color = Color.black;
             else
                 Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(GetSlotPosition(index), 0.5f);
+            Gizmos.DrawWireSphere(GetWaitingSlotPosition(index), 0.5f);
+        }
+
+        for (int index = 0; index < numberOfAttackingSlots; ++index)
+        {
+            if (attackingSlots == null || attackingSlots.Length <= index || attackingSlots[index] == null)
+                Gizmos.color = Color.black;
+            else
+                Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(GetAttackingSlotPosition(index), 0.5f);
         }
 
         return;
@@ -27,51 +58,130 @@ public class SlotManager : EntityComponent
 
     protected void Start()
     {
-        slots = new GameObject[numberOfSlots];
-        for(int i = 0; i < numberOfSlots; i++)
+        attackingSlots = new GameObject[numberOfAttackingSlots];
+        for (int i = 0; i < numberOfAttackingSlots; i++)
         {
-            slots[i] = null;
+            attackingSlots[i] = null;
+        }
+
+        waitingSlots = new GameObject[numberOfWaitingSlots];
+        for (int i = 0; i < numberOfWaitingSlots; i++)
+        {
+            waitingSlots[i] = null;
         }
 
         return;
     }
 
-	public Vector3 GetSlotPosition(int index)
+    protected bool IsThereAFreeAtackingSlot()
     {
-        float degreesPerIndex = 360f / numberOfSlots;
+        bool isfree = false;
+
+        for (int index = 0; index < attackingSlots.Length; ++index)
+        {
+            if (attackingSlots[index] == null)
+            {
+                isfree = true;
+                break;
+            }
+        }
+
+        return isfree;
+    }
+
+    public Vector3 GetSlotPosition(Slot _slot)
+    {
+        Vector3 position = transform.position;
+        switch(_slot.type)
+        {
+            case Slot.Type.Attacking:
+                position = GetAttackingSlotPosition(_slot.index);
+                break;
+
+            case Slot.Type.Waiting:
+                position = GetWaitingSlotPosition(_slot.index);
+                break;
+        }
+        return position;
+    }
+
+	protected Vector3 GetWaitingSlotPosition(int index)
+    {
+        float degreesPerIndex = 360f / numberOfWaitingSlots;
         Vector3 posistion = transform.position;
-        Vector3 offset = new Vector3(0f, 0f, distaceToEntity);
+        Vector3 offset = new Vector3(0f, 0f, waitingDistaceToEntity);
 
         return posistion + (Quaternion.Euler(new Vector3(0f, degreesPerIndex * index, 0f)) * offset);
     }
 
-	public int Reserve(GameObject attacker)
+    protected Vector3 GetAttackingSlotPosition(int index)
+    {
+        float degreesPerIndex = 360f / numberOfAttackingSlots;
+        Vector3 posistion = transform.position;
+        Vector3 offset = new Vector3(0f, 0f, attackingDistaceToEntity);
+
+        return posistion + (Quaternion.Euler(new Vector3(0f, degreesPerIndex * index, 0f)) * offset);
+    }
+
+    public Slot Reserve(GameObject attacker)
     {
         Vector3 bestPosition = transform.position;
-        Vector3 offset = (attacker.transform.position - bestPosition).normalized * distaceToEntity;
+        Vector3 offset = (attacker.transform.position - bestPosition).normalized * waitingDistaceToEntity;
         bestPosition += offset;
-        int bestSlot = -1;
+        Slot bestSlot = null;
         float bestDist = 99999f;
-        for (int index = 0; index < slots.Length; ++index)
+
+        if(IsThereAFreeAtackingSlot())
         {
-            if (slots[index] != null)
-                continue;
-            var dist = (GetSlotPosition(index) - bestPosition).sqrMagnitude;
-            if (dist < bestDist)
+            for (int index = 0; index < attackingSlots.Length; ++index)
             {
-                bestSlot = index;
-                bestDist = dist;
+                if (attackingSlots[index] != null)
+                    continue;
+                var dist = (GetAttackingSlotPosition(index) - bestPosition).sqrMagnitude;
+                if (dist < bestDist)
+                {
+                    bestSlot = new Slot(Slot.Type.Attacking, index);
+                    bestDist = dist;
+                }
             }
+
+            if (bestSlot.index != -1)
+                attackingSlots[bestSlot.index] = attacker;
         }
-        if (bestSlot != -1)
-            slots[bestSlot] = attacker;
+
+        else if(!IsThereAFreeAtackingSlot())
+        {
+            for (int index = 0; index < waitingSlots.Length; ++index)
+            {
+                if (waitingSlots[index] != null)
+                    continue;
+                var dist = (GetWaitingSlotPosition(index) - bestPosition).sqrMagnitude;
+                if (dist < bestDist)
+                {
+                    bestSlot = new Slot(Slot.Type.Waiting, index);
+                    bestDist = dist;
+                }
+            }
+
+            if (bestSlot.index != -1)
+                waitingSlots[bestSlot.index] = attacker;
+        }
 
         return bestSlot;
     }
 
-	public void Release(int slot)
+	public void Release(Slot _slot)
     {
-        slots[slot] = null;
+        switch (_slot.type)
+        {
+            case Slot.Type.Attacking:
+                attackingSlots[_slot.index] = null;
+                break;
+
+            case Slot.Type.Waiting:
+                waitingSlots[_slot.index] = null; ;
+                break;
+        }
 
         return;
     }

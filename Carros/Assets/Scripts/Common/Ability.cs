@@ -39,7 +39,7 @@ public class Ability : AIEntityComponent
 
         if(aiEntity.Targetter == null || aiEntity.Targetter.CurrentTarget == null) { return isInRange; }
 
-        if (Vector3.Distance(entity.transform.position, aiEntity.Targetter.CurrentTarget.GetSlotPosition(aiEntity.Targetter.CurrentTargetSlot)) <= range)
+        if (Vector3.Distance(entity.transform.position, aiEntity.Targetter.CurrentTarget.GetSlotPosition(aiEntity.Targetter.CurrentSlot)) <= range)
             isInRange = true;
 
         return isInRange; 
