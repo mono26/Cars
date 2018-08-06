@@ -963,7 +963,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4146875072022618}
-  - component: {fileID: 54427556868800278}
   - component: {fileID: 135882763816781542}
   - component: {fileID: 114133104605930896}
   m_Layer: 0
@@ -2667,21 +2666,6 @@ Transform:
   m_Father: {fileID: 4409481390143438}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &54427556868800278
-Rigidbody:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1723466546491372}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!54 &54958318596336042
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -2898,7 +2882,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entity: {fileID: 114489460927426014}
   aiEntity: {fileID: 114489460927426014}
-  detectionRange: 10
+  detectionRange: 20
   detectionRate: 2
   targetterTrigger: {fileID: 135882763816781542}
   targetableTags:
@@ -2928,14 +2912,15 @@ MonoBehaviour:
   model: {fileID: 137496178252355792}
   type: 1
   stats:
-    acceleration: 1
+    acceleration: 16
     maxHealth: 10
-    maxSpeed: 64
+    maxSpeed: 32
   stateUpdateRate: 2
+  navigation: {fileID: 195181851878292462}
   movement: {fileID: 114736692605747454}
   stateMachine: {fileID: 114019163273655812}
   targetter: {fileID: 114133104605930896}
-  startingState: {fileID: 11400000, guid: 2a1717594b4814c4083b5cf48ee18d6e, type: 2}
+  startingState: {fileID: 11400000, guid: b1d918f057b934441930358644f948c5, type: 2}
   nextAbility: {fileID: 0}
 --- !u!114 &114736692605747454
 MonoBehaviour:
@@ -2949,10 +2934,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 114489460927426014}
-  acceleration: 32
-  horizontalFactor: 0.3
-  maxSpeed: 64
-  movementDirection: {x: 0, y: 0, z: 0}
+  aiEntity: {fileID: 114489460927426014}
   angularSpeed: 45
   isFacingMovementDirection: 1
 --- !u!135 &135882763816781542
@@ -3087,11 +3069,11 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 2.5
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 2
-  m_BaseOffset: 0
+  m_BaseOffset: 0.4
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 3

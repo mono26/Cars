@@ -19,7 +19,7 @@ public class Targetter : AIEntityComponent
     protected SlotManager currentTarget;
     public SlotManager CurrentTarget { get { return currentTarget; } }
     [SerializeField]
-    protected int currentTargetSlot;
+    protected int currentTargetSlot = -1;
     public int CurrentTargetSlot { get { return currentTargetSlot; } }
     [SerializeField]
     protected List<SlotManager> nearTargets;
@@ -40,8 +40,6 @@ public class Targetter : AIEntityComponent
         if (sphere)
             sphere.radius = detectionRange;
 
-        updateRoutine = StartCoroutine(UpdateTarget());
-
         return;
     }
     public override void EveryFrame()
@@ -56,14 +54,15 @@ public class Targetter : AIEntityComponent
 
     protected SlotManager GetNearestTarget()
     {
-        if(nearTargets.Count == 0) { return null; }
+        if(nearTargets.Count.Equals(0)) { return null; }
 
         SlotManager nearestTarget = null;
         float distance1 = 0;
         for(int i = 0; i < nearTargets.Count; i++)
         {
+            SlotManager target = nearTargets[i];
             // TODO check if is dead
-            if (!nearTargets[i]|| !nearTargets[i].gameObject.activeInHierarchy)
+            if (!target || !target.gameObject.activeInHierarchy)
             {
                 nearTargets.RemoveAt(i);
                 continue;
@@ -72,7 +71,7 @@ public class Targetter : AIEntityComponent
             if(distance2 < distance1)
             {
                 distance1 = distance2;
-                nearestTarget = nearTargets[i];
+                nearestTarget = target;
             }
         }
         return nearestTarget;
@@ -96,8 +95,14 @@ public class Targetter : AIEntityComponent
                 SlotManager isSlot = IsAValidSlot(other.gameObject);
                 if (!isSlot || nearTargets.Contains(isSlot)) { return; }
 
+                if (nearTargets.Count.Equals(0)) { updateRoutine = StartCoroutine(UpdateTarget()); }
+                if (!currentTarget)
+                {
+                    currentTarget = isSlot;
+                    currentTargetSlot = currentTarget.Reserve(aiEntity.gameObject);
+                }
+
                 nearTargets.Add(isSlot);
-                if (currentTarget == null) { currentTarget = isSlot; }
             }
         }
 
@@ -110,12 +115,23 @@ public class Targetter : AIEntityComponent
         {
             if (other.CompareTag(tag))
             {
+                Debug.Log(other.gameObject + "exited range");
+
                 SlotManager isSlot = IsAValidSlot(other.gameObject);
-                if (isSlot || !nearTargets.Contains(isSlot)) { return; }
+                if (!isSlot || !nearTargets.Contains(isSlot)) { return; }
+
+                if (currentTarget.Equals(isSlot))
+                {
+                    currentTarget.Release(currentTargetSlot);
+                    SlotManager newTarget = GetNearestTarget();
+                    currentTarget = newTarget;
+                    if(newTarget)
+                        currentTargetSlot = newTarget.Reserve(aiEntity.gameObject);
+                }
 
                 nearTargets.Remove(isSlot);
-                if (currentTarget.Equals(isSlot)) { currentTarget = null; }
-                // Assign new target if possible.
+
+                if (nearTargets.Count.Equals(0)) { StopCoroutine(updateRoutine); }
             }
         }
 
@@ -124,13 +140,16 @@ public class Targetter : AIEntityComponent
 
     protected IEnumerator UpdateTarget()
     {
-        currentTarget = GetNearestTarget();
+        SlotManager nearestTarget = GetNearestTarget();
 
-        if(!currentTarget) { yield return new WaitForSeconds(1 / detectionRate); ; }
+        if(!nearestTarget) { yield return new WaitForSeconds(1 / detectionRate); ; }
 
         else
         {
-            currentTargetSlot = currentTarget.Reserve(gameObject);
+            if (!currentTarget.Equals(nearestTarget)) { currentTarget.Release(currentTargetSlot); }
+
+            currentTarget = nearestTarget;
+            currentTargetSlot = nearestTarget.Reserve(aiEntity.gameObject);
 
             yield return new WaitForSeconds(1 / detectionRate);
         }

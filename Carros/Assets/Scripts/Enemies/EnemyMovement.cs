@@ -1,10 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))]
-public class EnemyMovement : HorizontalAndVerticalMovement
+public class EnemyMovement : AIEntityComponent
 {
     public enum ForwardRotationMode { Instant, Partial}
 
@@ -15,63 +13,26 @@ public class EnemyMovement : HorizontalAndVerticalMovement
     protected bool isFacingMovementDirection = true;
     public bool IsFacingMovementDirection { set { isFacingMovementDirection = value; } }
 
-    [Header("Enemy Movement components")]
-    protected NavMeshAgent enemyNavigation;
-
-    /*public override void FixedFrame()
-    {
-        if(movementDirection.Equals(Vector3.zero) == true || isFacingMovementDirection == false) { return; }
-
-        FaceMovementDirection(ForwardRotationMode.Instant);
-
-        base.FixedFrame();
-
-        Debug.Log(entity.gameObject.name + " Velocity " + entity.Body.velocity);
-
-        return;
-    }*/
-
     /// <summary>
     /// Used to set the enemy destination
     /// </summary>
     /// <param name="_destination"> The destination for the navMeshAgent.</param>
     public void SetDestination(Vector3 _destination)
     {
-        if(enemyNavigation == null) { return; }
+        if(!aiEntity.Navigation) { return; }
 
-        enemyNavigation.SetDestination(_destination);
-
-        return;
-    }
-
-    /// <summary>
-    /// Used set the next movement direction.
-    /// </summary>
-    /// <param name="_direction"> The new normalized direction.</param>
-    public void SetMoveDirection(Vector3 _direction)
-    {
-        if(_direction.magnitude > 1)
-            _direction = _direction.normalized;
-
-        movementDirection = _direction;
+        if(aiEntity.Navigation.isOnNavMesh)
+            aiEntity.Navigation.SetDestination(_destination);
 
         return;
     }
 
-    protected void FaceMovementDirection(ForwardRotationMode _rotationMode)
+    public void SetMovementValues(float _acceleration, float _maxSpeed)
     {
-        switch(_rotationMode)
-        {
-            case ForwardRotationMode.Instant:
-                entity.Body.rotation = Quaternion.LookRotation(entity.Body.velocity.normalized);
-                break;
+        if (!aiEntity.Navigation) { return; }
 
-            case ForwardRotationMode.Partial:
-                float delta = Vector3.SignedAngle(entity.transform.forward, entity.Body.velocity.normalized, Vector3.up);
-                Quaternion direction = Quaternion.LookRotation(entity.Body.velocity.normalized);
-                //entity.Body.rotation = Quaternion.Lerp(entity.Body.rotation, direction, delta, angularSpeed);
-                break;
-        }
+        aiEntity.Navigation.speed = _maxSpeed;
+        aiEntity.Navigation.acceleration = _acceleration;
 
         return;
     }

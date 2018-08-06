@@ -17,12 +17,8 @@ public class RunTowardsTarget : AIAction
 
         if (!enemy.Targetter.CurrentTarget) { return; }
 
+        Debug.Log(enemy.Targetter.CurrentTarget.GetSlotPosition(enemy.Targetter.CurrentTargetSlot).ToString());
         enemy.Movement.SetDestination(enemy.Targetter.CurrentTarget.GetSlotPosition(enemy.Targetter.CurrentTargetSlot));
-
-        /*Vector3 directionToTarget = Vector3.zero;
-        directionToTarget = enemy.Target.position - enemy.transform.position;
-        enemy.Movement.SetMoveDirection(directionToTarget.normalized);
-        //enemy.Movement.IsFacingMovementDirection = true;*/
 
         return;
     }

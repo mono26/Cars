@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine))]
 public class Enemy : Entity
@@ -24,6 +25,9 @@ public class Enemy : Entity
     protected float stateUpdateRate = 2.0f; // Updates per second
 
     [Header("Enemy components")]
+    [SerializeField]
+    protected NavMeshAgent navigation;
+    public NavMeshAgent Navigation { get { return navigation; } }
     [SerializeField]
     protected EnemyMovement movement;
     public EnemyMovement Movement { get { return movement; } }
@@ -55,11 +59,13 @@ public class Enemy : Entity
     {
         base.Awake();
 
-        if (movement == null)
-            GetComponent<HorizontalAndVerticalMovement>();
-        if (stateMachine == null)
+        if (!navigation)
+            GetComponent<NavMeshAgent>();
+        if (!movement)
+            GetComponent<EnemyMovement>();
+        if (!stateMachine)
             GetComponent<AIStateMachine>();
-        if (targetter == null)
+        if (!targetter)
             GetComponent<Targetter>();
 
         abilities = GetComponents<Ability>();
