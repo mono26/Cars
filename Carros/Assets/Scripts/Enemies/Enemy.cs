@@ -1,23 +1,20 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.AI;
 
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine))]
-public class Enemy : Entity
+public class Enemy : Entity, EventHandler<EnemyMovementEvent>
 {
     [System.Serializable]
     public class EnemyStats
     {
         [SerializeField]
-        protected float acceleration; // m / s2
-        public float Acceleration { get { return acceleration; } }
+        protected EnemyMovement.MovementStats movementStats;
+        public EnemyMovement.MovementStats MovementStats { get { return movementStats; } }
         [SerializeField]
         protected float maxHealth;
         public float MaxHealth { get { return maxHealth; } }
-        [SerializeField]
-        protected float maxSpeed; // m / s
-        public float MaxSpeed { get { return maxSpeed; } }
     }
+
     [Header("Enemy settings")]
     [SerializeField]
     protected EnemyStats stats; // Set in the editor.
@@ -25,9 +22,6 @@ public class Enemy : Entity
     protected float stateUpdateRate = 2.0f; // Updates per second
 
     [Header("Enemy components")]
-    [SerializeField]
-    protected NavMeshAgent navigation;
-    public NavMeshAgent Navigation { get { return navigation; } }
     [SerializeField]
     protected EnemyMovement movement;
     public EnemyMovement Movement { get { return movement; } }
@@ -60,8 +54,6 @@ public class Enemy : Entity
     {
         base.Awake();
 
-        if (navigation == null)
-            GetComponent<NavMeshAgent>();
         if (movement == null)
             GetComponent<EnemyMovement>();
         if (stateMachine == null)
@@ -70,15 +62,6 @@ public class Enemy : Entity
             GetComponent<Targetter>();
 
         abilities = GetComponents<Ability>();
-
-        return;
-    }
-
-    protected virtual void Start()
-    {
-        movement.SetMovementValues(stats.Acceleration, stats.MaxSpeed);
-        stateMachine.ChangeState(startingState);
-        updateStateRoutine = StartCoroutine(UpdateState());
 
         return;
     }
@@ -93,6 +76,58 @@ public class Enemy : Entity
     protected override void LateUpdate()
     {
         base.LateUpdate();
+
+        return;
+    }
+
+    protected void OnDisable()
+    {
+        EventManager.RemoveListener<EnemyMovementEvent>(this);
+
+        return;
+    }
+
+    protected void OnEnable()
+    {
+        EventManager.AddListener<EnemyMovementEvent>(this);
+
+        return;
+    }
+
+    public void OnEvent(EnemyMovementEvent _movementEvent)
+    {
+        if (!_movementEvent.enemy.Equals(this)) { return; }
+
+        switch (_movementEvent.movementType)
+        {
+            case EnemyMovement.MovementMode.Running:
+                movement.SetMovementOptions(
+                    stats.MovementStats.RunningAcceleration, 
+                    stats.MovementStats.RunningSpeed, 
+                    EnemyMovement.MovementMode.Running
+                    );
+                break;
+
+            case EnemyMovement.MovementMode.Walking:
+                movement.SetMovementOptions(
+                    stats.MovementStats.WalkingAcceleration, 
+                    stats.MovementStats.WalkingSpeed, 
+                    EnemyMovement.MovementMode.Walking
+                    );
+                break;
+        }
+    }
+
+    protected virtual void Start()
+    {
+        movement.SetMovementOptions(
+            stats.MovementStats.RunningSpeed,
+            stats.MovementStats.RunningAcceleration,
+            EnemyMovement.MovementMode.Running
+            );
+
+        stateMachine.ChangeState(startingState);
+        updateStateRoutine = StartCoroutine(UpdateState());
 
         return;
     }

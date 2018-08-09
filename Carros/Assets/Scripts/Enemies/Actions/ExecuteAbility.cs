@@ -15,8 +15,11 @@ public class ExecuteAbility : AIAction
         Enemy enemy = _entity as Enemy;
         if (enemy == null) { return; }
 
-        enemy.NextAbility.Cast();
-        enemy.SetNextAbility(null);
+        if(enemy.NextAbility)
+        {
+            enemy.NextAbility.Cast();
+            enemy.SetNextAbility(null);
+        }
 
         return;
     }

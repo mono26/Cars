@@ -73,22 +73,6 @@ public class SlotManager : EntityComponent
         return;
     }
 
-    protected bool IsThereAFreeAtackingSlot()
-    {
-        bool isfree = false;
-
-        for (int index = 0; index < attackingSlots.Length; ++index)
-        {
-            if (attackingSlots[index] == null)
-            {
-                isfree = true;
-                break;
-            }
-        }
-
-        return isfree;
-    }
-
     public Vector3 GetSlotPosition(Slot _slot)
     {
         Vector3 position = transform.position;
@@ -123,6 +107,24 @@ public class SlotManager : EntityComponent
         return posistion + (Quaternion.Euler(new Vector3(0f, degreesPerIndex * index, 0f)) * offset);
     }
 
+    protected bool IsThereAFreeAtackingSlot()
+    {
+        bool isfree = false;
+
+        if(attackingSlots.Length == 0) { return isfree; }
+
+        for (int index = 0; index < attackingSlots.Length; ++index)
+        {
+            if (attackingSlots[index] == null)
+            {
+                isfree = true;
+                break;
+            }
+        }
+
+        return isfree;
+    }
+
     public Slot Reserve(GameObject attacker)
     {
         Vector3 bestPosition = transform.position;
@@ -149,7 +151,7 @@ public class SlotManager : EntityComponent
                 attackingSlots[bestSlot.index] = attacker;
         }
 
-        else if(!IsThereAFreeAtackingSlot())
+        else
         {
             for (int index = 0; index < waitingSlots.Length; ++index)
             {

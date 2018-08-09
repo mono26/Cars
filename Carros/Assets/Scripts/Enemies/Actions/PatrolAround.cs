@@ -14,6 +14,17 @@ public class PatrolAround : AIAction
 
     protected void Patrol(Entity _entity)
     {
+        Enemy enemy = _entity as Enemy;
+        if(enemy == null) { return; }
+
+        if(enemy.Targetter == null) { return; }
+
+        if (enemy.Movement.CurrentMode != EnemyMovement.MovementMode.Walking)
+            EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Walking));
+
+        if (!enemy.Movement.Navigation.hasPath)
+            enemy.Movement.MoveTo(enemy.Targetter.CalculateRandomPointInsideTrigger());
+
         return;
     }
 }

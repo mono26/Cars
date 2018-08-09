@@ -33,13 +33,15 @@ public class Ability : AIEntityComponent
         return;
     }
 
-    public bool IsInRange()
+    public bool IsInRange(Transform _target)
     {
         bool isInRange = false;
 
-        if(aiEntity.Targetter == null || aiEntity.Targetter.CurrentTarget == null) { return isInRange; }
-
-        if (Vector3.Distance(entity.transform.position, aiEntity.Targetter.CurrentTarget.GetSlotPosition(aiEntity.Targetter.CurrentSlot)) <= range)
+        float distance = Vector3.Distance(
+            aiEntity.transform.position, 
+            _target.position
+            );
+        if (distance <= range)
             isInRange = true;
 
         return isInRange; 

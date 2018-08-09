@@ -42,6 +42,7 @@ public class Targetter : AIEntityComponent
 
         return;
     }
+
     public override void EveryFrame()
     {
         base.EveryFrame();
@@ -50,6 +51,16 @@ public class Targetter : AIEntityComponent
         currentTarget = GetNearestTarget();
 
         return;
+    }
+
+    public Vector3 CalculateRandomPointInsideTrigger()
+    {
+        float randomRadius = Random.Range(0, (int)detectionRange);
+        float randomAngle = Random.Range(0, 360);
+        float x = randomRadius * Mathf.Cos(randomAngle);
+        float z = randomRadius * Mathf.Sin(randomAngle);
+
+        return new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
     }
 
     protected SlotManager GetNearestTarget()
@@ -123,9 +134,10 @@ public class Targetter : AIEntityComponent
                 if (currentTarget.Equals(isSlot))
                 {
                     currentTarget.Release(currentSlot);
+                    currentSlot = null;
                     SlotManager newTarget = GetNearestTarget();
                     currentTarget = newTarget;
-                    if(newTarget)
+                    if(newTarget != null)
                         currentSlot = newTarget.Reserve(aiEntity.gameObject);
                 }
 

@@ -19,9 +19,14 @@ public class Ram : Ability
     {
         Debug.Log(entity.gameObject.name + "Casting Ram");
 
-        entity.Body.velocity = Vector3.zero;
-        entity.Body.AddForce(transform.up * ramForce * 0.9f, ForceMode.Impulse);
-        entity.Body.AddForce(transform.right * ramForce, ForceMode.Impulse);
+        if(aiEntity.Targetter.CurrentTarget == null) { return; }
+
+        aiEntity.Body.velocity = Vector3.zero;
+        //aiEntity.Navigation.isStopped = true;
+
+        entity.Body.AddForce(transform.up * ramForce , ForceMode.Impulse);
+        Vector3 directionToTarget = aiEntity.Targetter.CurrentTarget.transform.position - aiEntity.transform.position;
+        entity.Body.AddForce(directionToTarget.normalized * ramForce, ForceMode.Impulse);
 
         return;
     }

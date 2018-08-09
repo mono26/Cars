@@ -15,10 +15,12 @@ public class RunTowardsTarget : AIAction
         Enemy enemy = _entity as Enemy;
         if (enemy == null) { return; }
 
-        if (!enemy.Targetter.CurrentTarget) { return; }
+        if (enemy.Targetter == null || enemy.Targetter.CurrentTarget == null || enemy.Targetter.CurrentSlot == null) { return; }
 
-        Debug.Log(enemy.Targetter.CurrentTarget.GetSlotPosition(enemy.Targetter.CurrentSlot).ToString());
-        enemy.Movement.SetDestination(enemy.Targetter.CurrentTarget.GetSlotPosition(enemy.Targetter.CurrentSlot));
+        if (enemy.Movement.CurrentMode != EnemyMovement.MovementMode.Running)
+            EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Running));
+
+        enemy.Movement.MoveTo(enemy.Targetter.CurrentTarget.GetSlotPosition(enemy.Targetter.CurrentSlot));
 
         return;
     }
