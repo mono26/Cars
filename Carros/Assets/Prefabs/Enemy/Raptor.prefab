@@ -2918,10 +2918,10 @@ MonoBehaviour:
   startingState: {fileID: 11400000, guid: b1d918f057b934441930358644f948c5, type: 2}
   stats:
     movementStats:
-      runningAcceleration: 4
-      runningSpeed: 16
-      walkingAcceleration: 1
-      walkingSpeed: 4
+      runningAcceleration: 2
+      runningSpeed: 8
+      walkingAcceleration: 0.5
+      walkingSpeed: 2
     maxHealth: 10
   stateUpdateRate: 4
   movement: {fileID: 114736692605747454}
