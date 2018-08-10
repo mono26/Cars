@@ -2,6 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum TargetterEventType { TargetLost, TargetAcquired }
+
+public class TargetterEvent : CarEvent
+{
+    public Enemy enemy;
+    public TargetterEventType eventType;
+
+    public TargetterEvent(Enemy _enemy, TargetterEventType _eventType)
+    {
+        enemy = _enemy;
+        eventType = _eventType;
+    }
+}
+
 public class Targetter : AIEntityComponent
 {
     [Header("Targetter settings")]
@@ -26,21 +40,14 @@ public class Targetter : AIEntityComponent
     [SerializeField]
     protected Coroutine updateRoutine;
 
-    protected void OnDrawGizmosSelected()
+    public Vector3 CalculateRandomPointInsideTrigger()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
+        float randomRadius = Random.Range(0, (int)detectionRange);
+        float randomAngle = Random.Range(0, 360);
+        float x = randomRadius * Mathf.Cos(randomAngle);
+        float z = randomRadius * Mathf.Sin(randomAngle);
 
-        return;
-    }
-
-    protected virtual void Start()
-    {
-        SphereCollider sphere = targetterTrigger as SphereCollider;
-        if (sphere)
-            sphere.radius = detectionRange;
-
-        return;
+        return new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
     }
 
     public override void EveryFrame()
@@ -51,16 +58,6 @@ public class Targetter : AIEntityComponent
         currentTarget = GetNearestTarget();
 
         return;
-    }
-
-    public Vector3 CalculateRandomPointInsideTrigger()
-    {
-        float randomRadius = Random.Range(0, (int)detectionRange);
-        float randomAngle = Random.Range(0, 360);
-        float x = randomRadius * Mathf.Cos(randomAngle);
-        float z = randomRadius * Mathf.Sin(randomAngle);
-
-        return new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
     }
 
     protected SlotManager GetNearestTarget()
@@ -95,6 +92,14 @@ public class Targetter : AIEntityComponent
         else { return isSlot; }
     }
 
+    protected void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        return;
+    }
+
     protected void OnTriggerEnter(Collider other)
     {
         foreach (string tag in targetableTags)
@@ -126,10 +131,10 @@ public class Targetter : AIEntityComponent
         {
             if (other.CompareTag(tag))
             {
-                Debug.Log(other.gameObject + "exited range");
-
                 SlotManager isSlot = IsAValidSlot(other.gameObject);
                 if (!isSlot || !nearTargets.Contains(isSlot)) { return; }
+
+                nearTargets.Remove(isSlot);
 
                 if (currentTarget.Equals(isSlot))
                 {
@@ -141,11 +146,22 @@ public class Targetter : AIEntityComponent
                         currentSlot = newTarget.Reserve(aiEntity.gameObject);
                 }
 
-                nearTargets.Remove(isSlot);
-
-                if (nearTargets.Count.Equals(0)) { StopCoroutine(updateRoutine); }
+                if (currentSlot == null && currentTarget == null && nearTargets.Count.Equals(0))
+                {
+                    EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(aiEntity, TargetterEventType.TargetLost));
+                    StopCoroutine(updateRoutine);
+                }
             }
         }
+
+        return;
+    }
+
+    protected virtual void Start()
+    {
+        SphereCollider sphere = targetterTrigger as SphereCollider;
+        if (sphere)
+            sphere.radius = detectionRange;
 
         return;
     }

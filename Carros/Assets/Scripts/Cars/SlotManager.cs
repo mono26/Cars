@@ -85,6 +85,9 @@ public class SlotManager : EntityComponent
             case Slot.Type.Waiting:
                 position = GetWaitingSlotPosition(_slot.index);
                 break;
+
+            default:
+                break;
         }
         return position;
     }
@@ -182,6 +185,9 @@ public class SlotManager : EntityComponent
 
             case Slot.Type.Waiting:
                 waitingSlots[_slot.index] = null; ;
+                break;
+
+            default:
                 break;
         }
 

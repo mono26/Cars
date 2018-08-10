@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine))]
-public class Enemy : Entity, EventHandler<EnemyMovementEvent>
+public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<TargetterEvent>
 {
     [System.Serializable]
     public class EnemyStats
@@ -16,6 +16,10 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>
     }
 
     [Header("Enemy settings")]
+    [SerializeField]
+    protected AIState returnState;
+    [SerializeField]
+    protected AIState startingState;
     [SerializeField]
     protected EnemyStats stats; // Set in the editor.
     [SerializeField]
@@ -37,12 +41,13 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>
     protected Ability[] abilities;
     public Ability[] Abilities { get { return abilities; } }
     [SerializeField]
-    protected AIState startingState;
-    [SerializeField]
-    protected Coroutine updateStateRoutine;
+    protected Vector3 initialPosition;
+    public Vector3 InitialPosition { get { return initialPosition; } }
     [SerializeField]
     protected Ability nextAbility;
     public Ability NextAbility { get { return nextAbility; } }
+    [SerializeField]
+    protected Coroutine updateStateRoutine;
 
     /// <summary>
     /// The next ability to cast.
@@ -83,6 +88,7 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>
     protected void OnDisable()
     {
         EventManager.RemoveListener<EnemyMovementEvent>(this);
+        EventManager.RemoveListener<TargetterEvent>(this);
 
         return;
     }
@@ -90,6 +96,7 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>
     protected void OnEnable()
     {
         EventManager.AddListener<EnemyMovementEvent>(this);
+        EventManager.AddListener<TargetterEvent>(this);
 
         return;
     }
@@ -115,11 +122,31 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>
                     EnemyMovement.MovementMode.Walking
                     );
                 break;
+
+            default:
+                break;
+        }
+    }
+
+    public void OnEvent(TargetterEvent _targetterEvent)
+    {
+        if (!_targetterEvent.enemy.Equals(this)) { return; }
+
+        switch (_targetterEvent.eventType)
+        {
+            case TargetterEventType.TargetLost:
+                stateMachine.ChangeState(returnState);
+                break;
+
+            default:
+                break;
         }
     }
 
     protected virtual void Start()
     {
+        initialPosition = transform.position;
+
         movement.SetMovementOptions(
             stats.MovementStats.RunningSpeed,
             stats.MovementStats.RunningAcceleration,

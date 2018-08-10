@@ -2914,6 +2914,8 @@ MonoBehaviour:
   input: {fileID: 0}
   model: {fileID: 137496178252355792}
   components: []
+  returnState: {fileID: 11400000, guid: 291a9bd454433af428542ed14c5d4aed, type: 2}
+  startingState: {fileID: 11400000, guid: b1d918f057b934441930358644f948c5, type: 2}
   stats:
     movementStats:
       runningAcceleration: 4
@@ -2926,7 +2928,7 @@ MonoBehaviour:
   stateMachine: {fileID: 114019163273655812}
   targetter: {fileID: 114130686985338072}
   abilities: []
-  startingState: {fileID: 11400000, guid: b1d918f057b934441930358644f948c5, type: 2}
+  initialPosition: {x: 0, y: 0, z: 0}
   nextAbility: {fileID: 0}
 --- !u!114 &114736692605747454
 MonoBehaviour:

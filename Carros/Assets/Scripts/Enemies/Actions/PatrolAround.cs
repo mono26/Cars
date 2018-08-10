@@ -17,7 +17,8 @@ public class PatrolAround : AIAction
         Enemy enemy = _entity as Enemy;
         if(enemy == null) { return; }
 
-        if(enemy.Targetter == null) { return; }
+        if (enemy.Targetter == null) { return; }
+        if (enemy.Movement == null || enemy.Movement.Navigation == null) { return; }
 
         if (enemy.Movement.CurrentMode != EnemyMovement.MovementMode.Walking)
             EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Walking));
