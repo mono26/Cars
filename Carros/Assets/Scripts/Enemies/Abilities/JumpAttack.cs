@@ -24,13 +24,14 @@ public class JumpAttack : Ability
         Targetter targetter = aiEntity.Targetter;
         if(targetter == null || targetter.CurrentTarget == null) { return; }
 
-        //aiEntity.Body.velocity = Vector3.zero;
-        //aiEntity.Movement.Navigation.isStopped = true;
+        aiEntity.Body.velocity = Vector3.zero;
+        aiEntity.Movement.ActivateNavigation(false);
 
         Vector3 initialPosition = aiEntity.transform.position;
+        Debug.Log("initialPosition" + initialPosition.ToString());
         Vector3 targetPosition = targetter.CurrentTarget.transform.position;
+        Debug.Log("targetPosition" + targetPosition.ToString());
         Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpHeight);
-        Debug.Log("Jump velocity" + jumpVelocity.ToString());
 
         entity.Body.velocity = jumpVelocity;
 

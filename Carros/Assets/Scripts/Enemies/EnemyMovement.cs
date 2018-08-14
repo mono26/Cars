@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿    using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyMovementEvent : CarEvent
@@ -89,6 +89,24 @@ public class EnemyMovement : AIEntityComponent
         currentMode = _mode;
         navigation.acceleration = _acceleration;
         navigation.speed = _speed;
+
+        return;
+    }
+
+    public void ActivateNavigation(bool _state)
+    {
+        if (_state)
+            navigation.enabled = true;
+        else if (!_state)
+            navigation.enabled = false;
+
+        return;
+    }
+
+    protected void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.CompareTag("Terrain"))
+            ActivateNavigation(true);
 
         return;
     }

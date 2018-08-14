@@ -25,12 +25,12 @@ public static class CustomPhysics
     /// <param name="_angle"> Angle to launche the parabolic movement.</param>
     /// <param name="_distance"> Max reach of the parabolic movement.</param>
     /// <returns></returns>
-    public static float CalculateSpeedToPerformParabolicMovement(float _angle, float _distance, float _relativeY)
+    public static float CalculateSpeedToPerformParabolicMovement(float _angle, float _distance)
     {
         // Equation d = (Vo2/g)sin(2angle)
         float twoTheta = (2 * _angle) * Mathf.Deg2Rad;
         float speedSquare = (_distance * Mathf.Abs(Physics.gravity.y) / Mathf.Sin(twoTheta));
-        float speed = Mathf.Sqrt(speedSquare); 
+        float speed = Mathf.Sqrt(speedSquare);
 
         if (_distance > 0)
         {
@@ -46,10 +46,12 @@ public static class CustomPhysics
         target.y = _initialPosition.y;
         Vector3 directionToTarget = target - _initialPosition;
         float targetDistance = directionToTarget.magnitude;
-        float relativeY = _initialPosition.y - _targetPosition.y;
+        Debug.Log("Distance: " + targetDistance.ToString());
 
         float angle = CalculateLaunchAngleForParabolicMovement(_height, targetDistance);
-        float speed = CalculateSpeedToPerformParabolicMovement(angle, targetDistance, relativeY);
+        Debug.Log("Angle: " + angle.ToString());
+        float speed = CalculateSpeedToPerformParabolicMovement(angle, targetDistance);
+        Debug.Log("Speed: " + speed.ToString());
 
         Vector3 launchVector = Vector3.forward;
 
@@ -62,8 +64,7 @@ public static class CustomPhysics
 
         Vector3 rotAxis = Vector3.Cross(launchVector, Vector3.up);
         Quaternion rotation = Quaternion.AngleAxis(angle, rotAxis);
-        launchVector = rotation * launchVector.normalized;
-        Debug.DrawRay(_initialPosition, launchVector, Color.red);
+        launchVector = rotation * launchVector.normalized;  
 
         return launchVector * speed;
     }
