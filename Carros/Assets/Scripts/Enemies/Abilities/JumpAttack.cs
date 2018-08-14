@@ -6,9 +6,7 @@ public class JumpAttack : Ability
 {
     [Header("Ram settings")]
     [SerializeField]
-    protected float flightTime = 1.0f;
-    [SerializeField]
-    protected float jumpAngle = 45f;
+    protected float jumpHeight = 5.0f;
 
     public override void Cast()
     {
@@ -26,16 +24,16 @@ public class JumpAttack : Ability
         Targetter targetter = aiEntity.Targetter;
         if(targetter == null || targetter.CurrentTarget == null) { return; }
 
-        Debug.Log(aiEntity.gameObject.name + " current body velocity " + aiEntity.Body.velocity);
-        aiEntity.Body.velocity = Vector3.zero;
-        //aiEntity.Navigation.isStopped = true;
+        //aiEntity.Body.velocity = Vector3.zero;
+        //aiEntity.Movement.Navigation.isStopped = true;
 
         Vector3 initialPosition = aiEntity.transform.position;
         Vector3 targetPosition = targetter.CurrentTarget.transform.position;
-        Vector3 jumpVelocity = CustomPhysics.CalculateJumpVelocityFromTimeAndAngle(initialPosition, targetPosition, jumpAngle, flightTime);
+        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpHeight);
+        Debug.Log("Jump velocity" + jumpVelocity.ToString());
 
         entity.Body.velocity = jumpVelocity;
 
-        return;
+        return; 
     }
 }
