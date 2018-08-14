@@ -20,6 +20,7 @@ public class SlotManager : EntityComponent
     [Header("Slot Manager settings")]
     [SerializeField]
     protected float attackingDistaceToEntity = 1.5f;
+    public float AttackingDistaceToEntity { get { return attackingDistaceToEntity; } }
     [SerializeField]
     protected float waitingDistaceToEntity = 5.0f;
     [SerializeField]

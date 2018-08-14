@@ -16,13 +16,14 @@ public class CanCastAbility : AIDecision
         Enemy enemy = _entity as Enemy;
         if(enemy == null) { return false; }
 
-        if(enemy.Targetter == null || enemy.Targetter.CurrentTarget == null || enemy.Targetter.CurrentSlot == null) { return false; }
+        Targetter targetter = enemy.Targetter;
+        if(targetter == null || targetter.CurrentTarget == null || targetter.CurrentSlot == null) { return false; }
 
-        if(!enemy.Targetter.CurrentSlot.type.Equals(SlotManager.Slot.Type.Waiting))
+        if(!targetter.CurrentSlot.type.Equals(SlotManager.Slot.Type.Waiting))
         {
             foreach (Ability ability in enemy.Abilities)
             {
-                if (ability.IsInRange(enemy.Targetter.CurrentTarget.transform) == true && ability.IsInCooldown() == false)
+                if (ability.IsInRange(targetter.CurrentTarget.transform) && !ability.IsInCooldown())
                 {
                     Debug.Log(enemy.gameObject.name + " Can cast" + ability.ToString());
                     enemy.SetNextAbility(ability);

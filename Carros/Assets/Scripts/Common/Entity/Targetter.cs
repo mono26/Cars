@@ -106,8 +106,6 @@ public class Targetter : AIEntityComponent
         {
             if (other.CompareTag(tag))
             {
-                Debug.Log(other.gameObject + "entered range");
-
                 SlotManager isSlot = IsAValidSlot(other.gameObject);
                 if (!isSlot || nearTargets.Contains(isSlot)) { return; }
 
