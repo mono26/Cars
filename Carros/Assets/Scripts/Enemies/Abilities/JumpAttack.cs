@@ -7,6 +7,7 @@ public class JumpAttack : Ability
     [Header("Ram settings")]
     [SerializeField]
     protected float jumpHeight = 5.0f;
+    protected float jumpSpeed = 10.0f;
 
     public override void Cast()
     {

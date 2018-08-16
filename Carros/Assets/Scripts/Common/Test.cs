@@ -16,7 +16,7 @@ public class Test : MonoBehaviour
     {
         Vector3 initialPosition = body.position;
         Vector3 targetPosition = target.position;
-        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, height);
+        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, speed);
         Debug.Log("Jump velocity" + jumpVelocity.ToString());
 
         body.velocity = jumpVelocity;
