@@ -7,6 +7,7 @@ public class JumpAttack : Ability
     [Header("Ram settings")]
     [SerializeField]
     protected float jumpHeight = 5.0f;
+    [SerializeField]
     protected float jumpSpeed = 10.0f;
 
     public override void Cast()
@@ -32,7 +33,7 @@ public class JumpAttack : Ability
         Debug.Log("initialPosition" + initialPosition.ToString());
         Vector3 targetPosition = targetter.CurrentTarget.transform.position;
         Debug.Log("targetPosition" + targetPosition.ToString());
-        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpHeight);
+        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
 
         entity.Body.velocity = jumpVelocity;
 

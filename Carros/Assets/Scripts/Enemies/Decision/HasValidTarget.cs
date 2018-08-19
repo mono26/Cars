@@ -18,8 +18,12 @@ public class HasValidTarget : AIDecision
         Enemy enemy = _entity as Enemy;
         if (enemy == null) { return false; }
 
-        if(enemy.Targetter.CurrentTarget == null) { return false; }
+        SlotTargetter slotTargetter = enemy.Targetter as SlotTargetter;
+        if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null && slotTargetter.CurrentSlot != null) { return true; }
 
-        else { return true; }
+        Targetter targetter = enemy.Targetter;
+        if (targetter != null && targetter.CurrentTarget != null) { return true; }
+
+        return false;
     }
 }

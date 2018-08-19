@@ -21,7 +21,7 @@ public class ReturnToInitialPosition : AIAction
             EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Running));
 
         if (!enemy.Movement.Navigation.destination.Equals(enemy.InitialPosition))
-            enemy.Movement.MoveTo(enemy.InitialPosition);
+            enemy.Movement.NavigateTo(enemy.InitialPosition);
 
         return;
     }

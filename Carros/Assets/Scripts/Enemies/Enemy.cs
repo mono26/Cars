@@ -108,7 +108,7 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<Targ
         switch (_movementEvent.movementType)
         {
             case EnemyMovement.MovementMode.Running:
-                movement.SetMovementOptions(
+                movement.SetNavigationValues(
                     stats.MovementStats.RunningAcceleration, 
                     stats.MovementStats.RunningSpeed, 
                     EnemyMovement.MovementMode.Running
@@ -116,7 +116,7 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<Targ
                 break;
 
             case EnemyMovement.MovementMode.Walking:
-                movement.SetMovementOptions(
+                movement.SetNavigationValues(
                     stats.MovementStats.WalkingAcceleration, 
                     stats.MovementStats.WalkingSpeed, 
                     EnemyMovement.MovementMode.Walking
@@ -147,7 +147,7 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<Targ
     {
         initialPosition = transform.position;
 
-        movement.SetMovementOptions(
+        movement.SetNavigationValues(
             stats.MovementStats.RunningSpeed,
             stats.MovementStats.RunningAcceleration,
             EnemyMovement.MovementMode.Running

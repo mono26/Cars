@@ -16,20 +16,37 @@ public class CanCastAbility : AIDecision
         Enemy enemy = _entity as Enemy;
         if(enemy == null) { return false; }
 
-        Targetter targetter = enemy.Targetter;
-        if(targetter == null || targetter.CurrentTarget == null || targetter.CurrentSlot == null) { return false; }
+        SlotTargetter slotTargetter = enemy.Targetter as SlotTargetter;
+        if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null && slotTargetter.CurrentSlot != null)
+        {
+            if (!slotTargetter.CurrentSlot.type.Equals(SlotManager.Slot.Type.Waiting))
+            {
+                foreach (Ability ability in enemy.Abilities)
+                {
+                    if (ability.IsInRange(slotTargetter.CurrentTarget) && !ability.IsInCooldown())
+                    {
+                        Debug.Log(enemy.gameObject.name + " Can cast" + ability.ToString());
+                        enemy.SetNextAbility(ability);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
-        if(!targetter.CurrentSlot.type.Equals(SlotManager.Slot.Type.Waiting))
+        Targetter targetter = enemy.Targetter;
+        if(targetter != null && targetter.CurrentTarget != null)
         {
             foreach (Ability ability in enemy.Abilities)
             {
-                if (ability.IsInRange(targetter.CurrentTarget.transform) && !ability.IsInCooldown())
+                if (ability.IsInRange(slotTargetter.CurrentTarget) && !ability.IsInCooldown())
                 {
                     Debug.Log(enemy.gameObject.name + " Can cast" + ability.ToString());
                     enemy.SetNextAbility(ability);
                     return true;
                 }
             }
+            return false;
         }
 
         return false;

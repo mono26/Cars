@@ -1,4 +1,4 @@
-﻿    using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyMovementEvent : CarEvent
@@ -42,13 +42,6 @@ public class EnemyMovement : AIEntityComponent
         }
     }
 
-    [Header("Enemy Movement settings")]
-    [SerializeField]
-    protected float angularSpeed = 45.0f;   // Radians per second
-    [SerializeField]
-    protected bool isFacingMovementDirection = true;
-    public bool IsFacingMovementDirection { set { isFacingMovementDirection = value; } }
-
     [Header("Enemy Movement Components")]
     [SerializeField]
     protected NavMeshAgent navigation;
@@ -58,40 +51,6 @@ public class EnemyMovement : AIEntityComponent
     [SerializeField]
     protected MovementMode currentMode;
     public MovementMode CurrentMode { get { return currentMode; } }
-
-    protected override void Awake()
-    {
-        base.Awake();
-
-        if (navigation == null)
-            GetComponent<NavMeshAgent>();
-
-        return;
-    }
-    /// <summary>
-    /// Used to set the enemy destination
-    /// </summary>
-    /// <param name="_destination"> The destination for the navMeshAgent.</param>
-    public void MoveTo(Vector3 _destination)
-    {
-        if(navigation == null) { return; }
-
-        if(navigation.isOnNavMesh)
-            navigation.SetDestination(_destination);
-
-        return;
-    }
-
-    public void SetMovementOptions(float _acceleration, float _speed, MovementMode _mode)
-    {
-        if (navigation == null) { return; }
-
-        currentMode = _mode;
-        navigation.acceleration = _acceleration;
-        navigation.speed = _speed;
-
-        return;
-    }
 
     public void ActivateNavigation(bool _state)
     {
@@ -103,10 +62,45 @@ public class EnemyMovement : AIEntityComponent
         return;
     }
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        if (navigation == null)
+            GetComponent<NavMeshAgent>();
+
+        return;
+    }
+
+    /// <summary>
+    /// Used to set the enemy destination
+    /// </summary>
+    /// <param name="_destination"> The destination for the navMeshAgent.</param>
+    public void NavigateTo(Vector3 _destination)
+    {
+        if (navigation == null) { return; }
+
+        if (navigation.isOnNavMesh)
+            navigation.SetDestination(_destination);
+
+        return;
+    }
+
     protected void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Terrain"))
             ActivateNavigation(true);
+
+        return;
+    }
+
+    public void SetNavigationValues(float _acceleration, float _speed, MovementMode _mode)
+    {
+        if (navigation == null) { return; }
+
+        currentMode = _mode;
+        navigation.acceleration = _acceleration;
+        navigation.speed = _speed;
 
         return;
     }

@@ -30,15 +30,12 @@ public class Targetter : AIEntityComponent
 
     [Header("Editor debugging")]
     [SerializeField]
-    protected SlotManager currentTarget;
-    public SlotManager CurrentTarget { get { return currentTarget; } }
+    protected Transform currentTarget;
+    public Transform CurrentTarget { get { return currentTarget; } }
     [SerializeField]
-    protected SlotManager.Slot currentSlot = null;
-    public SlotManager.Slot CurrentSlot { get { return currentSlot; } }
+    protected List<Transform> nearTargets;
     [SerializeField]
-    protected List<SlotManager> nearTargets;
-    [SerializeField]
-    protected Coroutine updateRoutine;
+    protected Coroutine updateTargetRoutine;
 
     public Vector3 CalculateRandomPointInsideTrigger()
     {
@@ -60,15 +57,15 @@ public class Targetter : AIEntityComponent
         return;
     }
 
-    protected SlotManager GetNearestTarget()
+    protected Transform GetNearestTarget()
     {
         if(nearTargets.Count.Equals(0)) { return null; }
 
-        SlotManager nearestTarget = null;
+        Transform nearestTarget = null;
         float distance1 = 0;
         for(int i = 0; i < nearTargets.Count; i++)
         {
-            SlotManager target = nearTargets[i];
+            Transform target = nearTargets[i];
             // TODO check if is dead
             if (!target || !target.gameObject.activeInHierarchy)
             {
@@ -85,13 +82,6 @@ public class Targetter : AIEntityComponent
         return nearestTarget;
     }
 
-    protected SlotManager IsAValidSlot(GameObject _object)
-    {
-        SlotManager isSlot = _object.GetComponent<SlotManager>();
-        if (!isSlot) { return null; }
-        else { return isSlot; }
-    }
-
     protected void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
@@ -100,58 +90,49 @@ public class Targetter : AIEntityComponent
         return;
     }
 
-    protected void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         foreach (string tag in targetableTags)
         {
             if (other.CompareTag(tag))
             {
-                SlotManager isSlot = IsAValidSlot(other.gameObject);
-                if (!isSlot || nearTargets.Contains(isSlot)) { return; }
+                Transform posibleTarget = other.transform;
+                if (posibleTarget == null || nearTargets.Contains(posibleTarget)) { return; }
 
-                if (nearTargets.Count.Equals(0)) { updateRoutine = StartCoroutine(UpdateTarget()); }
-                if (!currentTarget)
-                {
-                    currentTarget = isSlot;
-                    currentSlot = currentTarget.Reserve(aiEntity.gameObject);
-                }
+                if (nearTargets.Count.Equals(0)) { updateTargetRoutine = StartCoroutine(UpdateTarget()); }
+                if (currentTarget == null) { currentTarget = posibleTarget; }
 
-                nearTargets.Add(isSlot);
+                nearTargets.Add(posibleTarget);
             }
         }
 
         return;
     }
 
-    protected void OnTriggerExit(Collider other)
+    protected virtual void OnTriggerExit(Collider other)
     {
         foreach (string tag in targetableTags)
         {
             if (other.CompareTag(tag))
             {
-                SlotManager isSlot = IsAValidSlot(other.gameObject);
-                if (!isSlot || !nearTargets.Contains(isSlot)) { return; }
+                Transform releasedTarget = other.transform;
+                if (releasedTarget  == null || !nearTargets.Contains(releasedTarget)) { return; }
 
-                nearTargets.Remove(isSlot);
+                nearTargets.Remove(releasedTarget);
 
-                if (currentTarget.Equals(isSlot))
+                if (currentTarget.Equals(releasedTarget))
                 {
-                    currentTarget.Release(currentSlot);
-                    currentSlot = null;
-                    SlotManager newTarget = GetNearestTarget();
+                    Transform newTarget = GetNearestTarget();
                     currentTarget = newTarget;
-                    if(newTarget != null)
-                        currentSlot = newTarget.Reserve(aiEntity.gameObject);
                 }
 
-                if (currentSlot == null && currentTarget == null && nearTargets.Count.Equals(0))
+                if (currentTarget == null && nearTargets.Count.Equals(0))
                 {
                     EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(aiEntity, TargetterEventType.TargetLost));
-                    StopCoroutine(updateRoutine);
+                    StopCoroutine(updateTargetRoutine);
                 }
             }
         }
-
         return;
     }
 
@@ -166,20 +147,17 @@ public class Targetter : AIEntityComponent
 
     protected IEnumerator UpdateTarget()
     {
-        SlotManager nearestTarget = GetNearestTarget();
+        Transform nearestTarget = GetNearestTarget();
 
         if(!nearestTarget) { yield return new WaitForSeconds(1 / detectionRate); ; }
 
         else
         {
-            if (!currentTarget.Equals(nearestTarget)) { currentTarget.Release(currentSlot); }
-
             currentTarget = nearestTarget;
-            currentSlot = nearestTarget.Reserve(aiEntity.gameObject);
 
             yield return new WaitForSeconds(1 / detectionRate);
         }
 
-        updateRoutine = StartCoroutine(UpdateTarget());
+        updateTargetRoutine = StartCoroutine(UpdateTarget());
     }
 }
