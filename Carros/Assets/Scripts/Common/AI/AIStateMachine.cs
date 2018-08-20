@@ -20,7 +20,7 @@ public class AIStateMachine : MonoBehaviour
 
     public void ChangeState(AIState _newState)
     {
-        if(_newState != null && _newState.name != "RemainInState")
+        if(_newState != null && !_newState.stateName.Equals("RemainInState"))
             currentState = _newState;
 
         return;

@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class JumpAttack : Ability
 {
-    [Header("Ram settings")]
-    [SerializeField]
-    protected float jumpHeight = 5.0f;
+    [Header("Jump Attack settings")]
     [SerializeField]
     protected float jumpSpeed = 10.0f;
 
@@ -21,36 +19,22 @@ public class JumpAttack : Ability
 
     protected void Jump()
     {
-        // TODO refactorization
-        Debug.Log(entity.gameObject.name + "Casting Ram");
+        Debug.Log(entity.gameObject.name + "Casting Jump Attack");
 
         Vector3 initialPosition = aiEntity.transform.position;
         Vector3 targetPosition = Vector3.zero;
         Vector3 jumpVelocity = Vector3.zero;
 
         SlotTargetter slotTargetter = aiEntity.Targetter as SlotTargetter;
-        if(slotTargetter != null && slotTargetter.CurrentSlotTarget != null)
-        {
-            aiEntity.Body.velocity = Vector3.zero;
-            aiEntity.Movement.ActivateNavigation(false);
-
-            targetPosition = slotTargetter.CurrentSlotTarget.transform.position;
-            jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
-            entity.Body.velocity = jumpVelocity;
-            return;
-        }
-
         Targetter targetter = aiEntity.Targetter;
-        if (targetter != null && targetter.CurrentTarget != null)
-        {
-            aiEntity.Body.velocity = Vector3.zero;
-            aiEntity.Movement.ActivateNavigation(false);
+        if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null) { targetPosition = slotTargetter.CurrentSlotTarget.transform.position; }
+        else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position; }
 
-            targetPosition = targetter.CurrentTarget.position;
-            jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
-            entity.Body.velocity = jumpVelocity;
-            return;
-        }
+        aiEntity.Body.velocity = Vector3.zero;
+        aiEntity.Movement.ActivateNavigation(false);
+
+        jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
+        entity.Body.velocity = jumpVelocity;
 
         return;
     }
