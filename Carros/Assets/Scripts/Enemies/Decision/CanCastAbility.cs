@@ -13,6 +13,7 @@ public class CanCastAbility : AIDecision
 
     protected bool CanCast(Entity _entity)
     {
+        // TODO refactorization
         Enemy enemy = _entity as Enemy;
         if(enemy == null) { return false; }
 
@@ -23,7 +24,7 @@ public class CanCastAbility : AIDecision
             {
                 foreach (Ability ability in enemy.Abilities)
                 {
-                    if (ability.IsInRange(slotTargetter.CurrentTarget) && !ability.IsInCooldown())
+                    if (ability.IsInRange(slotTargetter.CurrentSlotTarget) && !ability.IsInCooldown())
                     {
                         Debug.Log(enemy.gameObject.name + " Can cast" + ability.ToString());
                         enemy.SetNextAbility(ability);

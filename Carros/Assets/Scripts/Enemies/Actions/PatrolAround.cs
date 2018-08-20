@@ -14,17 +14,22 @@ public class PatrolAround : AIAction
 
     protected void Patrol(Entity _entity)
     {
+        // TODO refactorization
         Enemy enemy = _entity as Enemy;
         if(enemy == null) { return; }
 
-        if (enemy.Targetter == null) { return; }
-        if (enemy.Movement == null || enemy.Movement.Navigation == null) { return; }
+        Targetter targetter = enemy.Targetter;
+        if (targetter == null) { return; }
 
-        if (enemy.Movement.CurrentMode != EnemyMovement.MovementMode.Walking)
+        EnemyMovement movement = enemy.Movement;
+        UnityEngine.AI.NavMeshAgent navigation = enemy.Movement.Navigation;
+        if (movement == null || navigation == null) { return; }
+
+        if (movement.CurrentMode != EnemyMovement.MovementMode.Walking)
             EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Walking));
 
-        if (!enemy.Movement.Navigation.hasPath)
-            enemy.Movement.NavigateTo(enemy.Targetter.CalculateRandomPointInsideTrigger());
+        if (!navigation.hasPath)
+            movement.NavigateTo(targetter.CalculateRandomPointInsideTrigger());
 
         return;
     }

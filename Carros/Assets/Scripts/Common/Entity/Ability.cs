@@ -49,7 +49,6 @@ public class Ability : AIEntityComponent
             aiEntity.transform.position,
             _slotTarget.transform.position
             );
-        Debug.Log("Disatcne to slotTarget: " + (distance - _slotTarget.AttackingDistaceToEntity).ToString());
         if (distance - _slotTarget.AttackingDistaceToEntity <= range)
             isInRange = true;
 

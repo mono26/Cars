@@ -21,22 +21,37 @@ public class JumpAttack : Ability
 
     protected void Jump()
     {
+        // TODO refactorization
         Debug.Log(entity.gameObject.name + "Casting Ram");
 
-        Targetter targetter = aiEntity.Targetter;
-        if(targetter == null || targetter.CurrentTarget == null) { return; }
-
-        aiEntity.Body.velocity = Vector3.zero;
-        aiEntity.Movement.ActivateNavigation(false);
-
         Vector3 initialPosition = aiEntity.transform.position;
-        Debug.Log("initialPosition" + initialPosition.ToString());
-        Vector3 targetPosition = targetter.CurrentTarget.transform.position;
-        Debug.Log("targetPosition" + targetPosition.ToString());
-        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
+        Vector3 targetPosition = Vector3.zero;
+        Vector3 jumpVelocity = Vector3.zero;
 
-        entity.Body.velocity = jumpVelocity;
+        SlotTargetter slotTargetter = aiEntity.Targetter as SlotTargetter;
+        if(slotTargetter != null && slotTargetter.CurrentSlotTarget != null)
+        {
+            aiEntity.Body.velocity = Vector3.zero;
+            aiEntity.Movement.ActivateNavigation(false);
 
-        return; 
+            targetPosition = slotTargetter.CurrentSlotTarget.transform.position;
+            jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
+            entity.Body.velocity = jumpVelocity;
+            return;
+        }
+
+        Targetter targetter = aiEntity.Targetter;
+        if (targetter != null && targetter.CurrentTarget != null)
+        {
+            aiEntity.Body.velocity = Vector3.zero;
+            aiEntity.Movement.ActivateNavigation(false);
+
+            targetPosition = targetter.CurrentTarget.position;
+            jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
+            entity.Body.velocity = jumpVelocity;
+            return;
+        }
+
+        return;
     }
 }

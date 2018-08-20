@@ -37,6 +37,16 @@ public class Targetter : AIEntityComponent
     [SerializeField]
     protected Coroutine updateTargetRoutine;
 
+    protected void AddTarget(Transform _target)
+    {
+        if (nearTargets.Count.Equals(0)) { updateTargetRoutine = StartCoroutine(UpdateTarget()); }
+        if (currentTarget == null) { currentTarget = _target; }
+
+        nearTargets.Add(_target);
+
+        return;
+    }
+
     public Vector3 CalculateRandomPointInsideTrigger()
     {
         float randomRadius = Random.Range(0, (int)detectionRange);
@@ -94,16 +104,13 @@ public class Targetter : AIEntityComponent
     {
         foreach (string tag in targetableTags)
         {
-            if (other.CompareTag(tag))
-            {
-                Transform posibleTarget = other.transform;
-                if (posibleTarget == null || nearTargets.Contains(posibleTarget)) { return; }
+            if (!other.CompareTag(tag)) { return; }
 
-                if (nearTargets.Count.Equals(0)) { updateTargetRoutine = StartCoroutine(UpdateTarget()); }
-                if (currentTarget == null) { currentTarget = posibleTarget; }
+            Transform posibleTarget = other.transform;
+            if (posibleTarget == null || nearTargets.Contains(posibleTarget)) { return; }
 
-                nearTargets.Add(posibleTarget);
-            }
+            AddTarget(posibleTarget);
+
         }
 
         return;
@@ -113,26 +120,32 @@ public class Targetter : AIEntityComponent
     {
         foreach (string tag in targetableTags)
         {
-            if (other.CompareTag(tag))
-            {
-                Transform releasedTarget = other.transform;
-                if (releasedTarget  == null || !nearTargets.Contains(releasedTarget)) { return; }
+            if (!other.CompareTag(tag)) { return; }
 
-                nearTargets.Remove(releasedTarget);
+            Transform realisingTarget = other.transform;
+            if (realisingTarget  == null || !nearTargets.Contains(realisingTarget)) { return; }
 
-                if (currentTarget.Equals(releasedTarget))
-                {
-                    Transform newTarget = GetNearestTarget();
-                    currentTarget = newTarget;
-                }
-
-                if (currentTarget == null && nearTargets.Count.Equals(0))
-                {
-                    EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(aiEntity, TargetterEventType.TargetLost));
-                    StopCoroutine(updateTargetRoutine);
-                }
-            }
+            RemoveTarget(realisingTarget);
         }
+        return;
+    }
+
+    protected void RemoveTarget(Transform _target)
+    {
+        nearTargets.Remove(_target);
+
+        if (currentTarget.Equals(_target))
+        {
+            Transform newTarget = GetNearestTarget();
+            currentTarget = newTarget;
+        }
+
+        if (currentTarget == null && nearTargets.Count.Equals(0))
+        {
+            EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(aiEntity, TargetterEventType.TargetLost));
+            StopCoroutine(updateTargetRoutine);
+        }
+
         return;
     }
 

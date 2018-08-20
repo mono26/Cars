@@ -12,6 +12,7 @@ public class RunTowardsTarget : AIAction
 
     protected void MakeItRun(Entity _entity)
     {
+        // TODO refactorization
         Enemy enemy = _entity as Enemy;
         if (enemy == null) { return; }
 
