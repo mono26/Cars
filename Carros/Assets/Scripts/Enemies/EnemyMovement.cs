@@ -13,9 +13,9 @@ public class EnemyMovementEvent : CarEvent
     }
 }
 
-public class EnemyMovement : AIEntityComponent
+public class EnemyMovement : AIEntityComponent, EventHandler<EnemyMovementEvent>
 {
-    public enum MovementMode { Running, Walking }
+    public enum MovementMode { Running, Patrolling }
 
     [System.Serializable]
     public class MovementStats
@@ -33,14 +33,22 @@ public class EnemyMovement : AIEntityComponent
         protected float walkingSpeed;
         public float WalkingSpeed { get { return walkingSpeed; } }
 
-        public MovementStats(float _rA, float _rS, float _wA, float _wS)
+        public MovementStats(float _runningAcceleration, float _runningSpeed, float _walkingAcceleration, float _walkingSpeed)
         {
-            runningAcceleration = _rA;
-            runningSpeed = _rS;
-            walkingAcceleration = _wA;
-            walkingSpeed = _wS;
+            runningAcceleration = _runningAcceleration;
+            runningSpeed = _runningSpeed;
+            walkingAcceleration = _walkingAcceleration;
+            walkingSpeed = _walkingSpeed;
         }
     }
+
+    [Header("Enemy Movement settings")]
+    [SerializeField]
+    protected AudioClip backStep;
+    [SerializeField]
+    protected AudioClip frontStep;
+    [SerializeField]
+    protected float groundCheckRayLenght = 0.5f;
 
     [Header("Enemy Movement Components")]
     [SerializeField]
@@ -51,9 +59,13 @@ public class EnemyMovement : AIEntityComponent
     [SerializeField]
     protected MovementMode currentMode;
     public MovementMode CurrentMode { get { return currentMode; } }
+    [SerializeField]
+    protected bool isGrounded;
 
-    public void ActivateNavigation(bool _state)
+    public void SetFollowNavigation(bool _state)
     {
+        if(navigation == null) { return; }
+
         if (_state)
             navigation.enabled = true;
         else if (!_state)
@@ -72,16 +84,61 @@ public class EnemyMovement : AIEntityComponent
         return;
     }
 
+    protected void CheckGrounded()
+    {
+        RaycastHit hit;
+        Ray ray = new Ray(transform.position + Vector3.up * groundCheckRayLenght * 0.5f, -Vector3.up);
+        isGrounded = Physics.Raycast(ray, out hit, groundCheckRayLenght, Physics.AllLayers,
+            QueryTriggerInteraction.Ignore);
+
+        return;
+    }
+
+    public override void EveryFrame()
+    {
+        transform.position = navigation.nextPosition;
+
+        return;
+    }
+
+    public override void FixedFrame()
+    {
+        CheckGrounded();
+
+        if(entity.Animator == null) { return; }
+
+        entity.Animator.SetBoolWithParameterCheck(
+            "IsGrounded",
+            AnimatorControllerParameterType.Bool,
+            isGrounded
+            );
+    }
+
     /// <summary>
     /// Used to set the enemy destination
     /// </summary>
     /// <param name="_destination"> The destination for the navMeshAgent.</param>
-    public void NavigateTo(Vector3 _destination)
+    public void SetMovementDestination(Vector3 _destination)
     {
         if (navigation == null) { return; }
 
         if (navigation.isOnNavMesh)
-            navigation.SetDestination(_destination);
+            navigation.destination = _destination;
+            //navigation.SetDestination(_destination);
+
+        return;
+    }
+
+    protected void OnDisable()
+    {
+        EventManager.RemoveListener<EnemyMovementEvent>(this);
+
+        return;
+    }
+
+    protected void OnEnable()
+    {
+        EventManager.AddListener<EnemyMovementEvent>(this);
 
         return;
     }
@@ -89,18 +146,120 @@ public class EnemyMovement : AIEntityComponent
     protected void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Terrain"))
-            ActivateNavigation(true);
+            SetFollowNavigation(true);
 
         return;
     }
 
-    public void SetNavigationValues(float _acceleration, float _speed, MovementMode _mode)
+    public void OnEvent(EnemyMovementEvent _movementEvent)
+    {
+        if (!_movementEvent.enemy.Equals(aiEntity)) { return; }
+
+        switch (_movementEvent.movementType)
+        {
+            case MovementMode.Running:
+                StopPatrolling();
+                StartChassing();
+                break;
+
+            case MovementMode.Patrolling:
+                StopChassing();
+                StartPatrolling();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    protected void PlayStep(int frontFoot)
+    {
+        /*if (frontStepAudio != null && frontFoot == 1)
+            frontStepAudio.PlayRandomClip();
+        else if (backStepAudio != null && frontFoot == 0)
+            backStepAudio.PlayRandomClip();*/
+
+        return;
+    }
+
+    public void SetMovementValues(float _acceleration, float _speed, MovementMode _mode)
     {
         if (navigation == null) { return; }
 
         currentMode = _mode;
         navigation.acceleration = _acceleration;
         navigation.speed = _speed;
+
+        return;
+    }
+
+    protected void Start()
+    {
+        navigation.updatePosition = false;
+
+        return;
+    }
+
+    protected void StartPatrolling()
+    {
+        if (currentMode != EnemyMovement.MovementMode.Patrolling)
+            SetMovementValues(
+                aiEntity.Stats.MovementStats.RunningSpeed,
+                aiEntity.Stats.MovementStats.RunningAcceleration,
+                EnemyMovement.MovementMode.Running
+                );
+
+        if (entity.Animator == null) { return; }
+
+        entity.Animator.SetBoolWithParameterCheck(
+                "IsWalking",
+                AnimatorControllerParameterType.Bool,
+                true
+                );
+
+        return;
+    }
+
+    protected void StartChassing()
+    {
+        if (currentMode != EnemyMovement.MovementMode.Patrolling)
+            SetMovementValues(
+                aiEntity.Stats.MovementStats.WalkingAcceleration,
+                aiEntity.Stats.MovementStats.WalkingSpeed,
+                EnemyMovement.MovementMode.Patrolling
+                );
+
+        if (entity.Animator == null) { return; }
+
+        entity.Animator.SetBoolWithParameterCheck(
+            "IsRunning",
+            AnimatorControllerParameterType.Bool,
+            true
+            );
+
+        return;
+    }
+
+    protected void StopChassing()
+    {
+        if (entity.Animator == null) { return; }
+
+        entity.Animator.SetBoolWithParameterCheck(
+            "IsRunning",
+            AnimatorControllerParameterType.Bool,
+            false
+            );
+
+        return;
+    }
+
+    protected void StopPatrolling()
+    {
+        entity.Animator.SetBoolWithParameterCheck(
+            "IsWalking",
+            AnimatorControllerParameterType.Bool,
+            false
+            );
 
         return;
     }

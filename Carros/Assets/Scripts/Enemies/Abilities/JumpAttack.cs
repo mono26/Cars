@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class JumpAttack : Ability
 {
@@ -31,7 +29,7 @@ public class JumpAttack : Ability
         else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position; }
 
         aiEntity.Body.velocity = Vector3.zero;
-        aiEntity.Movement.ActivateNavigation(false);
+        aiEntity.Movement.SetFollowNavigation(false);
 
         jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
         entity.Body.velocity = jumpVelocity;

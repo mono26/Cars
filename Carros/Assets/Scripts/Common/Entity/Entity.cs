@@ -13,6 +13,9 @@ public class Entity : MonoBehaviour
 
     [Header("Entity components")]
     [SerializeField]
+    protected Animator animator;
+    public Animator Animator { get { return animator; } }
+    [SerializeField]
     protected AudioSource audioSource;
     [SerializeField]
     protected Rigidbody body;

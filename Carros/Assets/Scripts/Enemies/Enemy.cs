@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine))]
-public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<TargetterEvent>
+public class Enemy : Entity, EventHandler<TargetterEvent>
 {
     [System.Serializable]
     public class EnemyStats
@@ -16,12 +16,14 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<Targ
     }
 
     [Header("Enemy settings")]
+    protected AudioClip idleAudio;
     [SerializeField]
     protected AIState returnState;
     [SerializeField]
     protected AIState startingState;
     [SerializeField]
     protected EnemyStats stats; // Set in the editor.
+    public EnemyStats Stats { get { return stats; } }
     [SerializeField]
     protected float stateUpdateRate = 2.0f; // Updates per second
 
@@ -71,6 +73,14 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<Targ
         return;
     }
 
+    public void Grunt()
+    {
+        /*if (gruntAudio != null)
+            gruntAudio.PlayRandomClip();*/
+
+        return;
+    }
+
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
@@ -87,7 +97,6 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<Targ
 
     protected void OnDisable()
     {
-        EventManager.RemoveListener<EnemyMovementEvent>(this);
         EventManager.RemoveListener<TargetterEvent>(this);
 
         return;
@@ -95,37 +104,9 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<Targ
 
     protected void OnEnable()
     {
-        EventManager.AddListener<EnemyMovementEvent>(this);
         EventManager.AddListener<TargetterEvent>(this);
 
         return;
-    }
-
-    public void OnEvent(EnemyMovementEvent _movementEvent)
-    {
-        if (!_movementEvent.enemy.Equals(this)) { return; }
-
-        switch (_movementEvent.movementType)
-        {
-            case EnemyMovement.MovementMode.Running:
-                movement.SetNavigationValues(
-                    stats.MovementStats.RunningAcceleration, 
-                    stats.MovementStats.RunningSpeed, 
-                    EnemyMovement.MovementMode.Running
-                    );
-                break;
-
-            case EnemyMovement.MovementMode.Walking:
-                movement.SetNavigationValues(
-                    stats.MovementStats.WalkingAcceleration, 
-                    stats.MovementStats.WalkingSpeed, 
-                    EnemyMovement.MovementMode.Walking
-                    );
-                break;
-
-            default:
-                break;
-        }
     }
 
     public void OnEvent(TargetterEvent _targetterEvent)
@@ -147,7 +128,7 @@ public class Enemy : Entity, EventHandler<EnemyMovementEvent>, EventHandler<Targ
     {
         initialPosition = transform.position;
 
-        movement.SetNavigationValues(
+        movement.SetMovementValues(
             stats.MovementStats.RunningSpeed,
             stats.MovementStats.RunningAcceleration,
             EnemyMovement.MovementMode.Running

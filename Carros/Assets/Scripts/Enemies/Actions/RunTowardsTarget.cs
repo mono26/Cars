@@ -20,23 +20,13 @@ public class RunTowardsTarget : AIAction
         UnityEngine.AI.NavMeshAgent navigation = enemy.Movement.Navigation;
         if (movement == null || navigation == null) { return; }
 
+        Vector3 slotPosition = Vector3.zero;
         SlotTargetter slotTargetter = enemy.Targetter as SlotTargetter;
-        if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null && slotTargetter.CurrentSlot != null)
-        {
-            Vector3 slotPosition = slotTargetter.CurrentSlotTarget.GetSlotPosition(slotTargetter.CurrentSlot);
-            SetNavigationPointAndMakeItRun(enemy, slotPosition);
-
-            return;
-        }
-
         Targetter targetter = enemy.Targetter;
-        if (targetter != null && targetter.CurrentTarget != null)
-        {
-            Vector3 targetPosition = targetter.CurrentTarget.position;
-            SetNavigationPointAndMakeItRun(enemy, targetPosition);
+        if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null && slotTargetter.CurrentSlot != null) { slotPosition = slotTargetter.CurrentSlotTarget.GetSlotPosition(slotTargetter.CurrentSlot); }
+        else if (targetter != null && targetter.CurrentTarget != null) { Vector3 targetPosition = targetter.CurrentTarget.position; }
 
-            return;
-        }
+        SetNavigationPointAndMakeItRun(enemy, slotPosition);
 
         return;
     }
@@ -48,7 +38,7 @@ public class RunTowardsTarget : AIAction
             EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(_enemy, EnemyMovement.MovementMode.Running));
 
         if (!movement.Navigation.destination.Equals(_targetPoint))
-            movement.NavigateTo(_targetPoint);
+            movement.SetMovementDestination(_targetPoint);
 
         return;
     }

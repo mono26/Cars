@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "AIComponents/Actions/Enemy/PatrolAround")]
 public class PatrolAround : AIAction
@@ -23,13 +21,15 @@ public class PatrolAround : AIAction
 
         EnemyMovement movement = enemy.Movement;
         UnityEngine.AI.NavMeshAgent navigation = enemy.Movement.Navigation;
-        if (movement == null || navigation == null) { return; }
+        if (movement == null) { return; }
 
-        if (movement.CurrentMode != EnemyMovement.MovementMode.Walking)
-            EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Walking));
+        if (movement.CurrentMode != EnemyMovement.MovementMode.Patrolling)
+        {
+            EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Patrolling));
+        }
 
         if (!navigation.hasPath)
-            movement.NavigateTo(targetter.CalculateRandomPointInsideTrigger());
+            movement.SetMovementDestination(targetter.CalculateRandomPointInsideTrigger());
 
         return;
     }

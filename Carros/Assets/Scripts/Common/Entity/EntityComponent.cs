@@ -37,4 +37,9 @@ public class EntityComponent : MonoBehaviour
     {
 
     }
+
+    protected virtual void HandleAnimation()
+    {
+
+    }
 }
