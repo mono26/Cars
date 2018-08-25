@@ -777,7 +777,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1423693820582264
 GameObject:
   m_ObjectHideFlags: 1
@@ -2820,7 +2820,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1412303192627782}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -17.33, y: -0.9, z: 10.35}
+  m_LocalPosition: {x: -17.33, y: 0.23, z: 10.35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4603743944410660}
@@ -3109,8 +3109,8 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!65 &65019230010698256
@@ -3302,10 +3302,11 @@ MonoBehaviour:
   aiEntity: {fileID: 114192524373165864}
   backStep: {fileID: 0}
   frontStep: {fileID: 0}
-  groundCheckRayLenght: 0.5
+  groundCheckRayLenght: 1
   navigation: {fileID: 195290854091500534}
   currentMode: 1
   isGrounded: 0
+  isStandingStill: 0
 --- !u!114 &114713968063541614
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3506,7 +3507,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1.5
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1

@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine))]
-public class Enemy : Entity, EventHandler<TargetterEvent>
+public class Enemy : Entity, EventHandler<TargetterEvent>, EventHandler<EnemyMovementEvent>
 {
     [System.Serializable]
     public class EnemyStats
@@ -98,6 +98,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     protected void OnDisable()
     {
         EventManager.RemoveListener<TargetterEvent>(this);
+        EventManager.RemoveListener<EnemyMovementEvent>(this);
 
         return;
     }
@@ -105,8 +106,40 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     protected void OnEnable()
     {
         EventManager.AddListener<TargetterEvent>(this);
+        EventManager.AddListener<EnemyMovementEvent>(this);
 
         return;
+    }
+
+    public void OnEvent(EnemyMovementEvent _movementEvent)
+    {
+        if (movement == null) { return; }
+        if (!_movementEvent.enemy.Equals(this)) { return; }
+
+        switch (_movementEvent.movementType)
+        {
+            case EnemyMovement.MovementMode.Running:
+                if (movement.CurrentMode != EnemyMovement.MovementMode.Running)
+                    movement.SetMovementValues(
+                        stats.MovementStats.RunningAcceleration,
+                        stats.MovementStats.RunningSpeed,
+                        EnemyMovement.MovementMode.Running
+                        );
+
+                break;
+
+            case EnemyMovement.MovementMode.Patrolling:
+                if (movement.CurrentMode != EnemyMovement.MovementMode.Patrolling)
+                    movement.SetMovementValues(
+                        stats.MovementStats.WalkingAcceleration,
+                        stats.MovementStats.WalkingSpeed,
+                        EnemyMovement.MovementMode.Patrolling
+                        );
+                break;
+
+            default:
+                break;
+        }
     }
 
     public void OnEvent(TargetterEvent _targetterEvent)
@@ -127,12 +160,6 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     protected virtual void Start()
     {
         initialPosition = transform.position;
-
-        movement.SetMovementValues(
-            stats.MovementStats.RunningSpeed,
-            stats.MovementStats.RunningAcceleration,
-            EnemyMovement.MovementMode.Running
-            );
 
         stateMachine.ChangeState(startingState);
         updateStateRoutine = StartCoroutine(UpdateState());

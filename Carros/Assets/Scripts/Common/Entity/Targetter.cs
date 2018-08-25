@@ -50,7 +50,7 @@ public class Targetter : AIEntityComponent
     public Vector3 CalculateRandomPointInsideTrigger()
     {
         float randomRadius = Random.Range(0, (int)detectionRange);
-        float randomAngle = Random.Range(0, 360);
+        float randomAngle = Random.Range(0, 360) * Mathf.Deg2Rad;
         float x = randomRadius * Mathf.Cos(randomAngle);
         float z = randomRadius * Mathf.Sin(randomAngle);
 

@@ -17,6 +17,7 @@ public class ReachedInitialPosition : AIDecision
         if (enemy == null) { return false; }
 
         float stopDistance = enemy.Movement.Navigation.stoppingDistance;
+        Debug.Log((Vector3.Distance(enemy.transform.position, enemy.InitialPosition) - stopDistance).ToString());
         if (Vector3.Distance(enemy.transform.position, enemy.InitialPosition) - stopDistance < stopDistance)
             return true;
 
