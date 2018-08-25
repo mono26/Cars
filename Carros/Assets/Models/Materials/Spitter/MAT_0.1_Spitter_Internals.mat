@@ -4,13 +4,14 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Spitter_Internals_Mat
+  m_Name: MAT_0.1_Spitter_Internals
   m_Shader: {fileID: 4800000, guid: 84aeb24142fb65343ad3294cfee76576, type: 3}
   m_ShaderKeywords: _GRID_ON _METALLICGLOSSMAP _NORMALMAP _PARALLAXMAP _SPECGLOSSMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -159,6 +160,7 @@ Material:
     - _UVSec: 0
     - _UVs: 0
     - _UseMicroBumps: 0
+    - _VertexAnimate: 0
     - _WaterSlopeDamp: 0.5
     - _ZWrite: 1
     m_Colors:

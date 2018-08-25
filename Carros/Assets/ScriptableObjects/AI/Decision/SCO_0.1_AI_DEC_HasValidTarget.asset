@@ -8,6 +8,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 823a20d82ac270743952bd234c9aebed, type: 3}
-  m_Name: AI_A_RunTowardsTarget
+  m_Script: {fileID: 11500000, guid: 6d1717237b22c3849ac99ecd3b7862c7, type: 3}
+  m_Name: SCO_0.1_AI_DEC_HasValidTarget
   m_EditorClassIdentifier: 

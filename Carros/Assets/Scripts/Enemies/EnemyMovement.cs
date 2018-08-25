@@ -94,13 +94,6 @@ public class EnemyMovement : AIEntityComponent, EventHandler<EnemyMovementEvent>
         return;
     }
 
-    public override void EveryFrame()
-    {
-        transform.position = navigation.nextPosition;
-
-        return;
-    }
-
     public override void FixedFrame()
     {
         CheckGrounded();
@@ -114,17 +107,10 @@ public class EnemyMovement : AIEntityComponent, EventHandler<EnemyMovementEvent>
             );
     }
 
-    /// <summary>
-    /// Used to set the enemy destination
-    /// </summary>
-    /// <param name="_destination"> The destination for the navMeshAgent.</param>
-    public void SetMovementDestination(Vector3 _destination)
+    protected void OnAnimatorMove()
     {
-        if (navigation == null) { return; }
-
-        if (navigation.isOnNavMesh)
-            navigation.destination = _destination;
-            //navigation.SetDestination(_destination);
+        navigation.speed = (entity.Animator.deltaPosition / Time.deltaTime).magnitude;
+        transform.position = navigation.nextPosition;
 
         return;
     }
@@ -178,6 +164,21 @@ public class EnemyMovement : AIEntityComponent, EventHandler<EnemyMovementEvent>
             frontStepAudio.PlayRandomClip();
         else if (backStepAudio != null && frontFoot == 0)
             backStepAudio.PlayRandomClip();*/
+
+        return;
+    }
+
+    /// <summary>
+    /// Used to set the enemy destination
+    /// </summary>
+    /// <param name="_destination"> The destination for the navMeshAgent.</param>
+    public void SetMovementDestination(Vector3 _destination)
+    {
+        if (navigation == null) { return; }
+
+        if (navigation.isOnNavMesh)
+            navigation.destination = _destination;
+        //navigation.SetDestination(_destination);
 
         return;
     }

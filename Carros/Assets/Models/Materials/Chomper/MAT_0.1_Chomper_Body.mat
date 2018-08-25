@@ -4,9 +4,9 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Chomper_Body_Mat
+  m_Name: MAT_0.1_Chomper_Body
   m_Shader: {fileID: 4800000, guid: df778dfc69de7fb48809501a413b8bbf, type: 3}
   m_ShaderKeywords: _METALLICGLOSSMAP _NORMALMAP _SPECGLOSSMAP _USE_GRADIENT_ON
   m_LightmapFlags: 4
