@@ -2225,6 +2225,20 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1412303192627782, guid: 9c391adb4c38cdd49919c3917624085e, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114192524373165864, guid: 9c391adb4c38cdd49919c3917624085e,
+        type: 2}
+      propertyPath: stats.movementStats.walkingSpeed
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114192524373165864, guid: 9c391adb4c38cdd49919c3917624085e,
+        type: 2}
+      propertyPath: stats.movementStats.walkingAcceleration
+      value: 0.1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c391adb4c38cdd49919c3917624085e, type: 2}
   m_IsPrefabAsset: 0

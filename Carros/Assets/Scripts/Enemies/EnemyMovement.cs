@@ -112,25 +112,50 @@ public class EnemyMovement : AIEntityComponent
     {
         if (entity.Animator == null) { return; }
 
-        entity.Animator.SetBoolWithParameterCheck(
+        HandleAnimationStates();
+
+        HandleAnimationSpeed();
+
+        return;
+    }
+
+    protected void HandleAnimationSpeed()
+    {
+        Animator animatorToHandle = entity.Animator;
+        if (animatorToHandle == null || navigation == null) { return; }
+
+        if (currentMode == MovementMode.Idle)
+            animatorToHandle.speed = 1.0f;
+        else
+            animatorToHandle.speed = navigation.velocity.magnitude;
+
+        return;
+    }
+
+    protected void HandleAnimationStates()
+    {
+        Animator animatorToHandle = entity.Animator;
+        if (animatorToHandle == null) { return; }
+
+        animatorToHandle.SetBoolWithParameterCheck(
             "IsGrounded",
             AnimatorControllerParameterType.Bool,
             CheckGrounded()
             );
 
-        entity.Animator.SetBoolWithParameterCheck(
+        animatorToHandle.SetBoolWithParameterCheck(
             "IsIdle",
             AnimatorControllerParameterType.Bool,
             CheckIfStandingStill()
             );
 
-        entity.Animator.SetBoolWithParameterCheck(
+        animatorToHandle.SetBoolWithParameterCheck(
             "IsRunning",
             AnimatorControllerParameterType.Bool,
             (currentMode == MovementMode.Running)
             );
 
-        entity.Animator.SetBoolWithParameterCheck(
+        animatorToHandle.SetBoolWithParameterCheck(
             "IsWalking",
             AnimatorControllerParameterType.Bool,
             (currentMode == MovementMode.Patrolling)
