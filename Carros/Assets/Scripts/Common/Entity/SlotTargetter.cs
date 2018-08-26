@@ -18,7 +18,7 @@ public class SlotTargetter : Targetter
 
     protected void AddSlotedTarget(SlotManager _slotedTarget)
     {
-        if (nearTargets.Count.Equals(0)) { updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget()); }
+        if (nearSlotTargets.Count.Equals(0)) { updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget()); }
         if (currentSlotTarget == null)
         {
             currentSlotTarget = _slotedTarget;
@@ -26,16 +26,6 @@ public class SlotTargetter : Targetter
         }
 
         nearSlotTargets.Add(_slotedTarget);
-
-        return;
-    }
-
-    public override void EveryFrame()
-    {
-        base.EveryFrame();
-
-        // TODO encapsulate in a routine.
-        currentSlotTarget = GetNearestSlotTarget();
 
         return;
     }

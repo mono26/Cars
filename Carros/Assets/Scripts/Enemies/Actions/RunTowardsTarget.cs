@@ -38,7 +38,7 @@ public class RunTowardsTarget : AIAction
             EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(_enemy, EnemyMovement.MovementMode.Running));
 
         if (!movement.Navigation.destination.Equals(_targetPoint))
-            movement.SetMovementDestination(_targetPoint);
+            movement.SetNavigationDestination(_targetPoint);
 
         return;
     }

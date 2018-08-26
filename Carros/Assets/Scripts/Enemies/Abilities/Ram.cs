@@ -10,14 +10,14 @@ public class Ram : Ability
 
     public override void Cast()
     {
-        Jump();
+        RamTowardsTarget();
 
         base.Cast();
 
         return;
     }
 
-    protected void Jump()
+    protected void RamTowardsTarget()
     {
         Debug.Log(entity.gameObject.name + "Casting Ram");
 
@@ -31,10 +31,12 @@ public class Ram : Ability
         else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position;}
 
         aiEntity.Body.velocity = Vector3.zero;
-        //aiEntity.Movement.ActivateNavigation(false);
+        aiEntity.Movement.NavigationSetActive(false);
 
-        targetDirection = (targetPosition - initialPosition).normalized;
-        entity.Body.AddForce(targetDirection * ramForce, ForceMode.Acceleration);
+        targetDirection = (targetPosition - initialPosition);
+        targetDirection.y = 0;
+        targetDirection = targetDirection.normalized;
+        entity.Body.AddForce(targetDirection * ramForce, ForceMode.Impulse);
 
         return;
     }

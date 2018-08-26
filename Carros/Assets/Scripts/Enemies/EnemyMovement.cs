@@ -60,18 +60,6 @@ public class EnemyMovement : AIEntityComponent
     protected MovementMode currentMode;
     public MovementMode CurrentMode { get { return currentMode; } }
 
-    public void SetFollowNavigation(bool _state)
-    {
-        if(navigation == null) { return; }
-
-        if (_state)
-            navigation.enabled = true;
-        else if (!_state)
-            navigation.enabled = false;
-
-        return;
-    }
-
     protected override void Awake()
     {
         base.Awake();
@@ -127,7 +115,7 @@ public class EnemyMovement : AIEntityComponent
         if (currentMode == MovementMode.Idle)
             animatorToHandle.speed = 1.0f;
         else
-            animatorToHandle.speed = navigation.velocity.magnitude;
+            animatorToHandle.speed = navigation.velocity.magnitude / navigation.height;
 
         return;
     }
@@ -164,6 +152,18 @@ public class EnemyMovement : AIEntityComponent
         return;
     }
 
+    public void NavigationSetActive(bool _state)
+    {
+        if (navigation == null) { return; }
+
+        if (!_state && navigation.enabled)
+            navigation.ResetPath();
+
+        navigation.enabled = _state;
+
+        return;
+    }
+
     protected void OnAnimatorMove()
     {
         //navigation.speed = (entity.Animator.deltaPosition / Time.deltaTime).magnitude;
@@ -175,7 +175,7 @@ public class EnemyMovement : AIEntityComponent
     protected void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Terrain"))
-            SetFollowNavigation(true);
+            NavigationSetActive(true);
 
         return;
     }
@@ -194,7 +194,7 @@ public class EnemyMovement : AIEntityComponent
     /// Used to set the enemy destination
     /// </summary>
     /// <param name="_destination"> The destination for the navMeshAgent.</param>
-    public void SetMovementDestination(Vector3 _destination)
+    public void SetNavigationDestination(Vector3 _destination)
     {
         if (navigation == null) { return; }
 

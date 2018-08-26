@@ -1508,7 +1508,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1920267379013084
 GameObject:
   m_ObjectHideFlags: 1
@@ -3317,7 +3317,7 @@ MonoBehaviour:
       runningSpeed: 6
       walkingAcceleration: 0.5
       walkingSpeed: 3
-    maxHealth: 0
+    maxHealth: 10
   stateUpdateRate: 4
   movement: {fileID: 114492005458317368}
   stateMachine: {fileID: 114035895911611468}
@@ -3359,8 +3359,6 @@ MonoBehaviour:
   groundCheckRayLenght: 0.5
   navigation: {fileID: 195592297357346138}
   currentMode: 0
-  isGrounded: 0
-  isStandingStill: 0
 --- !u!135 &135056422774069968
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -3505,8 +3503,8 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.6
-  m_Speed: 3.5
-  m_Acceleration: 8
+  m_Speed: 3
+  m_Acceleration: 0.5
   avoidancePriority: 50
   m_AngularSpeed: 120
   m_StoppingDistance: 0.9

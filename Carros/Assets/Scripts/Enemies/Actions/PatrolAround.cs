@@ -27,7 +27,7 @@ public class PatrolAround : AIAction
             EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Patrolling));
 
         if (!navigation.hasPath)
-            movement.SetMovementDestination(targetter.CalculateRandomPointInsideTrigger());
+            movement.SetNavigationDestination(targetter.CalculateRandomPointInsideTrigger());
 
         return;
     }

@@ -8,14 +8,14 @@ public class JumpAttack : Ability
 
     public override void Cast()
     {
-        Jump();
+        JumpTowardsTarget();
 
         base.Cast();
 
         return;
     }
 
-    protected void Jump()
+    protected void JumpTowardsTarget()
     {
         Debug.Log(entity.gameObject.name + "Casting Jump Attack");
 
@@ -29,7 +29,7 @@ public class JumpAttack : Ability
         else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position; }
 
         aiEntity.Body.velocity = Vector3.zero;
-        aiEntity.Movement.SetFollowNavigation(false);
+        aiEntity.Movement.NavigationSetActive(false);
 
         jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
         entity.Body.velocity = jumpVelocity;

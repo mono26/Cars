@@ -57,16 +57,6 @@ public class Targetter : AIEntityComponent
         return new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
     }
 
-    public override void EveryFrame()
-    {
-        base.EveryFrame();
-
-        // TODO encapsulate in a routine.
-        currentTarget = GetNearestTarget();
-
-        return;
-    }
-
     protected Transform GetNearestTarget()
     {
         if(nearTargets.Count.Equals(0)) { return null; }
@@ -110,7 +100,6 @@ public class Targetter : AIEntityComponent
             if (posibleTarget == null || nearTargets.Contains(posibleTarget)) { return; }
 
             AddTarget(posibleTarget);
-
         }
 
         return;
