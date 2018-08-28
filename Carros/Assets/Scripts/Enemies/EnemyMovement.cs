@@ -44,11 +44,7 @@ public class EnemyMovement : AIEntityComponent
 
     [Header("Enemy Movement settings")]
     [SerializeField]
-    protected AudioClip backStep;
-    [SerializeField]
-    protected AudioClip frontStep;
-    [SerializeField]
-    protected float groundCheckRayLenght = 0.5f;
+    protected float groundCheckRayLenght = 1.0f;
 
     [Header("Enemy Movement Components")]
     [SerializeField]
@@ -59,6 +55,7 @@ public class EnemyMovement : AIEntityComponent
     [SerializeField]
     protected MovementMode currentMode;
     public MovementMode CurrentMode { get { return currentMode; } }
+    protected Vector3 lastPosition;
 
     protected override void Awake()
     {
@@ -104,6 +101,8 @@ public class EnemyMovement : AIEntityComponent
 
         HandleAnimationSpeed();
 
+        lastPosition = transform.position;
+
         return;
     }
 
@@ -112,10 +111,12 @@ public class EnemyMovement : AIEntityComponent
         Animator animatorToHandle = entity.Animator;
         if (animatorToHandle == null || navigation == null) { return; }
 
-        if (currentMode == MovementMode.Idle)
-            animatorToHandle.speed = 1.0f;
+        if (currentMode == MovementMode.Idle) { animatorToHandle.speed = 1.0f; }
         else
-            animatorToHandle.speed = navigation.velocity.magnitude / navigation.height;
+        {
+            if (navigation.height < 1.0f) { animatorToHandle.speed = navigation.velocity.magnitude / (navigation.height * (navigation.height + 1)); }
+            else { animatorToHandle.speed = navigation.velocity.magnitude / (navigation.height * navigation.height); }
+        }
 
         return;
     }
@@ -176,16 +177,6 @@ public class EnemyMovement : AIEntityComponent
     {
         if (collision.collider.CompareTag("Terrain"))
             NavigationSetActive(true);
-
-        return;
-    }
-
-    protected void PlayStep(int frontFoot)
-    {
-        /*if (frontStepAudio != null && frontFoot == 1)
-            frontStepAudio.PlayRandomClip();
-        else if (backStepAudio != null && frontFoot == 0)
-            backStepAudio.PlayRandomClip();*/
 
         return;
     }

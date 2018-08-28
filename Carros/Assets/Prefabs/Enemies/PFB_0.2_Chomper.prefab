@@ -269,6 +269,7 @@ GameObject:
   - component: {fileID: 114465413062336926}
   - component: {fileID: 114683437778673810}
   - component: {fileID: 114689919894975214}
+  - component: {fileID: 114944531277518676}
   m_Layer: 8
   m_Name: MDL_0.1_Chomper
   m_TagString: Untagged
@@ -1187,7 +1188,7 @@ GameObject:
   - component: {fileID: 4185463239969126}
   - component: {fileID: 135937266025569388}
   - component: {fileID: 114582308149608636}
-  m_Layer: 8
+  m_Layer: 11
   m_Name: Targetter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3338,8 +3339,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entity: {fileID: 114465413062336926}
   aiEntity: {fileID: 114465413062336926}
-  backStep: {fileID: 0}
-  frontStep: {fileID: 0}
   groundCheckRayLenght: 0.5
   navigation: {fileID: 195802425642049254}
   currentMode: 0
@@ -3359,6 +3358,20 @@ MonoBehaviour:
   cooldown: 6
   range: 3
   jumpSpeed: 10
+--- !u!114 &114944531277518676
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1131782393478256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f1e7b43ad86dd4780c150934fdac43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backStep: {fileID: 0}
+  frontStep: {fileID: 0}
+  idleAudio: {fileID: 0}
 --- !u!135 &135937266025569388
 SphereCollider:
   m_ObjectHideFlags: 1

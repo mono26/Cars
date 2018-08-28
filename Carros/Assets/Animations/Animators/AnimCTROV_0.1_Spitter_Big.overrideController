@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: AnimCTROV_0.1_Spitter_Big
+  m_Controller: {fileID: 9100000, guid: 5615e6430388d1e41b8230cc41c70cb8, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: ab5bda48f8799bb4f84ab060e69f60a7, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: d7517257ddde9d14481279a8b5b14544, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: 1e35373135394fa45852a3e55ba00889, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: e04f6c431ce69e04b9bc257ab30d142c, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: 207dc8692867d714ab049ba3b95ff920, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: a12e6390e42789b4eb51d2c492d7a8c5, type: 3}

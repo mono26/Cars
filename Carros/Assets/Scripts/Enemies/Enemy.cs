@@ -16,7 +16,6 @@ public class Enemy : Entity, EventHandler<TargetterEvent>, EventHandler<EnemyMov
     }
 
     [Header("Enemy settings")]
-    protected AudioClip idleAudio;
     [SerializeField]
     protected AIState returnState;
     [SerializeField]
@@ -69,14 +68,6 @@ public class Enemy : Entity, EventHandler<TargetterEvent>, EventHandler<EnemyMov
             GetComponent<Targetter>();
 
         abilities = GetComponents<Ability>();
-
-        return;
-    }
-
-    public void Grunt()
-    {
-        /*if (gruntAudio != null)
-            gruntAudio.PlayRandomClip();*/
 
         return;
     }
