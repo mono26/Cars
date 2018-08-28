@@ -114,8 +114,13 @@ public class EnemyMovement : AIEntityComponent
         if (currentMode == MovementMode.Idle) { animatorToHandle.speed = 1.0f; }
         else
         {
-            if (navigation.height < 1.0f) { animatorToHandle.speed = navigation.velocity.magnitude / (navigation.height * (navigation.height + 1)); }
-            else { animatorToHandle.speed = navigation.velocity.magnitude / (navigation.height * navigation.height); }
+            float currentSpeed = navigation.velocity.magnitude;
+            if(currentSpeed < 1.0f) { animatorToHandle.speed = currentSpeed; }
+            else
+            {
+                if (navigation.height < 1.0f) { animatorToHandle.speed = navigation.velocity.magnitude / (navigation.height + 1); }
+                else { animatorToHandle.speed = navigation.velocity.magnitude / (navigation.height + navigation.height); }
+            }
         }
 
         return;
