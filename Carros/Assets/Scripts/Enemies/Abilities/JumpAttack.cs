@@ -17,19 +17,20 @@ public class JumpAttack : Ability
 
     protected void JumpTowardsTarget()
     {
-        Debug.Log(entity.gameObject.name + "Casting Jump Attack");
+        // TODO refactorization
 
-        Vector3 initialPosition = aiEntity.transform.position;
+        Vector3 initialPosition = entity.transform.position;
         Vector3 targetPosition = Vector3.zero;
         Vector3 jumpVelocity = Vector3.zero;
 
-        SlotTargetter slotTargetter = aiEntity.Targetter as SlotTargetter;
-        Targetter targetter = aiEntity.Targetter;
+        Enemy castingEnemy = entity as Enemy;
+        SlotTargetter slotTargetter = castingEnemy.Targetter as SlotTargetter;
+        Targetter targetter = castingEnemy.Targetter;
         if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null) { targetPosition = slotTargetter.CurrentSlotTarget.transform.position; }
         else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position; }
 
-        aiEntity.Body.velocity = Vector3.zero;
-        aiEntity.Movement.NavigationSetActive(false);
+        entity.Body.velocity = Vector3.zero;
+        castingEnemy.Movement.NavigationSetActive(false);
 
         jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
         entity.Body.velocity = jumpVelocity;

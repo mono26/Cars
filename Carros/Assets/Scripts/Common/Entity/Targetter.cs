@@ -16,7 +16,7 @@ public class TargetterEvent : CarEvent
     }
 }
 
-public class Targetter : AIEntityComponent
+public class Targetter : EntityComponent
 {
     [Header("Targetter settings")]
     [SerializeField]
@@ -72,7 +72,7 @@ public class Targetter : AIEntityComponent
                 nearTargets.RemoveAt(i);
                 continue;
             }
-            float distance2 = Vector3.Distance(aiEntity.transform.position, nearTargets[i].transform.position);
+            float distance2 = Vector3.Distance(entity.transform.position, nearTargets[i].transform.position);
             if(distance2 < distance1)
             {
                 distance1 = distance2;
@@ -131,7 +131,7 @@ public class Targetter : AIEntityComponent
 
         if (currentTarget == null && nearTargets.Count.Equals(0))
         {
-            EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(aiEntity, TargetterEventType.TargetLost));
+            EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(entity as Enemy, TargetterEventType.TargetLost));
             StopCoroutine(updateTargetRoutine);
         }
 

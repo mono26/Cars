@@ -22,7 +22,7 @@ public class SlotTargetter : Targetter
         if (currentSlotTarget == null)
         {
             currentSlotTarget = _slotedTarget;
-            currentSlot = currentSlotTarget.Reserve(aiEntity.gameObject);
+            currentSlot = currentSlotTarget.Reserve(entity.gameObject);
         }
 
         nearSlotTargets.Add(_slotedTarget);
@@ -45,7 +45,7 @@ public class SlotTargetter : Targetter
                 nearTargets.RemoveAt(i);
                 continue;
             }
-            float distance2 = Vector3.Distance(aiEntity.transform.position, nearTargets[i].transform.position);
+            float distance2 = Vector3.Distance(entity.transform.position, nearTargets[i].transform.position);
             if (distance2 < distance1)
             {
                 distance1 = distance2;
@@ -104,12 +104,12 @@ public class SlotTargetter : Targetter
             SlotManager newTarget = GetNearestSlotTarget();
             currentSlotTarget = newTarget;
             if (newTarget != null)
-                currentSlot = newTarget.Reserve(aiEntity.gameObject);
+                currentSlot = newTarget.Reserve(entity.gameObject);
         }
 
         if (currentSlot == null && currentSlotTarget == null && nearTargets.Count.Equals(0))
         {
-            EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(aiEntity, TargetterEventType.TargetLost));
+            EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(entity as Enemy, TargetterEventType.TargetLost));
             StopCoroutine(updateSlotTargetRoutine);
         }
 
@@ -127,11 +127,13 @@ public class SlotTargetter : Targetter
             if (!currentTarget.Equals(nearestTarget)) { currentSlotTarget.Release(currentSlot); }
 
             currentSlotTarget = nearestTarget;
-            currentSlot = nearestTarget.Reserve(aiEntity.gameObject);
+            currentSlot = nearestTarget.Reserve(entity.gameObject);
 
             yield return new WaitForSeconds(1 / detectionRate);
         }
 
         updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget());
+
+        yield break;
     }
 }

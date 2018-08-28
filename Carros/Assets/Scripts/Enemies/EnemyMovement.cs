@@ -13,7 +13,7 @@ public class EnemyMovementEvent : CarEvent
     }
 }
 
-public class EnemyMovement : AIEntityComponent
+public class EnemyMovement : EntityComponent
 {
     public enum MovementMode { Running, Patrolling, Idle }
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Ability : AIEntityComponent
+public abstract class Ability : EntityComponent
 {
     [Header("Ability settings")]
     [SerializeField]
@@ -32,7 +32,7 @@ public class Ability : AIEntityComponent
         bool isInRange = false;
 
         float distance = Vector3.Distance(
-            aiEntity.transform.position, 
+            entity.transform.position, 
             _target.position
             );
         if (distance <= range)
@@ -46,7 +46,7 @@ public class Ability : AIEntityComponent
         bool isInRange = false;
 
         float distance = Vector3.Distance(
-            aiEntity.transform.position,
+            entity.transform.position,
             _slotTarget.transform.position
             );
         if (distance - _slotTarget.AttackingDistaceToEntity <= range)
