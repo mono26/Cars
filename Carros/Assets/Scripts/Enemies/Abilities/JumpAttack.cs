@@ -17,7 +17,7 @@ public class JumpAttack : Ability
 
     protected void JumpTowardsTarget()
     {
-        // TODO refactorization
+        // TODO refactorization,check conditions and early exit.
 
         Vector3 initialPosition = entity.transform.position;
         Vector3 targetPosition = Vector3.zero;

@@ -109,6 +109,7 @@ public static class EventManager
     }
 }
 
+// TODO check if refactorization is possible
 public interface EventHandlerBase
 {
 

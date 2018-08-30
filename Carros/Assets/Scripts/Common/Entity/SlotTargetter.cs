@@ -35,31 +35,36 @@ public class SlotTargetter : Targetter
         if (nearTargets.Count.Equals(0)) { return null; }
 
         SlotManager nearestTarget = null;
-        float distance1 = 0;
-        for (int i = 0; i < nearTargets.Count; i++)
+        float distance1 = detectionRange;
+        for (int i = 0; i < nearSlotTargets.Count; i++)
         {
             SlotManager target = nearSlotTargets[i];
             // TODO check if is dead
-            if (!target || !target.gameObject.activeInHierarchy)
+            if (target != null && !target.gameObject.activeInHierarchy)
             {
                 nearTargets.RemoveAt(i);
                 continue;
             }
-            float distance2 = Vector3.Distance(entity.transform.position, nearTargets[i].transform.position);
+            float distance2 = Vector3.Distance(entity.transform.position, target.transform.position);
             if (distance2 < distance1)
             {
                 distance1 = distance2;
                 nearestTarget = target;
             }
         }
+
         return nearestTarget;
     }
 
     protected SlotManager IsAValidSlot(GameObject _object)
     {
         SlotManager isSlot = _object.GetComponent<SlotManager>();
-        if (!isSlot) { return null; }
-        else { return isSlot; }
+        if (isSlot == null)
+        {
+            isSlot = _object.GetComponentInParent<SlotManager>();
+        }
+
+        return isSlot;
     }
 
     protected override void OnTriggerEnter(Collider other)
@@ -70,11 +75,13 @@ public class SlotTargetter : Targetter
 
             SlotManager possibleSlot = IsAValidSlot(other.gameObject);
             Debug.Log("Entered range: " + possibleSlot);
-            if (possibleSlot != null|| !nearSlotTargets.Contains(possibleSlot))
+            if (possibleSlot != null && !nearSlotTargets.Contains(possibleSlot))
                 AddSlotedTarget(possibleSlot);
-
-            else base.OnTriggerEnter(other);
+            // If the posibleSlot is already contained we exit.
+            else if (possibleSlot && nearSlotTargets.Contains(possibleSlot)) { return; }
+            else { base.OnTriggerEnter(other); }
         }
+
         return;
     }
 
@@ -85,11 +92,12 @@ public class SlotTargetter : Targetter
             if (!other.CompareTag(tag)) { return; }
 
             SlotManager possibleSlot = IsAValidSlot(other.gameObject);
-            if (possibleSlot || nearSlotTargets.Contains(possibleSlot))
+            if (possibleSlot != null && nearSlotTargets.Contains(possibleSlot))
                 RemoveSlotedTarget(possibleSlot);
 
-            else base.OnTriggerExit(other);
+            else { base.OnTriggerExit(other); }
         }
+
         return;
     }
 
@@ -120,7 +128,7 @@ public class SlotTargetter : Targetter
     {
         SlotManager nearestTarget = GetNearestSlotTarget();
 
-        if (!nearestTarget) { yield return new WaitForSeconds(1 / detectionRate); ; }
+        if (nearestTarget == null) { yield return new WaitForSeconds(1 / detectionRate); ; }
 
         else
         {
@@ -137,3 +145,4 @@ public class SlotTargetter : Targetter
         yield break;
     }
 }
+    

@@ -62,7 +62,7 @@ public class Targetter : EntityComponent
         if(nearTargets.Count.Equals(0)) { return null; }
 
         Transform nearestTarget = null;
-        float distance1 = 0;
+        float distance1 = detectionRange;
         for(int i = 0; i < nearTargets.Count; i++)
         {
             Transform target = nearTargets[i];
@@ -72,7 +72,8 @@ public class Targetter : EntityComponent
                 nearTargets.RemoveAt(i);
                 continue;
             }
-            float distance2 = Vector3.Distance(entity.transform.position, nearTargets[i].transform.position);
+            // TODO make abstraction of check distance inside collection.
+            float distance2 = Vector3.Distance(entity.transform.position, target.transform.position);
             if(distance2 < distance1)
             {
                 distance1 = distance2;
