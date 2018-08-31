@@ -57,29 +57,13 @@ public class Targetter : EntityComponent
         return new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
     }
 
-    protected Transform GetNearestTarget()
+    protected Transform GetNearestActiveTarget()
     {
         if(nearTargets.Count.Equals(0)) { return null; }
 
-        Transform nearestTarget = null;
-        float distance1 = detectionRange;
-        for(int i = 0; i < nearTargets.Count; i++)
-        {
-            Transform target = nearTargets[i];
-            // TODO check if is dead
-            if (!target || !target.gameObject.activeInHierarchy)
-            {
-                nearTargets.RemoveAt(i);
-                continue;
-            }
-            // TODO make abstraction of check distance inside collection.
-            float distance2 = Vector3.Distance(entity.transform.position, target.transform.position);
-            if(distance2 < distance1)
-            {
-                distance1 = distance2;
-                nearestTarget = target;
-            }
-        }
+        HelperFunctions.ClearInactiveElementsInCollection(ref nearTargets);
+        Transform nearestTarget = HelperFunctions.GetElementAtMinimumDistanceInColection(nearTargets, entity.transform);
+
         return nearestTarget;
     }
 
@@ -98,9 +82,8 @@ public class Targetter : EntityComponent
             if (!other.CompareTag(tag)) { return; }
 
             Transform posibleTarget = other.transform;
-            if (posibleTarget == null || nearTargets.Contains(posibleTarget)) { return; }
-
-            AddTarget(posibleTarget);
+            if (posibleTarget != null && !nearTargets.Contains(posibleTarget))
+                AddTarget(posibleTarget);
         }
 
         return;
@@ -126,7 +109,7 @@ public class Targetter : EntityComponent
 
         if (currentTarget.Equals(_target))
         {
-            Transform newTarget = GetNearestTarget();
+            Transform newTarget = GetNearestActiveTarget();
             currentTarget = newTarget;
         }
 
@@ -150,7 +133,7 @@ public class Targetter : EntityComponent
 
     protected IEnumerator UpdateTarget()
     {
-        Transform nearestTarget = GetNearestTarget();
+        Transform nearestTarget = GetNearestActiveTarget();
 
         if(!nearestTarget) { yield return new WaitForSeconds(1 / detectionRate); ; }
 
