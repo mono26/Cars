@@ -3,12 +3,10 @@
 public class AIStateMachine : MonoBehaviour
 {
     [Header("AIState Machine components")]
-    [SerializeField]
-    protected Entity aiEntity;
+    [SerializeField] protected Entity aiEntity;
 
     [Header("Editor debugging")]
-    [SerializeField]
-    protected AIState currentState;
+    [SerializeField] protected AIState currentState;
 
     protected void Awake()
     {
@@ -20,7 +18,7 @@ public class AIStateMachine : MonoBehaviour
 
     public void ChangeState(AIState _newState)
     {
-        if(_newState != null && !_newState.stateName.Equals("RemainInState"))
+        if(_newState != null && !_newState.GetStateName.Equals("RemainInState"))
             currentState = _newState;
 
         return;

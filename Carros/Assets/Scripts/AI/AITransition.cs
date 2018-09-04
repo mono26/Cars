@@ -1,7 +1,14 @@
-﻿[System.Serializable]
+﻿using UnityEngine;
+
+[System.Serializable]
 public class AITransition
 {
-    public AIDecision decision;
-    public AIState trueState;
-    public AIState falseState;
+    [Header("AI Transitionsettings")]
+    [SerializeField] protected AIDecision decision;
+    [SerializeField] protected AIState trueState;
+    [SerializeField] protected AIState falseState;
+
+    public AIDecision GetDecision { get { return decision; } }
+    public AIState GetTrueState { get { return trueState;}}
+    public AIState GetFalseState {get { return falseState;}}
 }
