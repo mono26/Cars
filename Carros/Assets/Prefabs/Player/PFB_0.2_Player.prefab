@@ -2411,7 +2411,6 @@ MonoBehaviour:
   maxSteerAngle: 25
   wheelCollider: {fileID: 146111319226131878}
   wheelType: 0
-  steeringInput: 0
 --- !u!114 &114210854056996728
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2470,7 +2469,6 @@ MonoBehaviour:
   maxSteerAngle: 25
   wheelCollider: {fileID: 146584255589467544}
   wheelType: 1
-  steeringInput: 0
 --- !u!114 &114324604017863378
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2500,7 +2498,6 @@ MonoBehaviour:
   maxSteerAngle: 25
   wheelCollider: {fileID: 146104086509683510}
   wheelType: 1
-  steeringInput: 0
 --- !u!114 &114384431885388584
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2517,7 +2514,6 @@ MonoBehaviour:
   maxSteerAngle: 25
   wheelCollider: {fileID: 146042297180144576}
   wheelType: 0
-  steeringInput: 0
 --- !u!114 &114505349004450844
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2645,7 +2641,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 114996817103200194}
-  maxFootBrakeTorque: 20000
   maxHandBrakeTorque: 100000000
   maxReverseTorque: 500
 --- !u!114 &114914748086077894
@@ -2710,10 +2705,10 @@ MonoBehaviour:
   brakes: {fileID: 114838632373125516}
   engine: {fileID: 114625321033783286}
   wheels:
-  - {fileID: 114361582668674270}
   - {fileID: 114288528187736708}
-  - {fileID: 114384431885388584}
+  - {fileID: 114361582668674270}
   - {fileID: 114030082255046436}
+  - {fileID: 114384431885388584}
   accelerationInput: 0
   footBrakeInput: 0
   handBrakeInput: 0

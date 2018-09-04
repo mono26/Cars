@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(CarEngine), typeof(Brakes))]
 public class Car : Entity
@@ -54,25 +55,58 @@ public class Car : Entity
         return;
     }
 
+    protected void ApplyEngineTorqueToWheels()
+    {
+        try
+        {
+            if (engine == null) { throw new CarMissingComponentException("TheEngine"); }
+            if (wheels == null) { throw new CarMissingComponentException("AlTheWheels"); }
+
+            float accelerationTorque = engine.GetTorqueToApply(accelerationInput);
+            foreach (Wheel wheel in wheels)
+            {
+                if (wheel == null) { { throw new CarMissingComponentException("AWheel"); } }
+                wheel.SetTorque(accelerationTorque, Wheel.TorqueType.Acceleration);
+            }
+        }
+        catch (CarMissingComponentException exception)
+        {
+            Debug.LogWarning(exception.Message + exception.GetMissingComponent);
+        }
+
+        return;
+    }
+
     protected void DirectionAsssist()
     {
-        if(wheels == null) { return; }
+        try
+        {
+            if (wheels == null) { throw new CarMissingComponentException("AllTheWheels"); }
 
-        foreach (Wheel wheelToCheck in wheels)
-        {
-            WheelHit wheelhit;
-            wheelToCheck.GetWheelCollider.GetGroundHit(out wheelhit);
-            if (wheelhit.normal == Vector3.zero)
-                return; // wheels arent on the ground so dont realign the rigidbody velocity
+            foreach (Wheel wheelToCheck in wheels)
+            {
+                if (wheelToCheck == null) { { throw new CarMissingComponentException("AWheel"); } }
+                WheelHit wheelhit;
+                wheelToCheck.GetWheelCollider.GetGroundHit(out wheelhit);
+                if (wheelhit.normal == Vector3.zero)
+                    return; // wheels arent on the ground so dont realign the rigidbody velocity
+            }
+            // this if is needed to avoid gimbal lock problems that will make the car suddenly shift direction
+            if (Mathf.Abs(oldRotation - transform.eulerAngles.y) < 10f)
+            {
+                var turnadjust = (transform.eulerAngles.y - oldRotation) * directionAssist;
+                Quaternion velRotation = Quaternion.AngleAxis(turnadjust, Vector3.up);
+                body.velocity = velRotation * body.velocity;
+            }
+            oldRotation = transform.eulerAngles.y;
         }
-        // this if is needed to avoid gimbal lock problems that will make the car suddenly shift direction
-        if (Mathf.Abs(oldRotation - transform.eulerAngles.y) < 10f)
+
+        catch (CarMissingComponentException exception)
         {
-            var turnadjust = (transform.eulerAngles.y - oldRotation) * directionAssist;
-            Quaternion velRotation = Quaternion.AngleAxis(turnadjust, Vector3.up);
-            body.velocity = velRotation * body.velocity;
+            Debug.LogWarning(exception.Message + exception.GetMissingComponent);
         }
-        oldRotation = transform.eulerAngles.y;
+
+        return;
     }
 
     protected void Drive()
@@ -88,6 +122,7 @@ public class Car : Entity
     {
         DirectionAsssist();
         Drive();
+        TractionControl();
 
         base.FixedUpdate();
 
@@ -96,17 +131,31 @@ public class Car : Entity
 
     protected void FootBrake()
     {
-        if(footBrakeInput == 0) { return; }
+        try
+        {
+            if(brakes == null) { throw new CarMissingComponentException("Brakes"); }
 
-        float footBrakeTorque = -brakes.GetFootBrakeForceToApply(footBrakeInput);
-        foreach (Wheel wheel in wheels) { wheel.SetTorque(footBrakeTorque, Wheel.TorqueType.Acceleration); }
+            if (footBrakeInput > 0)
+            {
+                float footBrakeTorque = -brakes.GetFootBrakeForceToApply(footBrakeInput);
+                foreach (Wheel wheel in wheels)
+                {
+                    if(wheel == null) { throw new CarMissingComponentException("AWheel"); }
+                    wheel.SetTorque(footBrakeTorque, Wheel.TorqueType.Acceleration);
+                }
+            }
+        }
+        catch (CarMissingComponentException exception)
+        {
+            Debug.LogWarning(exception.Message + exception.GetMissingComponent);
+        }
 
         return;
     }
 
     protected void HandleAccelerationInput()
     {
-        if (type == Entity.EntityType.AIControlled || input == null) { return; }
+        if (!CanApplyExternalInputToEntity()) { return; }
 
         accelerationInput = input.GetMovementInput;
         accelerationInput = Mathf.Clamp(accelerationInput, 0, 1);
@@ -116,18 +165,28 @@ public class Car : Entity
 
     protected void HandBrake()
     {
-        if(handBrakeInput == 0) { return; }
+        try
+        {
+            if (wheels[0] == null || wheels[1] == null) { throw new CarMissingComponentException("FrontWheels"); }
 
-        float handBrakeTorque = brakes.GetHandBrakeForceToApply(handBrakeInput);
-        wheels[0].SetTorque(handBrakeTorque, Wheel.TorqueType.Braking);
-        wheels[1].SetTorque(handBrakeTorque, Wheel.TorqueType.Braking);
+            if (handBrakeInput > 0)
+            {
+                float handBrakeTorque = brakes.GetHandBrakeForceToApply(handBrakeInput);
+                wheels[0].SetTorque(handBrakeTorque, Wheel.TorqueType.Braking);
+                wheels[1].SetTorque(handBrakeTorque, Wheel.TorqueType.Braking);
+            }
+        }
+        catch (CarMissingComponentException exception)
+        {
+            Debug.LogWarning(exception.Message + exception.GetMissingComponent);
+        }
 
         return;
     }
 
     protected void HandleBrakesInput()
     {
-        if (type == Entity.EntityType.AIControlled || input == null) { return; }
+        if (!CanApplyExternalInputToEntity()) { return; }
 
         footBrakeInput = input.GetFootBrakesInput;
         footBrakeInput = -1 * Mathf.Clamp(footBrakeInput, -1, 0);
@@ -139,6 +198,8 @@ public class Car : Entity
 
     protected void HandleInput()
     {
+        if (!CanApplyExternalInputToEntity()) { return; }
+
         HandleAccelerationInput();
         HandleBrakesInput();
         HandleSteeringInput();
@@ -148,20 +209,10 @@ public class Car : Entity
 
     protected void HandleSteeringInput()
     {
-        if (type == Entity.EntityType.AIControlled || input == null) { return; }
+        if (!CanApplyExternalInputToEntity()) { return; }
 
         steeringInput = input.GetSteeringInput;
         steeringInput = Mathf.Clamp(steeringInput, -1, 1);
-
-        return;
-    }
-
-    protected void ApplyEngineTorqueToWheels()
-    {
-        if (engine == null) { return; }
-
-        float accelerationTorque = engine.GetTorqueToApply(accelerationInput);
-        foreach (Wheel wheel in wheels) { wheel.SetTorque(accelerationTorque, Wheel.TorqueType.Acceleration); }
 
         return;
     }
@@ -178,10 +229,39 @@ public class Car : Entity
 
     protected void SteerFrontWheels()
     {
-        if (wheels[0] == null || wheels[1] == null) { return; }
+        try
+        {
+            if (wheels[0] == null || wheels[1] == null) { throw new CarMissingComponentException("FrontWheels"); }
 
-        wheels[0].ApplySteer(steeringInput);
-        wheels[1].ApplySteer(steeringInput);
+            wheels[0].ApplySteer(steeringInput);
+            wheels[1].ApplySteer(steeringInput);
+        }
+        catch (CarMissingComponentException exception)
+        {
+            Debug.LogWarning(exception.Message + exception.GetMissingComponent);
+        }
+
+        return;
+    }
+
+    // Crude traction control that reduces the power to wheel if the car is wheel spinning too much
+    protected void TractionControl()
+    {
+        try
+        {
+            if (engine == null) { throw new CarMissingComponentException("TheEngine"); }
+            if (wheels == null) { throw new CarMissingComponentException("AlTheWheels"); }
+
+            foreach (Wheel wheelToCheck in wheels)
+            {
+                float currentSlip = wheelToCheck.GetCurrentSlip;
+                engine.AdjustTorque(currentSlip);
+            }
+        }
+        catch (CarMissingComponentException exception)
+        {
+            Debug.LogWarning(exception.Message + exception.GetMissingComponent);
+        }
 
         return;
     }
@@ -191,6 +271,24 @@ public class Car : Entity
         HandleInput();
 
         base.Update();
+
+        return;
+    }
+}
+
+public class CarMissingComponentException : Exception
+{
+    protected string missingComponent;
+    public string GetMissingComponent { get { return missingComponent; } }
+
+    public CarMissingComponentException() : base("The car is missing a component: ")
+    {
+
+    }
+
+    public CarMissingComponentException(string _component) : base("The car is missing a component: ")
+    {
+        missingComponent = _component;
 
         return;
     }

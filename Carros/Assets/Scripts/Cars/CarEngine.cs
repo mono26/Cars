@@ -75,7 +75,6 @@ public class CarEngine : EntityComponent
     {
         CapSpeed();
         CalculateRevs();
-        TractionControl();
 
         return;
     }
@@ -83,23 +82,6 @@ public class CarEngine : EntityComponent
     protected void Start()
     {
         currentTorque = maxTorqueOverTheWheels - (tractionControl * maxTorqueOverTheWheels);
-
-        return;
-    }
-
-    // Crude traction control that reduces the power to wheel if the car is wheel spinning too much
-    protected void TractionControl()
-    {
-        Car car = entity.GetControlledEntity<Car>();
-        Wheel[] wheelsToCheck = car.GetWheels;
-
-        if (car == null || wheelsToCheck == null) { return; }
-
-        foreach (Wheel wheel in wheelsToCheck)
-        {
-            float currentSlip = wheel.GetCurrentSlip;
-            AdjustTorque(currentSlip);
-        }
 
         return;
     }

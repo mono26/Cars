@@ -39,6 +39,13 @@ public class Entity : MonoBehaviour
         return;
     }
 
+    protected bool CanApplyExternalInputToEntity()
+    {
+        bool canApply = false;
+        canApply = (type == EntityType.Playable && input != null) ? true : false;
+        return canApply;
+    }
+
     protected virtual void Update()
     {
         if (components == null) { return; }
