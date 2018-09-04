@@ -1,54 +1,45 @@
 ﻿using UnityEngine;
 
-public class Wheel : CarComponent
+public class Wheel : EntityComponent
 {
-    public enum TorqueType { Accelerate, Break}
+    public enum TorqueType { Acceleration, Braking }
+    public enum WheelType { Rear, Front }
 
     [Header("Wheel settings")]
-    [SerializeField]
-    protected float downForce;
-    [SerializeField]
-    protected float maxTorque;
-    [SerializeField]
-    protected float maxWheelSlip;
-    [SerializeField]
-    protected float tractionControl;
-    [SerializeField]
-    protected WheelCollider wheelCollider;
+    [SerializeField] protected float downForce = 100; // Helps the car stick to the ground.
+    [SerializeField] protected float maxSteerAngle = 25;
+    [SerializeField] protected WheelCollider wheelCollider;
+    [SerializeField] protected WheelType wheelType = WheelType.Front;
+    //[SerializeField] private WheelEffects[] m_WheelEffects = new WheelEffects[4];
+
+    public WheelCollider GetWheelCollider { get { { return wheelCollider; } } }
+    public float GetCurrentSlip
+    {
+        get
+        {
+            WheelHit wheelHit;
+            wheelCollider.GetGroundHit(out wheelHit);
+            return wheelHit.forwardSlip;
+        }
+    }
 
     // This is used to add more grip in relation to speed
     protected void AddDownForce()
     {
+        if (wheelCollider == null) { return; }
+
         Rigidbody wheelBody = wheelCollider.attachedRigidbody;
         wheelBody.AddForce(-transform.up * downForce * wheelBody.velocity.magnitude);
 
         return;
     }
 
-    protected void AdjustTorque(float _forwardSlip)
+    public void SetTorque(float _torqueToApply = 0.0f, TorqueType _typeOfTorque = TorqueType.Acceleration)
     {
-        float newTorque = 0;
-        float currentTorque = wheelCollider.motorTorque;
-        if (_forwardSlip >= maxWheelSlip && currentTorque >= 0)
-        {
-            newTorque = currentTorque - (10 * tractionControl);
-        }
-        else
-        {
-            newTorque = currentTorque + (10 * tractionControl);
-            if (newTorque > maxTorque)
-            {
-                newTorque = maxTorque;
-            }
-        }
+        if (wheelCollider == null) { return; }
 
-        return;
-    }
-
-    public void ApplyTorque(float _torqueToApply = 0.0f, TorqueType _typeOfTorque = TorqueType.Accelerate)
-    {
-        if (_typeOfTorque == TorqueType.Accelerate) { wheelCollider.motorTorque = _torqueToApply; }
-        else { wheelCollider.brakeTorque = _torqueToApply; }
+        if (_typeOfTorque == TorqueType.Acceleration) { wheelCollider.motorTorque = _torqueToApply; }
+        else if (_typeOfTorque == TorqueType.Braking) { wheelCollider.brakeTorque = _torqueToApply; }
 
         return;
     }
@@ -102,35 +93,18 @@ public class Wheel : CarComponent
 
     public override void FixedFrame()
     {
-        SteerHelp();
         AddDownForce();
         CheckForWheelSpin();
-        TractionControl();
 
         return;
     }
 
-    public void SetSteerAngle(float _targetAngle)
+    public void ApplySteer(float _steerInput)
     {
-        wheelCollider.steerAngle = _targetAngle;
+        if (wheelCollider == null) { return; }
 
-        return;
-    }
-
-    protected void SteerHelp()
-    {
-        WheelHit wheelhit;
-        wheelCollider.GetGroundHit(out wheelhit);
-        if (wheelhit.normal == Vector3.zero)
-            return; // wheels arent on the ground so dont realign the rigidbody velocity
-    }
-
-    // Crude traction control that reduces the power to wheel if the car is wheel spinning too much
-    protected void TractionControl()
-    {
-        WheelHit wheelHit;
-        wheelCollider.GetGroundHit(out wheelHit);
-        AdjustTorque(wheelHit.forwardSlip);
+        float steerAngleToApply = _steerInput * maxSteerAngle;
+        wheelCollider.steerAngle = steerAngleToApply;
 
         return;
     }

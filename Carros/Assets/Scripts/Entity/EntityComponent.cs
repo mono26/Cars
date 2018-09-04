@@ -1,26 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class EntityComponent : MonoBehaviour
+public abstract class EntityComponent : MonoBehaviour
 {
     [Header("Entity Component settings")]
-    [SerializeField]
-    protected Entity entity;
+    [SerializeField] protected Entity entity = null;
 
     protected virtual void Awake()
     {
         if (entity == null)
             entity = GetComponent<Entity>();
+        if (entity == null)
+            entity = GetComponentInParent<Entity>();
 
         return;
     }
 
     public virtual void EveryFrame()
     {
-        HandleInput();
 
-        return;
     }
 
     public virtual void FixedFrame()
@@ -29,11 +26,6 @@ public class EntityComponent : MonoBehaviour
     }
 
     public virtual void LateFrame()
-    {
-
-    }
-
-    protected virtual void HandleInput()
     {
 
     }

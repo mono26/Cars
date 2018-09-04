@@ -221,6 +221,7 @@ namespace UnityStandardAssets.Vehicles.Car
 
             for (int i = 0; i < 4; i++)
             {
+                Debug.Log(Time.timeSinceLevelLoad.ToString() + " Current Speed: " + CurrentSpeed.ToString());
                 if (CurrentSpeed > 5 && Vector3.Angle(transform.forward, m_Rigidbody.velocity) < 50f)
                 {
                     m_WheelColliders[i].brakeTorque = m_BrakeTorque*footbrake;

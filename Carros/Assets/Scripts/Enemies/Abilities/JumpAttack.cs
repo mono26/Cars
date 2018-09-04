@@ -29,11 +29,11 @@ public class JumpAttack : Ability
         if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null) { targetPosition = slotTargetter.CurrentSlotTarget.transform.position; }
         else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position; }
 
-        entity.Body.velocity = Vector3.zero;
+        entity.GetBody.velocity = Vector3.zero;
         castingEnemy.Movement.NavigationSetActive(false);
 
         jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
-        entity.Body.velocity = jumpVelocity;
+        entity.GetBody.velocity = jumpVelocity;
 
         return;
     }

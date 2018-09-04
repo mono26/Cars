@@ -95,7 +95,7 @@ public class EnemyMovement : EntityComponent
 
     private void HandleAnimations()
     {
-        if (entity.Animator == null) { return; }
+        if (entity.GetAnimator == null) { return; }
 
         HandleAnimationStates();
 
@@ -108,7 +108,7 @@ public class EnemyMovement : EntityComponent
 
     protected void HandleAnimationSpeed()
     {
-        Animator animatorToHandle = entity.Animator;
+        Animator animatorToHandle = entity.GetAnimator;
         if (animatorToHandle == null || navigation == null) { return; }
 
         if (currentMode == MovementMode.Idle) { animatorToHandle.speed = 1.0f; }
@@ -128,7 +128,7 @@ public class EnemyMovement : EntityComponent
 
     protected void HandleAnimationStates()
     {
-        Animator animatorToHandle = entity.Animator;
+        Animator animatorToHandle = entity.GetAnimator;
         if (animatorToHandle == null) { return; }
 
         animatorToHandle.SetBoolWithParameterCheck(

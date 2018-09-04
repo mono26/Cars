@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 222236497956734054}
   - component: {fileID: 114962739456998588}
   m_Layer: 5
-  m_Name: ImageTargetFeedback
+  m_Name: HitImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 222045922285216962}
   - component: {fileID: 114426311093411720}
   m_Layer: 5
-  m_Name: TargetImage
+  m_Name: ReticleImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -451,7 +451,7 @@ Canvas:
   m_GameObject: {fileID: 1686421031425886}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0

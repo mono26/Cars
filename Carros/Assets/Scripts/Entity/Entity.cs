@@ -1,36 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
     public enum EntityType { Playable, AIControlled}
 
     [Header("Entity settings")]
-    [SerializeField]
-    protected EntityType type = EntityType.AIControlled;
-    public EntityType Type { get { return type; } }
+    [SerializeField] protected EntityType type = EntityType.AIControlled;
 
     [Header("Entity components")]
-    [SerializeField]
-    protected Animator animator;
-    public Animator Animator { get { return animator; } }
-    [SerializeField]
-    protected AudioSource audioSource;
-    [SerializeField]
-    protected Rigidbody body;
-    public Rigidbody Body { get { return body; } }
-    [SerializeField]
-    protected Collider[] hitBox;
-    [SerializeField]
-    protected ExternalInput input;
-    public ExternalInput Input { get { return input; } }
-    [SerializeField]
-    protected SkinnedMeshRenderer model;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected AudioSource audioSource;
+    [SerializeField] protected Rigidbody body;
+    [SerializeField] protected Collider[] hitBox;
+    [SerializeField] protected ExternalInput input;
+    [SerializeField] protected SkinnedMeshRenderer[] model;
 
     [Header("Editor debugging")]
     [SerializeField]
     protected EntityComponent[] components;
+
+    public Animator GetAnimator { get { return animator; } }
+    public Rigidbody GetBody { get { return body; } }
+    public T GetControlledEntity<T>() where T : Entity { { return this as T; } }
 
     protected virtual void Awake()
     {
@@ -39,11 +30,11 @@ public class Entity : MonoBehaviour
         if (body == null)
             body = GetComponent<Rigidbody>();
         if (hitBox == null)
-            hitBox = transform.GetComponentsInChildren<Collider>();
+            hitBox = GetComponentsInChildren<Collider>();
         if (model == null)
-            model = GetComponent<SkinnedMeshRenderer>();
+            model = GetComponentsInChildren<SkinnedMeshRenderer>();
 
-        components = GetComponents<EntityComponent>();
+        components = GetComponentsInChildren<EntityComponent>();
 
         return;
     }

@@ -31,13 +31,13 @@ public class Ram : Ability
         if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null) { targetPosition = slotTargetter.CurrentSlotTarget.transform.position; }
         else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position;}
 
-        entity.Body.velocity = Vector3.zero;
+        entity.GetBody.velocity = Vector3.zero;
         castinEntity.Movement.NavigationSetActive(false);
 
         targetDirection = (targetPosition - initialPosition);
         targetDirection.y = 0;
         targetDirection = targetDirection.normalized;
-        entity.Body.AddForce(targetDirection * ramForce, ForceMode.Impulse);
+        entity.GetBody.AddForce(targetDirection * ramForce, ForceMode.Impulse);
 
         return;
     }
