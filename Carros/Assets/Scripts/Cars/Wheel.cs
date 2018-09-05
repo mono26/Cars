@@ -6,10 +6,10 @@ public class Wheel : EntityComponent
     public enum WheelType { Rear, Front }
 
     [Header("Wheel settings")]
-    [SerializeField] protected float downForce = 100; // Helps the car stick to the ground.
-    [SerializeField] protected float maxSteerAngle = 25;
-    [SerializeField] protected WheelCollider wheelCollider;
-    [SerializeField] protected WheelType wheelType = WheelType.Front;
+    [SerializeField] private float downForce = 100; // Helps the car stick to the ground.
+    [SerializeField] private float maxSteerAngle = 25;
+    [SerializeField] private WheelCollider wheelCollider;
+    [SerializeField] private WheelType wheelType = WheelType.Front;
     //[SerializeField] private WheelEffects[] m_WheelEffects = new WheelEffects[4];
 
     public WheelCollider GetWheelCollider { get { { return wheelCollider; } } }
@@ -23,32 +23,26 @@ public class Wheel : EntityComponent
         }
     }
 
-    // This is used to add more grip in relation to speed
-    protected void AddDownForce()
-    {
-        if (wheelCollider == null) { return; }
-
-        Rigidbody wheelBody = wheelCollider.attachedRigidbody;
-        wheelBody.AddForce(-transform.up * downForce * wheelBody.velocity.magnitude);
-
-        return;
-    }
-
-    public void SetTorque(float _torqueToApply = 0.0f, TorqueType _typeOfTorque = TorqueType.Acceleration)
-    {
-        if (wheelCollider == null) { return; }
-
-        if (_typeOfTorque == TorqueType.Acceleration) { wheelCollider.motorTorque = _torqueToApply; }
-        else if (_typeOfTorque == TorqueType.Braking) { wheelCollider.brakeTorque = _torqueToApply; }
-
-        return;
-    }
-
     protected override void Awake()
     {
-        if(wheelCollider == null)
+        if (wheelCollider == null)
             wheelCollider = GetComponent<WheelCollider>();
+        return;
+    }
 
+    public override void FixedFrame()
+    {
+        AddDownForce();
+        CheckForWheelSpin();
+        return;
+    }
+
+    // This is used to add more grip in relation to speed
+    private void AddDownForce()
+    {
+        if (wheelCollider == null) { return; }
+        Rigidbody wheelBody = wheelCollider.attachedRigidbody;
+        wheelBody.AddForce(-transform.up * downForce * wheelBody.velocity.magnitude);
         return;
     }
 
@@ -57,7 +51,7 @@ public class Wheel : EntityComponent
     // 2) plays tiure skidding sounds
     // 3) leaves skidmarks on the ground
     // these effects are controlled through the WheelEffects class
-    protected void CheckForWheelSpin()
+    private void CheckForWheelSpin()
     {
         // loop through all wheels
         for (int i = 0; i < 4; i++)
@@ -91,21 +85,19 @@ public class Wheel : EntityComponent
         return;
     }
 
-    public override void FixedFrame()
+    public void SetTorque(float _torqueToApply = 0.0f, TorqueType _typeOfTorque = TorqueType.Acceleration)
     {
-        AddDownForce();
-        CheckForWheelSpin();
-
+        if (wheelCollider == null) { return; }
+        if (_typeOfTorque == TorqueType.Acceleration) { wheelCollider.motorTorque = _torqueToApply; }
+        else if (_typeOfTorque == TorqueType.Braking) { wheelCollider.brakeTorque = _torqueToApply; }
         return;
     }
 
     public void ApplySteer(float _steerInput)
     {
         if (wheelCollider == null) { return; }
-
         float steerAngleToApply = _steerInput * maxSteerAngle;
         wheelCollider.steerAngle = steerAngleToApply;
-
         return;
     }
 }
