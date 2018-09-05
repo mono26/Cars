@@ -2417,13 +2417,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1567895917889442}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 459cec5b068041e44a60a6e3b6abb0eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carController: {fileID: 114464902703652052, guid: 3dd958f5e0c42114e83ee3647f683b3e,
-    type: 2}
+  carController: {fileID: 0}
 --- !u!114 &114215853510342074
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2623,12 +2622,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1619028564847750}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fffafd711dc1dbc478a49705cfe1ce3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  car: {fileID: 114464902703652052, guid: 3dd958f5e0c42114e83ee3647f683b3e, type: 2}
+  car: {fileID: 0}
 --- !u!114 &114838632373125516
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2674,13 +2673,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1824934460927424}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 459cec5b068041e44a60a6e3b6abb0eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carController: {fileID: 114464902703652052, guid: 3dd958f5e0c42114e83ee3647f683b3e,
-    type: 2}
+  carController: {fileID: 0}
 --- !u!114 &114996817103200194
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2705,8 +2703,8 @@ MonoBehaviour:
   brakes: {fileID: 114838632373125516}
   engine: {fileID: 114625321033783286}
   wheels:
-  - {fileID: 114288528187736708}
-  - {fileID: 114361582668674270}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 114030082255046436}
   - {fileID: 114384431885388584}
   accelerationInput: 0

@@ -17,7 +17,7 @@ public class AIState : ScriptableObject
         CheckTransitions(_entity);
     }
 
-    protected void DoActions(Entity _entity)
+    private void DoActions(Entity _entity)
     {
         try
         {
@@ -34,7 +34,7 @@ public class AIState : ScriptableObject
         return;
     }
 
-    protected void CheckTransitions(Entity _entity)
+    private void CheckTransitions(Entity _entity)
     {
         try
         {
@@ -58,6 +58,11 @@ public class AIState : ScriptableObject
         }
 
         return;
+    }
+
+    private bool HasTransition()
+    {
+
     }
 }
 

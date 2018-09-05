@@ -2303,7 +2303,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1299170604225318}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.07, z: 14.07}
+  m_LocalPosition: {x: -6.28, y: -1.52, z: 14.07}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4068462168725556}
@@ -3283,7 +3283,8 @@ MonoBehaviour:
   - {fileID: 65226593446134164}
   - {fileID: 65922570973394550}
   input: {fileID: 0}
-  model: {fileID: 137737120032530840}
+  model:
+  - {fileID: 0}
   components: []
   returnState: {fileID: 11400000, guid: 291a9bd454433af428542ed14c5d4aed, type: 2}
   startingState: {fileID: 11400000, guid: b1d918f057b934441930358644f948c5, type: 2}
@@ -3313,7 +3314,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 114465413062336926}
-  aiEntity: {fileID: 114465413062336926}
   detectionRange: 20
   detectionRate: 2
   targetterTrigger: {fileID: 135937266025569388}
@@ -3338,7 +3338,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 114465413062336926}
-  aiEntity: {fileID: 114465413062336926}
   groundCheckRayLenght: 0.5
   navigation: {fileID: 195802425642049254}
   currentMode: 0
@@ -3354,7 +3353,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 114465413062336926}
-  aiEntity: {fileID: 114465413062336926}
   cooldown: 6
   range: 3
   jumpSpeed: 10
