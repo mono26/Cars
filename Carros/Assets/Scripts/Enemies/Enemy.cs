@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine))]
-public class Enemy : Entity, EventHandler<TargetterEvent>, EventHandler<EnemyMovementEvent>
+public class Enemy : Entity, EventHandler<TargetterEvent>
 {
     [System.Serializable]
     public class EnemyStats
@@ -59,78 +59,159 @@ public class Enemy : Entity, EventHandler<TargetterEvent>, EventHandler<EnemyMov
     protected override void Awake()
     {
         base.Awake();
-
         if (movement == null)
             GetComponent<EnemyMovement>();
         if (stateMachine == null)
             GetComponent<AIStateMachine>();
         if (targetter == null)
             GetComponent<Targetter>();
-
         abilities = GetComponents<Ability>();
-
         return;
+    }
+
+    protected virtual void Start()
+    {
+        initialPosition = transform.position;
+        stateMachine.ChangeState(startingState);
+        updateStateRoutine = StartCoroutine(UpdateState());
+        return;
+    }
+
+    protected IEnumerator UpdateState()
+    {
+        stateMachine.UpdateState();
+        yield return new WaitForSeconds(1 / stateUpdateRate);
+        updateStateRoutine = StartCoroutine(UpdateState());
     }
 
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-
         return;
     }
 
     protected override void LateUpdate()
     {
         base.LateUpdate();
-
         return;
     }
 
     protected void OnDisable()
     {
         EventManager.RemoveListener<TargetterEvent>(this);
-        EventManager.RemoveListener<EnemyMovementEvent>(this);
-
         return;
     }
 
     protected void OnEnable()
     {
         EventManager.AddListener<TargetterEvent>(this);
-        EventManager.AddListener<EnemyMovementEvent>(this);
-
         return;
     }
 
-    public void OnEvent(EnemyMovementEvent _movementEvent)
+    /// <summary>
+    /// Used to calculate a random patrol point inside the enemy influence zone. Return enemy position
+    /// if there is no influence zone.
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 CalculateRandomPatrolPoint()
     {
-        if (movement == null) { return; }
-        if (!_movementEvent.enemy.Equals(this)) { return; }
-
-        switch (_movementEvent.movementType)
+        Vector3 patrolPoint = transform.position;
+        try
         {
-            case EnemyMovement.MovementMode.Running:
-                if (movement.CurrentMode != EnemyMovement.MovementMode.Running)
-                    movement.SetMovementValues(
-                        stats.MovementStats.RunningAcceleration,
-                        stats.MovementStats.RunningSpeed,
-                        EnemyMovement.MovementMode.Running
-                        );
-
-                break;
-
-            case EnemyMovement.MovementMode.Patrolling:
-                if (movement.CurrentMode != EnemyMovement.MovementMode.Patrolling)
-                    movement.SetMovementValues(
-                        stats.MovementStats.WalkingAcceleration,
-                        stats.MovementStats.WalkingSpeed,
-                        EnemyMovement.MovementMode.Patrolling
-                        );
-                break;
-
-            default:
-                break;
+            if (HasTargetterComponent())
+                targetter.CalculateRandomPointInsideTrigger();
         }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+        }
+        return patrolPoint;
+    }
+
+    private bool HasTargetterComponent()
+    {
+        bool hasTargetter = true;
+        if (targetter == null)
+        {
+            hasTargetter = false;
+            throw new MissingComponentException("The enemy has a missing component: ", typeof(Targetter));
+        }
+        return hasTargetter;
+    }
+
+    public void PatrolTowardsPoint(Vector3 _destinationPoint)
+    {
+        try
+        {
+            if (HasMovementComponent() && !movement.AlreadyInAPath())
+                movement.SetNavigationDestination(_destinationPoint);
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+        }
+        return;
+    }
+
+    private bool HasMovementComponent()
+    {
+        bool hasMovement = true;
+        if (movement == null)
+        {
+            hasMovement = false;
+            throw new MissingComponentException("The enemy has a missing component: ", typeof(EnemyMovement));
+        }
+        return hasMovement;
+    }
+
+    public void RunTowardsPoint(Vector3 _destinationPoint)
+    {
+        try
+        {
+            if (HasMovementComponent())
+                movement.SetNavigationDestination(_destinationPoint);
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+        }
+        return;
+    }
+
+    public void StartRunning()
+    {
+        try
+        {
+            if (HasMovementComponent() && movement.CurrentMode != EnemyMovement.MovementMode.Running)
+                movement.SetMovementValues(
+                    stats.MovementStats.RunningAcceleration,
+                    stats.MovementStats.RunningSpeed,
+                    EnemyMovement.MovementMode.Running
+                    );
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+        }
+        return;
+    }
+
+    public void StartPatrolling()
+    {
+        try
+        {
+            if (HasMovementComponent() && movement.CurrentMode != EnemyMovement.MovementMode.Patrolling)
+                movement.SetMovementValues(
+                    stats.MovementStats.WalkingAcceleration,
+                    stats.MovementStats.WalkingSpeed,
+                    EnemyMovement.MovementMode.Patrolling
+                    );
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+        }
+        return;
     }
 
     public void OnEvent(TargetterEvent _targetterEvent)
@@ -146,24 +227,5 @@ public class Enemy : Entity, EventHandler<TargetterEvent>, EventHandler<EnemyMov
             default:
                 break;
         }
-    }
-
-    protected virtual void Start()
-    {
-        initialPosition = transform.position;
-
-        stateMachine.ChangeState(startingState);
-        updateStateRoutine = StartCoroutine(UpdateState());
-
-        return;
-    }
-
-    protected IEnumerator UpdateState()
-    {
-        stateMachine.UpdateState();
-
-        yield return new WaitForSeconds(1 / stateUpdateRate);
-
-        updateStateRoutine = StartCoroutine(UpdateState());
     }
 }

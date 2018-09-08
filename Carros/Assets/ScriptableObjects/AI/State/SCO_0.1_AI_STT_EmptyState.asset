@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5080e473b531e1140bdc131a255204cb, type: 3}
   m_Name: SCO_0.1_AI_STT_EmptyState
   m_EditorClassIdentifier: 
-  stateName: RemainInState
+  stateName: EmptyState
   actions: []
   transitions: []
