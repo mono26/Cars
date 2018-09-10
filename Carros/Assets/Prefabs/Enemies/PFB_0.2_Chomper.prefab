@@ -3276,13 +3276,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
-  animator: {fileID: 95127303393065252}
-  audioSource: {fileID: 82585627710067760}
+  animatorComponent: {fileID: 0}
+  audioComponent: {fileID: 0}
   body: {fileID: 54661212036368316}
   hitBox:
   - {fileID: 65226593446134164}
   - {fileID: 65922570973394550}
-  input: {fileID: 0}
+  inputcomponent: {fileID: 0}
   model:
   - {fileID: 0}
   components: []
@@ -3316,7 +3316,7 @@ MonoBehaviour:
   entity: {fileID: 114465413062336926}
   detectionRange: 20
   detectionRate: 2
-  targetterTrigger: {fileID: 135937266025569388}
+  detectionTrigger: {fileID: 0}
   targetableTags:
   - Player
   currentTarget: {fileID: 0}
@@ -3339,7 +3339,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entity: {fileID: 114465413062336926}
   groundCheckRayLenght: 0.5
-  navigation: {fileID: 195802425642049254}
+  navigationComponent: {fileID: 195802425642049254}
   currentMode: 0
 --- !u!114 &114689919894975214
 MonoBehaviour:

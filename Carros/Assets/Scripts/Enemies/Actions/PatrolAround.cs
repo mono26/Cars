@@ -16,7 +16,8 @@ public class PatrolAround : AIAction
         {
             Enemy enemy = _entity as Enemy;
             enemy.StartPatrolling();
-            enemy.PatrolTowardsPoint(enemy.CalculateRandomPatrolPoint());
+            Vector3 patrolPoint = enemy.CalculateRandomPatrolPoint();
+            enemy.PatrolTowardsPoint(patrolPoint);
         }
         return;
     }

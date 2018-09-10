@@ -16,47 +16,11 @@ public class SlotTargetter : Targetter
     [SerializeField]
     protected Coroutine updateSlotTargetRoutine;
 
-    protected void AddSlotedTarget(SlotManager _slotedTarget)
-    {
-        if (nearSlotTargets.Count.Equals(0)) { updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget()); }
-        if (currentSlotTarget == null)
-        {
-            currentSlotTarget = _slotedTarget;
-            currentSlot = currentSlotTarget.Reserve(entity.gameObject);
-        }
-
-        nearSlotTargets.Add(_slotedTarget);
-
-        return;
-    }
-
-    protected SlotManager GetNearestActiveSlotTarget()
-    {
-        if (nearTargets.Count.Equals(0)) { return null; }
-
-        HelperFunctions.ClearInactiveElementsInCollection(ref nearSlotTargets);
-        SlotManager nearestTarget = HelperFunctions.GetElementAtMinimumDistanceInColection(nearSlotTargets, entity.transform);
-
-        return nearestTarget;
-    }
-
-    protected SlotManager IsAValidSlot(GameObject _object)
-    {
-        SlotManager isSlot = _object.GetComponent<SlotManager>();
-        if (isSlot == null)
-        {
-            isSlot = _object.GetComponentInParent<SlotManager>();
-        }
-
-        return isSlot;
-    }
-
     protected override void OnTriggerEnter(Collider other)
     {
         foreach (string tag in targetableTags)
         {
             if (!other.CompareTag(tag)){ return; }
-
             SlotManager possibleSlotTarget = IsAValidSlot(other.gameObject);
             if (possibleSlotTarget != null && !nearSlotTargets.Contains(possibleSlotTarget))
                 AddSlotedTarget(possibleSlotTarget);
@@ -64,8 +28,52 @@ public class SlotTargetter : Targetter
             else if (possibleSlotTarget && nearSlotTargets.Contains(possibleSlotTarget)) { return; }
             else { base.OnTriggerEnter(other); }
         }
-
         return;
+    }
+
+    private void AddSlotedTarget(SlotManager _slotedTarget)
+    {
+        if (nearSlotTargets.Count.Equals(0)) { updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget()); }
+        if (currentSlotTarget == null)
+        {
+            currentSlotTarget = _slotedTarget;
+            currentSlot = currentSlotTarget.Reserve(entity.gameObject);
+        }
+        nearSlotTargets.Add(_slotedTarget);
+        return;
+    }
+
+    private IEnumerator UpdateSlotTarget()
+    {
+        SlotManager nearestTarget = GetNearestActiveSlotTarget();
+        if (nearestTarget == null) { yield return new WaitForSeconds(1 / detectionRate); ; }
+        else
+        {
+            if (!currentTarget.Equals(nearestTarget)) { currentSlotTarget.Release(currentSlot); }
+            currentSlotTarget = nearestTarget;
+            currentSlot = nearestTarget.Reserve(entity.gameObject);
+            yield return new WaitForSeconds(1 / detectionRate);
+        }
+        updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget());
+        yield break;
+    }
+
+    private SlotManager GetNearestActiveSlotTarget()
+    {
+        if (nearTargets.Count.Equals(0)) { return null; }
+        HelperFunctions.ClearInactiveElementsInCollection(ref nearSlotTargets);
+        SlotManager nearestTarget = HelperFunctions.GetElementAtMinimumDistanceInColection(nearSlotTargets, entity.transform);
+        return nearestTarget;
+    }
+
+    private SlotManager IsAValidSlot(GameObject _object)
+    {
+        SlotManager isSlot = _object.GetComponent<SlotManager>();
+        if (isSlot == null)
+        {
+            isSlot = _object.GetComponentInParent<SlotManager>();
+        }
+        return isSlot;
     }
 
     protected override void OnTriggerExit(Collider other)
@@ -73,21 +81,18 @@ public class SlotTargetter : Targetter
         foreach (string tag in targetableTags)
         {
             if (!other.CompareTag(tag)) { return; }
-
             SlotManager possibleSlot = IsAValidSlot(other.gameObject);
             if (possibleSlot != null && nearSlotTargets.Contains(possibleSlot))
                 RemoveSlotedTarget(possibleSlot);
-
             else { base.OnTriggerExit(other); }
         }
 
         return;
     }
 
-    protected void RemoveSlotedTarget(SlotManager _slotedTarget)
+    private void RemoveSlotedTarget(SlotManager _slotedTarget)
     {
         nearSlotTargets.Remove(_slotedTarget);
-
         if (currentSlotTarget.Equals(_slotedTarget))
         {
             currentSlotTarget.Release(currentSlot);
@@ -97,35 +102,12 @@ public class SlotTargetter : Targetter
             if (newTarget != null)
                 currentSlot = newTarget.Reserve(entity.gameObject);
         }
-
         if (currentSlot == null && currentSlotTarget == null && nearTargets.Count.Equals(0))
         {
             EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(entity as Enemy, TargetterEventType.TargetLost));
             StopCoroutine(updateSlotTargetRoutine);
         }
-
         return;
-    }
-
-    protected IEnumerator UpdateSlotTarget()
-    {
-        SlotManager nearestTarget = GetNearestActiveSlotTarget();
-
-        if (nearestTarget == null) { yield return new WaitForSeconds(1 / detectionRate); ; }
-
-        else
-        {
-            if (!currentTarget.Equals(nearestTarget)) { currentSlotTarget.Release(currentSlot); }
-
-            currentSlotTarget = nearestTarget;
-            currentSlot = nearestTarget.Reserve(entity.gameObject);
-
-            yield return new WaitForSeconds(1 / detectionRate);
-        }
-
-        updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget());
-
-        yield break;
     }
 }
     

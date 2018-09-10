@@ -50,21 +50,18 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     [SerializeField]
     protected Coroutine updateStateRoutine;
 
-    /// <summary>
-    /// The next ability to cast.
-    /// </summary>
-    /// <param name="_nextAbility"> The next ability to cast, can be NULL.</param>
-    public void SetNextAbility(Ability _nextAbility) { nextAbility = _nextAbility; }
-
     protected override void Awake()
     {
         base.Awake();
-        if (movement == null)
+        if (movement == null) {
             GetComponent<EnemyMovement>();
-        if (stateMachine == null)
+        }
+        if (stateMachine == null) {
             GetComponent<AIStateMachine>();
-        if (targetter == null)
+        }
+        if (targetter == null) {
             GetComponent<Targetter>();
+        }
         abilities = GetComponents<Ability>();
         return;
     }
@@ -77,7 +74,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
         return;
     }
 
-    protected IEnumerator UpdateState()
+    private IEnumerator UpdateState()
     {
         stateMachine.UpdateState();
         yield return new WaitForSeconds(1 / stateUpdateRate);
@@ -118,11 +115,11 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
         Vector3 patrolPoint = transform.position;
         try
         {
-            if (HasTargetterComponent())
-                targetter.CalculateRandomPointInsideTrigger();
+            if (HasTargetterComponent()) {
+                patrolPoint = targetter.CalculateRandomPointInsideTrigger();
+            }
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return patrolPoint;
@@ -143,11 +140,11 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     {
         try
         {
-            if (HasMovementComponent() && !movement.AlreadyInAPath())
+            if (HasMovementComponent() && !movement.IsAlreadyInAPath()) {
                 movement.SetNavigationDestination(_destinationPoint);
+            }
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return;
@@ -171,8 +168,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
             if (HasMovementComponent())
                 movement.SetNavigationDestination(_destinationPoint);
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return;
@@ -182,15 +178,14 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     {
         try
         {
-            if (HasMovementComponent() && movement.CurrentMode != EnemyMovement.MovementMode.Running)
+            if (HasMovementComponent() && movement.GetCurrentMode != EnemyMovement.MovementMode.Running)
                 movement.SetMovementValues(
                     stats.MovementStats.RunningAcceleration,
                     stats.MovementStats.RunningSpeed,
                     EnemyMovement.MovementMode.Running
                     );
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return;
@@ -200,7 +195,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     {
         try
         {
-            if (HasMovementComponent() && movement.CurrentMode != EnemyMovement.MovementMode.Patrolling)
+            if (HasMovementComponent() && movement.GetCurrentMode != EnemyMovement.MovementMode.Patrolling)
                 movement.SetMovementValues(
                     stats.MovementStats.WalkingAcceleration,
                     stats.MovementStats.WalkingSpeed,
@@ -227,5 +222,40 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
             default:
                 break;
         }
+    }
+
+    /// <summary>
+    /// The next ability to cast.
+    /// </summary>
+    /// <param name="_nextAbility"> The next ability to cast, can be NULL.</param>
+    public void SetNextAbility(Ability _nextAbility)
+    {
+        nextAbility = _nextAbility;
+        return;
+    }
+
+    public void ChangeState(AIState _stateToChangeTo)
+    {
+        if (HasStateMachineComponent()) {
+            stateMachine.ChangeState(_stateToChangeTo);
+        }
+        return;
+    }
+
+    public bool HasStateMachineComponent()
+    {
+        bool hasStatemachine = true;
+        if (stateMachine == null)
+        {
+            hasStatemachine = false;
+            throw new MissingComponentException("The enemy has a missing component: ", typeof(AIStateMachine));
+        }
+        return hasStatemachine;
+    }
+
+    public void ActivateNavigation(bool _value)
+    {
+        movement.NavigationSetActive(_value);
+        return;
     }
 }

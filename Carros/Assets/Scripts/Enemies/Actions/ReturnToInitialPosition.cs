@@ -15,12 +15,12 @@ public class ReturnToInitialPosition : AIAction
         Enemy enemy = _entity as Enemy;
         if (enemy == null) { return; }
 
-        if(enemy.Movement == null || enemy.Movement.Navigation == null) { return; }
+        if(enemy.Movement == null || enemy.Movement.GetNavigationComponent == null) { return; }
 
-        if (enemy.Movement.CurrentMode != EnemyMovement.MovementMode.Running)
+        if (enemy.Movement.GetCurrentMode != EnemyMovement.MovementMode.Running)
             EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(enemy, EnemyMovement.MovementMode.Running));
 
-        if (!enemy.Movement.Navigation.destination.Equals(enemy.InitialPosition))
+        if (!enemy.Movement.GetNavigationComponent.destination.Equals(enemy.InitialPosition))
             enemy.Movement.SetNavigationDestination(enemy.InitialPosition);
 
         return;

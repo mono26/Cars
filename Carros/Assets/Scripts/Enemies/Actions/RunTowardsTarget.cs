@@ -17,7 +17,7 @@ public class RunTowardsTarget : AIAction
         if (enemy == null) { return; }
 
         EnemyMovement movement = enemy.Movement;
-        UnityEngine.AI.NavMeshAgent navigation = enemy.Movement.Navigation;
+        UnityEngine.AI.NavMeshAgent navigation = enemy.Movement.GetNavigationComponent;
         if (movement == null || navigation == null) { return; }
 
         Vector3 slotPosition = Vector3.zero;
@@ -34,10 +34,10 @@ public class RunTowardsTarget : AIAction
     protected void SetNavigationPointAndMakeItRun(Enemy _enemy, Vector3 _targetPoint)
     {
         EnemyMovement movement = _enemy.Movement;
-        if (movement.CurrentMode != EnemyMovement.MovementMode.Running)
+        if (movement.GetCurrentMode != EnemyMovement.MovementMode.Running)
             EventManager.TriggerEvent<EnemyMovementEvent>(new EnemyMovementEvent(_enemy, EnemyMovement.MovementMode.Running));
 
-        if (!movement.Navigation.destination.Equals(_targetPoint))
+        if (!movement.GetNavigationComponent.destination.Equals(_targetPoint))
             movement.SetNavigationDestination(_targetPoint);
 
         return;

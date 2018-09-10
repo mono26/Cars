@@ -58,27 +58,27 @@ public class Car : Entity
     {
         try
         {
-            if (wheels == null) { throw new CarMissingComponentException(); }
-            foreach (Wheel wheelToCheck in wheels)
+            if (HasAllWheels())
             {
-                if (wheelToCheck == null) { { throw new CarMissingComponentException(); } }
-                WheelHit wheelhit;
-                wheelToCheck.GetWheelCollider.GetGroundHit(out wheelhit);
-                if (wheelhit.normal == Vector3.zero)
-                    return; // wheels arent on the ground so dont realign the rigidbody velocity
+                foreach (Wheel wheelToCheck in wheels)
+                {
+                    WheelHit wheelhit;
+                    wheelToCheck.GetWheelCollider.GetGroundHit(out wheelhit);
+                    if (wheelhit.normal == Vector3.zero)
+                        return; // wheels arent on the ground so dont realign the rigidbody velocity
+                }
             }
             // this if is needed to avoid gimbal lock problems that will make the car suddenly shift direction
             if (Mathf.Abs(oldRotation - transform.eulerAngles.y) < 10f)
             {
                 var turnadjust = (transform.eulerAngles.y - oldRotation) * directionAssist;
                 Quaternion velRotation = Quaternion.AngleAxis(turnadjust, Vector3.up);
-                body.velocity = velRotation * body.velocity;
+                SetBodyVelocity(velRotation * GetBody.velocity);
             }
             oldRotation = transform.eulerAngles.y;
         }
-        catch (CarMissingComponentException carException)
-        {
-            carException.NoWheelException();
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return;
     }
@@ -101,26 +101,25 @@ public class Car : Entity
                 wheels[1].ApplySteer(steeringInput);
             }
         }
-        catch (CarMissingComponentException carException)
+        catch (MissingComponentException missingComponentException)
         {
-            carException.NoWheelException(carException.Message);
+            missingComponentException.DisplayException();
         }
         return;
     }
 
     private bool HasFrontWheels()
     {
-        bool hasWheels = false;
+        bool hasWheels = true;
         int numberOfFrontWheels = wheels.Length / 2;
         for (int i = 0; i < numberOfFrontWheels; i++)
         {
-            if (wheels[i] == null){
-                throw new CarMissingComponentException(
-                    CarMissingComponentException.MissingComponent.Wheel,
-                    "Missing the wheel: " + i.ToString());
+            if (wheels[i] == null)
+            {
+                hasWheels = false;
+                throw new MissingComponentException("The car has a missing front wheel: ", typeof(Wheel));
             }
         }
-        hasWheels = true;
         return hasWheels;
     }
 
@@ -136,9 +135,8 @@ public class Car : Entity
                 }
             }
         }
-        catch (CarMissingComponentException carException)
-        {
-            carException.LaunchException();
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return;
     }
@@ -149,7 +147,7 @@ public class Car : Entity
         if (engine == null)
         {
             hasEngine = false;
-            throw new CarMissingComponentException(CarMissingComponentException.MissingComponent.Engine);
+            throw new MissingComponentException("The car has a missing engine: ", typeof(CarEngine));
         }
         return hasEngine;
     }
@@ -175,9 +173,7 @@ public class Car : Entity
             if (wheels[i] == null)
             {
                 hasBackWheels = false;
-                throw new CarMissingComponentException(
-                    CarMissingComponentException.MissingComponent.Wheel,
-                    "Missing the wheel: " + i.ToString());
+                throw new MissingComponentException("The car has a missing rear wheel: ", typeof(Wheel));
             }
         }
         return hasBackWheels;
@@ -204,9 +200,8 @@ public class Car : Entity
                 }
             }
         }
-        catch (CarMissingComponentException carException)
-        {
-            carException.LaunchException();
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return;
     }
@@ -217,7 +212,7 @@ public class Car : Entity
         if (brakes == null)
         {
             hasBrakes = false;
-            throw new CarMissingComponentException(CarMissingComponentException.MissingComponent.Brakes);
+            throw new MissingComponentException("The car has missing brakes: ", typeof(Brakes));
         }
         return hasBrakes;
     }
@@ -238,9 +233,8 @@ public class Car : Entity
                 }
             }
         }
-        catch (CarMissingComponentException carException)
-        {
-            carException.LaunchException();
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return;
     }
@@ -259,9 +253,8 @@ public class Car : Entity
                 }
             }
         }
-        catch (CarMissingComponentException exception)
-        {
-            exception.LaunchException();
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return;
     }
@@ -285,7 +278,7 @@ public class Car : Entity
     private void HandleAccelerationInput()
     {
         if (!CanApplyExternalInputToEntity()) { return; }
-        accelerationInput = input.GetMovementInput;
+        accelerationInput = GetInputcomponent.GetMovementInput;
         accelerationInput = Mathf.Clamp(accelerationInput, 0, 1);
         return;
     }
@@ -293,9 +286,10 @@ public class Car : Entity
     private void HandleBrakesInput()
     {
         if (!CanApplyExternalInputToEntity()) { return; }
-        footBrakeInput = input.GetFootBrakesInput;
+        // TODO refactor input access.
+        footBrakeInput = GetInputcomponent.GetFootBrakesInput;
         footBrakeInput = -1 * Mathf.Clamp(footBrakeInput, -1, 0);
-        handBrakeInput = input.GetHandBrakeInput;
+        handBrakeInput = GetInputcomponent.GetHandBrakeInput;
         handBrakeInput = Mathf.Clamp(handBrakeInput, 0, 1);
         return;
     }
@@ -303,7 +297,7 @@ public class Car : Entity
     private void HandleSteeringInput()
     {
         if (!CanApplyExternalInputToEntity()) { return; }
-        steeringInput = input.GetSteeringInput;
+        steeringInput = GetInputcomponent.GetSteeringInput;
         steeringInput = Mathf.Clamp(steeringInput, -1, 1);
         return;
     }
@@ -318,98 +312,5 @@ public class Car : Entity
             }
         }*/
         return false;
-    }
-}
-
-public class CarMissingComponentException : Exception
-{
-    public enum MissingComponent { Brakes, Engine, Wheel }
-    public enum MissingWheelType { FronLeft, FrontRight, RearLeft, RearRight }
-
-    protected MissingComponent missingComponent;
-
-    public CarMissingComponentException() : base("The car is missing a component: ")
-    {
-
-    }
-
-    public CarMissingComponentException(MissingComponent _component) : base()
-    {
-        missingComponent = _component;
-
-        return;
-    }
-
-    public CarMissingComponentException(MissingComponent _component, string _message) : base(_message)
-    {
-        missingComponent = _component;
-
-        return;
-    }
-
-    public void LaunchException()
-    {
-        switch(missingComponent)
-        {
-            case MissingComponent.Brakes:
-                NoBrakeException();
-                break;
-            case MissingComponent.Engine:
-                NoEngineException();
-                break;
-            case MissingComponent.Wheel:
-                NoWheelException();
-                break;
-            default:
-                Debug.LogWarning("Car missing component exception.");
-                break;
-        }
-        return;
-    }
-
-    public void NoBrakeException()
-    {
-        if(Message != null && Message != ""){
-            NoBrakeException(Message);}
-        else{
-            NoBrakeException(" The car has no Brake component.");}
-        return;
-    }
-
-    public void NoBrakeException(string _message)
-    {
-        Debug.LogWarning(_message);
-        return;
-    }
-
-    public void NoEngineException()
-    {
-        if (Message != null && Message != ""){
-            NoEngineException(Message);}
-        else{
-            NoEngineException(" The car has no Engine component."); }
-            
-        return;
-    }
-
-    public void NoEngineException(string _message)
-    {
-        NoEngineException(_message);
-        return;
-    }
-
-    public void NoWheelException()
-    {
-        if (Message != null && Message != ""){
-            NoWheelException(Message);}
-        else{
-            NoWheelException(" The car has a missing Wheel component.");}
-        return;
-    }
-
-    public void NoWheelException(string _message)
-    {
-        Debug.LogWarning(_message);
-        return;
     }
 }

@@ -43,54 +43,32 @@ public class EnemyMovement : EntityComponent
     }
 
     [Header("Enemy Movement settings")]
-    [SerializeField]
-    protected float groundCheckRayLenght = 1.0f;
+    [SerializeField] private float groundCheckRayLenght = 1.0f;
 
     [Header("Enemy Movement Components")]
-    [SerializeField]
-    protected NavMeshAgent navigation;
-    public NavMeshAgent Navigation { get { return navigation; } }
+    [SerializeField] private NavMeshAgent navigationComponent;
 
     [Header("Editor debugging")]
-    [SerializeField]
-    protected MovementMode currentMode;
-    public MovementMode CurrentMode { get { return currentMode; } }
+    [SerializeField] private MovementMode currentMode;
+
     protected Vector3 lastPosition;
+
+    public MovementMode GetCurrentMode { get { return currentMode; } }
+    public NavMeshAgent GetNavigationComponent { get { return navigationComponent; } }
 
     protected override void Awake()
     {
-        base.Awake();
-        if (navigation == null)
+        if (navigationComponent == null) {
             GetComponent<NavMeshAgent>();
+        }
+        base.Awake();
         return;
     }
 
-    protected bool CheckGrounded()
+    private void Start()
     {
-        RaycastHit hit;
-        Ray ray = new Ray(transform.position + Vector3.up * groundCheckRayLenght * 0.5f, -Vector3.up);
-        bool isGrounded = Physics.Raycast(ray, out hit, groundCheckRayLenght, Physics.AllLayers,
-            QueryTriggerInteraction.Ignore);
-        return isGrounded;
-    }
-
-    protected bool CheckIfStandingStill()
-    {
-        bool isStandingStill = true;
-        try
-        {
-            if(HasNavigationComponent())
-            {
-                isStandingStill = navigation.desiredVelocity.sqrMagnitude <= 0.1f * 0.1f ? true : false;
-                if (isStandingStill)
-                    currentMode = MovementMode.Idle;
-            }
-        }
-        catch (MissingComponentException missingComponentException)
-        {
-            missingComponentException.DisplayException();
-        }
-        return isStandingStill;
+        navigationComponent.updatePosition = false;
+        return;
     }
 
     public override void FixedFrame()
@@ -99,45 +77,27 @@ public class EnemyMovement : EntityComponent
         return;
     }
 
+    private void OnAnimatorMove()
+    {
+        //Debug.Log(Time.timeSinceLevelLoad + "Navigation next position: " + navigation.nextPosition);
+        if (HasNavigationComponent()) {
+            transform.position = navigationComponent.nextPosition;
+        }
+        return;
+    }
+
     private void HandleAnimations()
     {
-        if (entity.GetAnimator == null) { return; }
+        if (entity.GetAnimatorComponent == null) { return; }
         HandleAnimationStates();
         HandleAnimationSpeed();
         lastPosition = transform.position;
         return;
     }
 
-    protected void HandleAnimationSpeed()
+    private void HandleAnimationStates()
     {
-        try
-        {
-            Animator animatorToHandle = entity.GetAnimator;
-            if (animatorToHandle != null && HasNavigationComponent())
-            {
-                if (currentMode == MovementMode.Idle) { animatorToHandle.speed = 1.0f; }
-                else
-                {
-                    float currentSpeed = navigation.velocity.magnitude;
-                    if (currentSpeed < 1.0f) { animatorToHandle.speed = currentSpeed; }
-                    else
-                    {
-                        if (navigation.height < 1.0f) { animatorToHandle.speed = navigation.velocity.magnitude / (navigation.height + 1); }
-                        else { animatorToHandle.speed = navigation.velocity.magnitude / (navigation.height + navigation.height); }
-                    }
-                }
-            }
-        }
-        catch (MissingComponentException missingComponentException)
-        {
-            missingComponentException.DisplayException();
-        }
-        return;
-    }
-
-    protected void HandleAnimationStates()
-    {
-        Animator animatorToHandle = entity.GetAnimator;
+        Animator animatorToHandle = entity.GetAnimatorComponent;
         if (animatorToHandle == null) { return; }
         animatorToHandle.SetBoolWithParameterCheck(
             "IsGrounded",
@@ -162,35 +122,94 @@ public class EnemyMovement : EntityComponent
         return;
     }
 
+    private bool CheckGrounded()
+    {
+        RaycastHit hit;
+        Ray ray = new Ray(transform.position + Vector3.up * groundCheckRayLenght * 0.5f, -Vector3.up);
+        bool isGrounded = Physics.Raycast (ray, out hit, groundCheckRayLenght, Physics.AllLayers,
+            QueryTriggerInteraction.Ignore);
+        return isGrounded;
+    }
+
+    private bool CheckIfStandingStill()
+    {
+        bool isStandingStill = true;
+        try
+        {
+            if (HasNavigationComponent())
+            {
+                isStandingStill = navigationComponent.desiredVelocity.sqrMagnitude <= 0.1f * 0.1f ? true : false;
+                if (isStandingStill)
+                    currentMode = MovementMode.Idle;
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
+        }
+        return isStandingStill;
+    }
+
+    private bool HasNavigationComponent()
+    {
+        bool hasNavigation = true;
+        if (navigationComponent == null)
+        {
+            hasNavigation = false;
+            throw new MissingComponentException("The enemy has a missing component: ", typeof(NavMeshAgent));
+        }
+        return hasNavigation;
+    }
+
+    private void HandleAnimationSpeed()
+    {
+        try
+        {
+            Animator animatorToHandle = entity.GetAnimatorComponent;
+            if (animatorToHandle != null && HasNavigationComponent())
+            {
+                if (currentMode == MovementMode.Idle) { animatorToHandle.speed = 1.0f; }
+                else
+                {
+                    float currentSpeed = navigationComponent.velocity.magnitude;
+                    if (currentSpeed < 1.0f) { animatorToHandle.speed = currentSpeed; }
+                    else
+                    {
+                        if (navigationComponent.height < 1.0f) { animatorToHandle.speed = navigationComponent.velocity.magnitude / (navigationComponent.height + 1); }
+                        else { animatorToHandle.speed = navigationComponent.velocity.magnitude / (navigationComponent.height + navigationComponent.height); }
+                    }
+                }
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
+        }
+        return;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.CompareTag("Terrain"))
+        {
+            NavigationSetActive(true);
+            entity.BodyAffectedByGravity(false);
+        }
+        return;
+    }
+
     public void NavigationSetActive(bool _state)
     {
         try
         {
             if (HasNavigationComponent())
             {
-                if (!_state && navigation.enabled)
-                    navigation.ResetPath();
-                navigation.enabled = _state;
+                if (!_state && navigationComponent.enabled)
+                    navigationComponent.ResetPath();
+                navigationComponent.enabled = _state;
             }
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
-        return;
-    }
-
-    protected void OnAnimatorMove()
-    {
-        //navigation.speed = (entity.Animator.deltaPosition / Time.deltaTime).magnitude;
-        transform.position = navigation.nextPosition;
-        return;
-    }
-
-    protected void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.CompareTag("Terrain"))
-            NavigationSetActive(true);
         return;
     }
 
@@ -202,11 +221,13 @@ public class EnemyMovement : EntityComponent
     {
         try
         {
-            if (HasNavigationComponent() && navigation.isOnNavMesh)
-                navigation.destination = _destination;
+            if (HasNavigationComponent() && navigationComponent.isOnNavMesh) {
+                navigationComponent.destination = _destination;
+                Debug.Log(Time.timeSinceLevelLoad + "New navigation destination: " + navigationComponent.destination);
+            }
+
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return;
@@ -214,42 +235,24 @@ public class EnemyMovement : EntityComponent
 
     public void SetMovementValues(float _acceleration, float _speed, MovementMode _mode)
     {
-        if (navigation == null) { return; }
+        if (navigationComponent == null) { return; }
         currentMode = _mode;
-        navigation.acceleration = _acceleration;
-        navigation.speed = _speed;
+        navigationComponent.acceleration = _acceleration;
+        navigationComponent.speed = _speed;
         return;
     }
 
-    protected void Start()
-    {
-        navigation.updatePosition = false;
-        return;
-    }
-
-    public bool AlreadyInAPath()
+    public bool IsAlreadyInAPath()
     {
         bool inPath = false;
         try
         {
             if(HasNavigationComponent())
-                inPath = navigation.hasPath;
+                inPath = navigationComponent.hasPath;
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return inPath;
-    }
-
-    private bool HasNavigationComponent()
-    {
-        bool hasNavigation = false;
-        if (navigation == null)
-        {
-            hasNavigation = false;
-            throw new MissingComponentException("The enemy has a missing component: ", typeof(NavMeshAgent));
-        }
-        return hasNavigation;
     }
 }

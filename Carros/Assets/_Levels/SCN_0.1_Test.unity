@@ -1181,6 +1181,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 54661212036368316, guid: f2e5d15b86feea647b1afbee02f645c9,
+        type: 2}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f2e5d15b86feea647b1afbee02f645c9, type: 2}
   m_IsPrefabAsset: 0
@@ -1628,6 +1633,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 114247220635818496, guid: 701b038f880554d4eb9ad4801a5ffb5c,
+        type: 2}
+      propertyPath: targetImg
+      value: 
+      objectReference: {fileID: 265158046}
     - target: {fileID: 114779014927180892, guid: 701b038f880554d4eb9ad4801a5ffb5c,
         type: 2}
       propertyPath: targetFeedbackImg
@@ -1638,11 +1648,6 @@ Prefab:
       propertyPath: bulletsGUI
       value: 
       objectReference: {fileID: 2143782611}
-    - target: {fileID: 114247220635818496, guid: 701b038f880554d4eb9ad4801a5ffb5c,
-        type: 2}
-      propertyPath: targetImg
-      value: 
-      objectReference: {fileID: 265158046}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 701b038f880554d4eb9ad4801a5ffb5c, type: 2}
   m_IsPrefabAsset: 0
@@ -2051,7 +2056,7 @@ GameObject:
   - component: {fileID: 1320427481}
   m_Layer: 10
   m_Name: TerrainMesh
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 8

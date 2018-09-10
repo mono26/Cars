@@ -8,77 +8,83 @@ public class Entity : MonoBehaviour
     [SerializeField] protected EntityType type = EntityType.AIControlled;
 
     [Header("Entity components")]
-    [SerializeField] protected Animator animator;
-    [SerializeField] protected AudioSource audioSource;
-    [SerializeField] protected Rigidbody body;
-    [SerializeField] protected Collider[] hitBox;
-    [SerializeField] protected ExternalInput input;
-    [SerializeField] protected SkinnedMeshRenderer[] model;
+    [SerializeField] private Animator animatorComponent;
+    [SerializeField] private AudioSource audioComponent;
+    [SerializeField] private Rigidbody body;
+    [SerializeField] private Collider[] hitBox;
+    [SerializeField] private ExternalInput inputcomponent;
+    [SerializeField] private SkinnedMeshRenderer[] model;
 
     [Header("Editor debugging")]
     [SerializeField]
     protected EntityComponent[] components;
 
-    public Animator GetAnimator { get { return animator; } }
+    public Animator GetAnimatorComponent { get { return animatorComponent; } }
     public Rigidbody GetBody { get { return body; } }
     public T GetControlledEntity<T>() where T : Entity { { return this as T; } }
+    public ExternalInput GetInputcomponent { get { return inputcomponent; } }
 
     protected virtual void Awake()
     {
-        if (audioSource == null)
-            audioSource = GetComponent<AudioSource>();
-        if (body == null)
+        if (audioComponent == null) {
+            audioComponent = GetComponent<AudioSource>();
+        }
+        if (body == null) {
             body = GetComponent<Rigidbody>();
-        if (hitBox == null)
+        }
+        if (hitBox == null) {
             hitBox = GetComponentsInChildren<Collider>();
-        if (model == null)
+        }
+        if (model == null) {
             model = GetComponentsInChildren<SkinnedMeshRenderer>();
-
+        }
         components = GetComponentsInChildren<EntityComponent>();
-
         return;
-    }
-
-    protected bool CanApplyExternalInputToEntity()
-    {
-        bool canApply = false;
-        canApply = (type == EntityType.Playable && input != null) ? true : false;
-        return canApply;
     }
 
     protected virtual void Update()
     {
         if (components == null) { return; }
-
-        foreach (EntityComponent component in components)
-        {
+        foreach (EntityComponent component in components) {
             component.EveryFrame();
         }
-
         return;
     }
 
     protected virtual void FixedUpdate()
     {
         if (components == null) { return; }
-
-        foreach (EntityComponent component in components)
-        {
+        foreach (EntityComponent component in components) {
             component.FixedFrame();
         }
-
         return;
     }
 
     protected virtual void LateUpdate()
     {
         if (components == null) { return; }
-
-        foreach (EntityComponent component in components)
-        {
+        foreach (EntityComponent component in components) {
             component.LateFrame();
         }
+        return;
+    }
 
+    protected bool CanApplyExternalInputToEntity()
+    {
+        bool canApply = false;
+        canApply = (type == EntityType.Playable && inputcomponent != null) ? true : false;
+        return canApply;
+    }
+
+    public void SetBodyVelocity(Vector3 _newVelocity)
+    {
+        body.velocity = _newVelocity;
+        return;
+    }
+
+    public void BodyAffectedByGravity(bool _value)
+    {
+        body.useGravity = _value;
         return;
     }
 }

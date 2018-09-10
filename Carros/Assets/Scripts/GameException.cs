@@ -52,3 +52,77 @@ public class MissingComponentException : GameException
         return message + missingComponent.ToString();
     }
 }
+
+public class AIStateException : GameException
+{
+    public enum AIStateExceptionType { NoAction, NoStateMachine, NoTransition }
+
+    protected AIStateExceptionType exceptionType;
+    protected AIState stateWithException;
+
+    public AIStateExceptionType GetExceptionType { get { return exceptionType; } }
+
+    public AIStateException() : base()
+    {
+        return;
+    }
+
+    public AIStateException(AIState _stateWithException) : base()
+    {
+        stateWithException = _stateWithException;
+
+        return;
+    }
+
+    public AIStateException(AIState _stateWithException, AIStateExceptionType _exceptionType) : base()
+    {
+        exceptionType = _exceptionType;
+        stateWithException = _stateWithException;
+
+        return;
+    }
+
+    public void LaunchException()
+    {
+        switch (exceptionType)
+        {
+            case AIStateExceptionType.NoAction:
+                break;
+            case AIStateExceptionType.NoStateMachine:
+                break;
+            case AIStateExceptionType.NoTransition:
+                break;
+            default:
+                Debug.LogWarning("AISTate exception.");
+                break;
+        }
+
+        return;
+    }
+
+    public void NoActionException()
+    {
+        if (stateWithException != null)
+            Debug.LogWarning(stateWithException.GetStateName + " has no actions to execute.");
+        else
+            Debug.LogWarning("AISTate with no actions to execute.");
+
+        return;
+    }
+
+    public void NoTransitionException()
+    {
+        if (stateWithException != null)
+            Debug.LogWarning(stateWithException.GetStateName + " has no transitions for a AIStateMachine to transition.");
+        else
+            Debug.LogWarning("AISTate with no transitions for a AIStateMachine to transition.");
+    }
+
+    public void NotFoundTargetStateMachine()
+    {
+        if (stateWithException != null)
+            Debug.LogWarning(stateWithException.GetStateName + "  no target AIStateMachine found.");
+        else
+            Debug.LogWarning("AISTate with no no target AIStateMachine found.");
+    }
+}

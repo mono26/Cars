@@ -24,7 +24,7 @@ public class Targetter : EntityComponent
     [SerializeField]
     protected float detectionRate = 2.0f; // Detection rate per second
     [SerializeField]
-    protected Collider targetterTrigger;
+    protected SphereCollider detectionTrigger;
     [SerializeField]
     protected string[] targetableTags;
 
@@ -37,33 +37,37 @@ public class Targetter : EntityComponent
     [SerializeField]
     protected Coroutine updateTargetRoutine;
 
-    protected void AddTarget(Transform _target)
+    protected override void Awake()
     {
-        if (nearTargets.Count.Equals(0)) { updateTargetRoutine = StartCoroutine(UpdateTarget()); }
-        if (currentTarget == null) { currentTarget = _target; }
+        if (detectionTrigger == null)
+            detectionTrigger = GetComponent<SphereCollider>();
+        if (detectionTrigger == null)
+            throw new MissingComponentException("There is no component attached to the object: ", typeof(SphereCollider));
+    }
 
-        nearTargets.Add(_target);
-
+    protected virtual void Start()
+    {
+        if (HasDetectionTrigger())
+            detectionTrigger.radius = detectionRange;
         return;
     }
 
-    public Vector3 CalculateRandomPointInsideTrigger()
+    protected bool HasDetectionTrigger()
     {
-        float randomRadius = Random.Range(0, (int)detectionRange);
-        float randomAngle = Random.Range(0, 360) * Mathf.Deg2Rad;
-        float x = randomRadius * Mathf.Cos(randomAngle);
-        float z = randomRadius * Mathf.Sin(randomAngle);
-
-        return new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
+        bool hasTrigger = true;
+        if (detectionTrigger == null)
+        {
+            hasTrigger = false;
+            throw new MissingComponentException("The enemy has a missing component: ", typeof(SphereCollider));
+        }
+        return hasTrigger;
     }
 
     protected Transform GetNearestActiveTarget()
     {
         if(nearTargets.Count.Equals(0)) { return null; }
-
         HelperFunctions.ClearInactiveElementsInCollection(ref nearTargets);
         Transform nearestTarget = HelperFunctions.GetElementAtMinimumDistanceInColection(nearTargets, entity.transform);
-
         return nearestTarget;
     }
 
@@ -71,7 +75,6 @@ public class Targetter : EntityComponent
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-
         return;
     }
 
@@ -80,13 +83,31 @@ public class Targetter : EntityComponent
         foreach (string tag in targetableTags)
         {
             if (!other.CompareTag(tag)) { return; }
-
             Transform posibleTarget = other.transform;
             if (posibleTarget != null && !nearTargets.Contains(posibleTarget))
                 AddTarget(posibleTarget);
         }
-
         return;
+    }
+
+    private void AddTarget(Transform _target)
+    {
+        if (nearTargets.Count.Equals(0)) { updateTargetRoutine = StartCoroutine(UpdateTarget()); }
+        if (currentTarget == null) { currentTarget = _target; }
+        nearTargets.Add(_target);
+        return;
+    }
+
+    private IEnumerator UpdateTarget()
+    {
+        Transform nearestTarget = GetNearestActiveTarget();
+        if (!nearestTarget) { yield return new WaitForSeconds(1 / detectionRate); ; }
+        else
+        {
+            currentTarget = nearestTarget;
+            yield return new WaitForSeconds(1 / detectionRate);
+        }
+        updateTargetRoutine = StartCoroutine(UpdateTarget());
     }
 
     protected virtual void OnTriggerExit(Collider other)
@@ -94,10 +115,8 @@ public class Targetter : EntityComponent
         foreach (string tag in targetableTags)
         {
             if (!other.CompareTag(tag)) { return; }
-
             Transform realisingTarget = other.transform;
             if (realisingTarget  == null || !nearTargets.Contains(realisingTarget)) { return; }
-
             RemoveTarget(realisingTarget);
         }
         return;
@@ -106,44 +125,25 @@ public class Targetter : EntityComponent
     protected void RemoveTarget(Transform _target)
     {
         nearTargets.Remove(_target);
-
         if (currentTarget.Equals(_target))
         {
             Transform newTarget = GetNearestActiveTarget();
             currentTarget = newTarget;
         }
-
         if (currentTarget == null && nearTargets.Count.Equals(0))
         {
             EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(entity as Enemy, TargetterEventType.TargetLost));
             StopCoroutine(updateTargetRoutine);
         }
-
         return;
     }
 
-    protected virtual void Start()
+    public Vector3 CalculateRandomPointInsideTrigger()
     {
-        SphereCollider sphere = targetterTrigger as SphereCollider;
-        if (sphere)
-            sphere.radius = detectionRange;
-
-        return;
-    }
-
-    protected IEnumerator UpdateTarget()
-    {
-        Transform nearestTarget = GetNearestActiveTarget();
-
-        if(!nearestTarget) { yield return new WaitForSeconds(1 / detectionRate); ; }
-
-        else
-        {
-            currentTarget = nearestTarget;
-
-            yield return new WaitForSeconds(1 / detectionRate);
-        }
-
-        updateTargetRoutine = StartCoroutine(UpdateTarget());
+        int randomRadius = Random.Range(0, (int)detectionRange);
+        float randomAngle = Random.Range(0, 360) * Mathf.Deg2Rad;
+        float x = randomRadius * Mathf.Cos(randomAngle);
+        float z = randomRadius * Mathf.Sin(randomAngle);
+        return new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
     }
 }
