@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public static class HelperFunctions
+public static class HelperMethods
 {
     public static T GetElementAtMinimumDistanceInColection<T>(List<T> _collection, Transform _collectionOwner) where T : Component 
     {

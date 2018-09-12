@@ -76,6 +76,10 @@ public class Entity : MonoBehaviour
         return canApply;
     }
 
+    /// <summary>
+    /// Applies raw velocity vector. The method doesn't normalize the velocity.
+    /// </summary>
+    /// <param name="_newVelocity"> New velocity for the body.</param>
     public void SetBodyVelocity(Vector3 _newVelocity)
     {
         body.velocity = _newVelocity;

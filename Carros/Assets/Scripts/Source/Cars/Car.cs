@@ -49,6 +49,7 @@ public class Car : Entity
     {
         DirectionAsssist();
         Drive();
+        CapCarSpeed();
         TractionControl();
         base.FixedUpdate();
         return;
@@ -129,7 +130,7 @@ public class Car : Entity
         {
             if (HasEngine() && HasAllWheels())
             {
-                float accelerationTorque = engine.GetTorqueToApply(accelerationInput);
+                float accelerationTorque = engine.GetTorqueToApply(accelerationInput) / wheels.Length;
                 foreach (Wheel wheel in wheels){
                     wheel.SetTorque(accelerationTorque, Wheel.TorqueType.Acceleration);
                 }
@@ -236,6 +237,21 @@ public class Car : Entity
         catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
+        return;
+    }
+
+    private void CapCarSpeed()
+    {
+        Vector3 actualVelocity = GetBody.velocity;
+        Vector3 clampedVelocity = engine.CapVelocityMagnitudeToMaxSpeed(actualVelocity);
+        SetBodyVelocity(clampedVelocity);
+        return;
+    }
+
+    private void CalculetCarRevolutions()
+    {
+        float currentSpeed = GetBody.velocity.magnitude;
+        engine.CalculateEngineRevolutions(currentSpeed);
         return;
     }
 

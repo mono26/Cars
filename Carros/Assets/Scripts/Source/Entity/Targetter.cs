@@ -66,8 +66,8 @@ public class Targetter : EntityComponent
     protected Transform GetNearestActiveTarget()
     {
         if(nearTargets.Count.Equals(0)) { return null; }
-        HelperFunctions.ClearInactiveElementsInCollection(ref nearTargets);
-        Transform nearestTarget = HelperFunctions.GetElementAtMinimumDistanceInColection(nearTargets, entity.transform);
+        HelperMethods.ClearInactiveElementsInCollection(ref nearTargets);
+        Transform nearestTarget = HelperMethods.GetElementAtMinimumDistanceInColection(nearTargets, entity.transform);
         return nearestTarget;
     }
 

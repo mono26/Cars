@@ -61,8 +61,8 @@ public class SlotTargetter : Targetter
     private SlotManager GetNearestActiveSlotTarget()
     {
         if (nearTargets.Count.Equals(0)) { return null; }
-        HelperFunctions.ClearInactiveElementsInCollection(ref nearSlotTargets);
-        SlotManager nearestTarget = HelperFunctions.GetElementAtMinimumDistanceInColection(nearSlotTargets, entity.transform);
+        HelperMethods.ClearInactiveElementsInCollection(ref nearSlotTargets);
+        SlotManager nearestTarget = HelperMethods.GetElementAtMinimumDistanceInColection(nearSlotTargets, entity.transform);
         return nearestTarget;
     }
 
