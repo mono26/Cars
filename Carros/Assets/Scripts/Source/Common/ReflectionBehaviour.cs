@@ -7,6 +7,7 @@ public class ReflectionBehaviour : MonoBehaviour
     public bool AwakeCalled { get; private set; }
     public bool StartCalled { get; private set; }
     public bool OnEnableCalled { get; private set; }
+    public bool CustomCalled { get; private set; }
 
     protected void Awake()
     {
@@ -23,6 +24,12 @@ public class ReflectionBehaviour : MonoBehaviour
     protected void OnEnable()
     {
         OnEnableCalled = true;
+        return;
+    }
+
+    protected void CustomMethod()
+    {
+        CustomCalled = true;
         return;
     }
 }

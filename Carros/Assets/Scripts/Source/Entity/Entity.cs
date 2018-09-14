@@ -44,27 +44,65 @@ public class Entity : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (components == null) { return; }
-        foreach (EntityComponent component in components) {
-            component.EveryFrame();
+        try
+        {
+            if (HasEntitytComponents())
+            {
+                foreach (EntityComponent component in components)
+                {
+                    component.EveryFrame();
+                }
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return;
     }
 
+    private bool HasEntitytComponents()
+    {
+        bool hasComponents = true;
+        if(components == null || components.Length == 0)
+        {
+            hasComponents = false;
+            throw new MissingComponentException("The entity has a missing components: ", typeof(EntityComponent));
+        }
+        return hasComponents;
+    }
+
     protected virtual void FixedUpdate()
     {
-        if (components == null) { return; }
-        foreach (EntityComponent component in components) {
-            component.FixedFrame();
+        try
+        {
+            if (HasEntitytComponents())
+            {
+                foreach (EntityComponent component in components)
+                {
+                    component.FixedFrame();
+                }
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return;
     }
 
     protected virtual void LateUpdate()
     {
-        if (components == null) { return; }
-        foreach (EntityComponent component in components) {
-            component.LateFrame();
+        try
+        {
+            if (HasEntitytComponents())
+            {
+                foreach (EntityComponent component in components)
+                {
+                    component.LateFrame();
+                }
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return;
     }

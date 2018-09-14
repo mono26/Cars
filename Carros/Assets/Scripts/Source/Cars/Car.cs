@@ -25,12 +25,15 @@ public class Car : Entity
 
     protected override void Awake()
     {
-        if (brakes == null)
+        if (brakes == null) {
             brakes = GetComponent<Brakes>();
-        if (engine == null)
+        }
+        if (engine == null) {
             engine = GetComponent<CarEngine>();
-        if (wheels == null)
+        }
+        if (wheels == null) {
             wheels = GetComponentsInChildren<Wheel>();
+        }
         base.Awake();
         return;
     }
@@ -59,29 +62,111 @@ public class Car : Entity
     {
         try
         {
-            if (HasAllWheels())
+            if (HasAllWheelsGrounded())
             {
-                foreach (Wheel wheelToCheck in wheels)
+                // this if is needed to avoid gimbal lock problems that will make the car suddenly shift direction
+                if (Mathf.Abs(oldRotation - transform.eulerAngles.y) < 10f)
                 {
-                    WheelHit wheelhit;
-                    wheelToCheck.GetWheelCollider.GetGroundHit(out wheelhit);
-                    if (wheelhit.normal == Vector3.zero)
-                        return; // wheels arent on the ground so dont realign the rigidbody velocity
+                    var turnadjust = (transform.eulerAngles.y - oldRotation) * directionAssist;
+                    Quaternion velRotation = Quaternion.AngleAxis(turnadjust, Vector3.up);
+                    SetBodyVelocity(velRotation * GetBody.velocity);
                 }
+                oldRotation = transform.eulerAngles.y;
             }
-            // this if is needed to avoid gimbal lock problems that will make the car suddenly shift direction
-            if (Mathf.Abs(oldRotation - transform.eulerAngles.y) < 10f)
-            {
-                var turnadjust = (transform.eulerAngles.y - oldRotation) * directionAssist;
-                Quaternion velRotation = Quaternion.AngleAxis(turnadjust, Vector3.up);
-                SetBodyVelocity(velRotation * GetBody.velocity);
-            }
-            oldRotation = transform.eulerAngles.y;
         }
         catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return;
+    }
+
+    private bool HasAllWheelsGrounded()
+    {
+        bool hasAllWheelsGrounded = false;
+        try
+        {
+            if (HasAllWheels())
+            {
+                foreach (Wheel wheelToCheck in wheels)
+                {
+                    if (!wheelToCheck.WheelIsGrounded())
+                    {
+                        hasAllWheelsGrounded = false;
+                        break;
+                    }
+                }
+            }
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+        }
+        return hasAllWheelsGrounded;
+    }
+
+    private bool HasAllWheels()
+    {
+        bool hasAllWheels = false;
+        try
+        {
+            if (HasBackWheels() || HasFrontWheels())
+            {
+                hasAllWheels = true;
+            }
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+            throw new MissingComponentException("The car has incomplete wheels");
+        }
+        return hasAllWheels;
+    }
+
+    private bool HasBackWheels()
+    {
+        bool hasBackWheels = true;
+        if (wheels == null)
+        {
+            hasBackWheels = false;
+            throw new MissingComponentException("The car has a missing  wheels: ");
+        }
+        else
+        {
+            int numberOfWheels = wheels.Length;
+            // We start at the half number of wheels to exclude the front.
+            for (int i = numberOfWheels / 2; i < numberOfWheels; i++)
+            {
+                if (wheels[i] == null)
+                {
+                    hasBackWheels = false;
+                    throw new MissingComponentException("The car has a missing rear wheel: ", typeof(Wheel));
+                }
+            }
+        }
+        return hasBackWheels;
+    }
+
+    private bool HasFrontWheels()
+    {
+        bool hasFrontWheels = true;
+        if (wheels == null)
+        {
+            hasFrontWheels = false;
+            throw new MissingComponentException("The car has a missing  wheels: ");
+        }
+        else
+        {
+            int numberOfFrontWheels = wheels.Length / 2;
+            for (int i = 0; i < numberOfFrontWheels; i++)
+            {
+                if (wheels[i] == null)
+                {
+                    hasFrontWheels = false;
+                    throw new MissingComponentException("The car has a missing front wheel: ", typeof(Wheel));
+                }
+            }
+        }
+        return hasFrontWheels;
     }
 
     private void Drive()
@@ -102,26 +187,10 @@ public class Car : Entity
                 wheels[1].ApplySteer(steeringInput);
             }
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return;
-    }
-
-    private bool HasFrontWheels()
-    {
-        bool hasWheels = true;
-        int numberOfFrontWheels = wheels.Length / 2;
-        for (int i = 0; i < numberOfFrontWheels; i++)
-        {
-            if (wheels[i] == null)
-            {
-                hasWheels = false;
-                throw new MissingComponentException("The car has a missing front wheel: ", typeof(Wheel));
-            }
-        }
-        return hasWheels;
     }
 
     private void ApplyEngineTorqueToAllWheels()
@@ -130,7 +199,7 @@ public class Car : Entity
         {
             if (HasEngine() && HasAllWheels())
             {
-                float accelerationTorque = engine.GetTorqueToApply(accelerationInput) / wheels.Length;
+                float accelerationTorque = engine.GetCarEngineTorqueToApply(accelerationInput) / wheels.Length;
                 foreach (Wheel wheel in wheels){
                     wheel.SetTorque(accelerationTorque, Wheel.TorqueType.Acceleration);
                 }
@@ -151,33 +220,6 @@ public class Car : Entity
             throw new MissingComponentException("The car has a missing engine: ", typeof(CarEngine));
         }
         return hasEngine;
-    }
-
-    private bool HasAllWheels()
-    {
-        bool hasAllWheels = true;
-        if (!HasBackWheels() || !HasFrontWheels())
-        {
-            hasAllWheels = false;
-        } 
-        return hasAllWheels;
-    }
-
-    private bool HasBackWheels()
-    {
-        bool hasBackWheels = true;
-        int numberOfWheels = wheels.Length;
-        int numberOfBackWheels = numberOfWheels / 2;
-        // We start at the amount of backwheels to exclude the front.
-        for (int i = numberOfBackWheels; i < numberOfWheels; i++)
-        {
-            if (wheels[i] == null)
-            {
-                hasBackWheels = false;
-                throw new MissingComponentException("The car has a missing rear wheel: ", typeof(Wheel));
-            }
-        }
-        return hasBackWheels;
     }
 
     private void ApplyBrakes()
@@ -226,7 +268,7 @@ public class Car : Entity
             {
                 if(footBrakeInput > 0)
                 {
-                    float footBrakeTorque = -brakes.GetFootBrakeForceToApply(footBrakeInput);
+                    float footBrakeTorque = -brakes.GetFootBrakeTorqueToApply(footBrakeInput);
                     foreach (Wheel wheel in wheels)
                     {
                         wheel.SetTorque(footBrakeTorque, Wheel.TorqueType.Acceleration);
@@ -264,7 +306,7 @@ public class Car : Entity
             {
                 foreach (Wheel wheelToCheck in wheels)
                 {
-                    float currentSlip = wheelToCheck.GetCurrentSlip;
+                    float currentSlip = wheelToCheck.GetWheelSlip();
                     engine.AdjustTorque(currentSlip);
                 }
             }

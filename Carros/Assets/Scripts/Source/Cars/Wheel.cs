@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(WheelCollider))]
 public class Wheel : EntityComponent
 {
     public enum TorqueType { Acceleration, Braking }
@@ -8,25 +9,15 @@ public class Wheel : EntityComponent
     [Header("Wheel settings")]
     [SerializeField] private float downForce = 100; // Helps the car stick to the ground.
     [SerializeField] private float maxSteerAngle = 25;
-    [SerializeField] private WheelCollider wheelCollider;
+    [SerializeField] private WheelCollider wheelColliderComponent;
     [SerializeField] private WheelType wheelType = WheelType.Front;
     //[SerializeField] private WheelEffects[] m_WheelEffects = new WheelEffects[4];
 
-    public WheelCollider GetWheelCollider { get { { return wheelCollider; } } }
-    public float GetCurrentSlip
-    {
-        get
-        {
-            WheelHit wheelHit;
-            wheelCollider.GetGroundHit(out wheelHit);
-            return wheelHit.forwardSlip;
-        }
-    }
-
     protected override void Awake()
     {
-        if (wheelCollider == null)
-            wheelCollider = GetComponent<WheelCollider>();
+        if (wheelColliderComponent == null) {
+            wheelColliderComponent = GetComponent<WheelCollider>();
+        }
         return;
     }
 
@@ -40,10 +31,29 @@ public class Wheel : EntityComponent
     // This is used to add more grip in relation to speed
     private void AddDownForce()
     {
-        if (wheelCollider == null) { return; }
-        Rigidbody wheelBody = wheelCollider.attachedRigidbody;
-        wheelBody.AddForce(-transform.up * downForce * wheelBody.velocity.magnitude);
+        try
+        {
+            if (HasWheelColliderComponent())
+            {
+                Rigidbody wheelBody = wheelColliderComponent.attachedRigidbody;
+                wheelBody.AddForce(-transform.up * downForce * wheelBody.velocity.magnitude);
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
+        }
         return;
+    }
+
+    private bool HasWheelColliderComponent()
+    {
+        bool hasWheelCollider = true;
+        if (wheelColliderComponent == null)
+        {
+            hasWheelCollider = false;
+            throw new MissingComponentException("The wheel has a missing collider: ", typeof(WheelCollider));
+        }
+        return hasWheelCollider;
     }
 
     // Checks if the wheels are spinning and is so does three things
@@ -57,7 +67,7 @@ public class Wheel : EntityComponent
         for (int i = 0; i < 4; i++)
         {
             WheelHit wheelHit;
-            wheelCollider.GetGroundHit(out wheelHit);
+            wheelColliderComponent.GetGroundHit(out wheelHit);
 
             // is the tire slipping above the given threshhold
             /*if (Mathf.Abs(wheelHit.forwardSlip) >= m_SlipLimit || Mathf.Abs(wheelHit.sidewaysSlip) >= m_SlipLimit)
@@ -87,17 +97,53 @@ public class Wheel : EntityComponent
 
     public void SetTorque(float _torqueToApply = 0.0f, TorqueType _typeOfTorque = TorqueType.Acceleration)
     {
-        if (wheelCollider == null) { return; }
-        if (_typeOfTorque == TorqueType.Acceleration) { wheelCollider.motorTorque = _torqueToApply; }
-        else if (_typeOfTorque == TorqueType.Braking) { wheelCollider.brakeTorque = _torqueToApply; }
+        if (HasWheelColliderComponent())
+        {
+            if (_typeOfTorque == TorqueType.Acceleration) { wheelColliderComponent.motorTorque = _torqueToApply; }
+            else if (_typeOfTorque == TorqueType.Braking) { wheelColliderComponent.brakeTorque = _torqueToApply; }
+        }
         return;
     }
 
     public void ApplySteer(float _steerInput)
     {
-        if (wheelCollider == null) { return; }
-        float steerAngleToApply = _steerInput * maxSteerAngle;
-        wheelCollider.steerAngle = steerAngleToApply;
+        if (HasWheelColliderComponent())
+        {
+            float steerAngleToApply = _steerInput * maxSteerAngle;
+            wheelColliderComponent.steerAngle = steerAngleToApply;
+        }
         return;
+    }
+
+    public float GetWheelSlip()
+    {
+        float wheelSlip = 0;
+        try
+        {
+            if (HasWheelColliderComponent())
+            {
+                WheelHit wheelHit;
+                wheelColliderComponent.GetGroundHit(out wheelHit);
+                wheelSlip = wheelHit.forwardSlip;
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
+        }
+        return wheelSlip;
+    }
+
+    public bool WheelIsGrounded()
+    {
+        bool isGrounded = false;
+        if (HasWheelColliderComponent())
+        {
+            WheelHit wheelhit;
+            wheelColliderComponent.GetGroundHit(out wheelhit);
+            if (wheelhit.normal == Vector3.zero) {
+                isGrounded = false;
+            }
+        }
+        return isGrounded;
     }
 }

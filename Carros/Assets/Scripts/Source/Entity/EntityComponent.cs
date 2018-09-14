@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
 
-public abstract class EntityComponent : MonoBehaviour
+public class EntityComponent : MonoBehaviour
 {
     [Header("Entity Component settings")]
     [SerializeField] protected Entity entity = null;
 
     protected virtual void Awake()
     {
-        if (entity == null)
+        /*if (entity == null)
             entity = GetComponent<Entity>();
         if (entity == null)
-            entity = GetComponentInParent<Entity>();
+            entity = GetComponentInParent<Entity>();*/
 
         return;
     }

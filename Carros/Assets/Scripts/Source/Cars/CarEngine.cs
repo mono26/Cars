@@ -4,7 +4,7 @@ public class CarEngine : EntityComponent
 {
     [Header("Engine settings")]
     [SerializeField] private float maxSpeed = 150; // In M/H (Milles per hour).
-    [SerializeField] private float maxTorqueOverTheWheels = 2500f;
+    [SerializeField] private float maxTorque = 2500f;
     [SerializeField] private float maxWheelSlip = 0.3f;
     [SerializeField] private float tractionControl = 1.0f;
 
@@ -16,7 +16,7 @@ public class CarEngine : EntityComponent
 
     private void Start()
     {
-        currentTorque = maxTorqueOverTheWheels - (tractionControl * maxTorqueOverTheWheels);
+        currentTorque = maxTorque - (tractionControl * maxTorque);
         return;
     }
 
@@ -31,7 +31,7 @@ public class CarEngine : EntityComponent
         else
         {
             newTorque = currentTorque + (10 * tractionControl);
-            if (newTorque > maxTorqueOverTheWheels) { newTorque = maxTorqueOverTheWheels; }
+            if (newTorque > maxTorque) { newTorque = maxTorque; }
         }
         currentTorque = newTorque;
         return;
@@ -42,10 +42,14 @@ public class CarEngine : EntityComponent
     /// </summary>
     /// <param name="_accelerationInput"> The acceleration input, usually from 0 to 1</param>
     /// <param name="_footBrakeInput">The footbrake input, usually from -1 to 0 </param>
-    public float GetTorqueToApply(float _accelerationInput)
+    public float GetCarEngineTorqueToApply(float _accelerationInput)
     {
+        // Only generates positive torque.
+        if (_accelerationInput < 0) {
+            _accelerationInput = 0;
+        }
         float thrustTorque = 0;
-        thrustTorque = _accelerationInput * currentTorque / 4f;
+        thrustTorque = _accelerationInput * currentTorque;
         return thrustTorque;
     }
 

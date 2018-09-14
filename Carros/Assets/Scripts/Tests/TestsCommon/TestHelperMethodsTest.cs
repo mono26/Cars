@@ -1,71 +1,86 @@
 ﻿using UnityEngine;
-using UnityEngine.TestTools;
 using NUnit.Framework;
-using System.Collections;
 
 public class TestHelperMethodsTest {
 
     [Test]
-    public void CreatesGameObject()
+    public void CreatesTestGameObject()
     {
-        GameObject testGameObject = TestHelperMethods.CreateTestGameObject();
-        Assert.NotNull(testGameObject);
+        ReflectionBehaviour testScriptInstanceGameObject = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CreatesGameObject");
+        Assert.NotNull(testScriptInstanceGameObject);
+        return;
+    }
+
+    [Test]
+    public void CreatesTestGameObjectWithCustomName()
+    {
+        ReflectionBehaviour testScriptInstanceGameObject = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CreatesGameObjectWithCustomName");
+        Assert.AreEqual(testScriptInstanceGameObject.gameObject.name, "Test_ScriptInstance_ReflectionBehaviour_CreatesGameObjectWithCustomName");
         return;
     }
 
     [Test]
     public void CallAwakeMethods()
     {
-        GameObject testGameObject = TestHelperMethods.CreateTestGameObject();
-        ReflectionBehaviour reflectionTestGameObject = testGameObject.AddComponent<ReflectionBehaviour>();
-        TestHelperMethods.CallAllAwake(reflectionTestGameObject.gameObject);
-        Assert.IsTrue(reflectionTestGameObject.AwakeCalled);
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CallAwakeMethods");
+        TestHelperMethods.CallAllAwake(testReflectionBehaviour.gameObject);
+        Assert.IsTrue(testReflectionBehaviour.AwakeCalled);
         return;
     }
 
     [Test]
     public void CallStartMethods()
     {
-        GameObject testGameObject = TestHelperMethods.CreateTestGameObject();
-        ReflectionBehaviour reflectionTestGameObject = testGameObject.AddComponent<ReflectionBehaviour>();
-        TestHelperMethods.CallAllStart(reflectionTestGameObject.gameObject);
-        Assert.IsTrue(reflectionTestGameObject.StartCalled);
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CallStartMethods");
+        TestHelperMethods.CallAllStart(testReflectionBehaviour.gameObject);
+        Assert.IsTrue(testReflectionBehaviour.StartCalled);
         return;
     }
 
     [Test]
-    public void CallOnEnableMethods()
+    public void CallOnEnableMethodsInTestGameObject()
     {
-        GameObject testGameObject = TestHelperMethods.CreateTestGameObject();
-        ReflectionBehaviour reflectionTestGameObject = testGameObject.AddComponent<ReflectionBehaviour>();
-        TestHelperMethods.CallAllOnEnable(reflectionTestGameObject.gameObject);
-        Assert.IsTrue(reflectionTestGameObject.OnEnableCalled);
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CallOnEnableMethodsInTestGameObject");
+        TestHelperMethods.CallAllOnEnable(testReflectionBehaviour.gameObject);
+        Assert.IsTrue(testReflectionBehaviour.OnEnableCalled);
+        return;
+    }
+
+    [Test]
+    public void CallCustomMethodInTestGameObject()
+    {
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CallCustomMethodInTestGameObject");
+        TestHelperMethods.CallMethod(testReflectionBehaviour, "CustomMethod");
+        Assert.IsTrue(testReflectionBehaviour.CustomCalled);
         return;
     }
 
     [Test]
     public void InitializeTestGameObject()
     {
-        GameObject testGameObject = TestHelperMethods.CreateTestGameObject();
-        ReflectionBehaviour reflectionTestGameObject = testGameObject.AddComponent<ReflectionBehaviour>();
-        TestHelperMethods.InitializeTestGameObject(reflectionTestGameObject.gameObject);
-        Assert.IsTrue(reflectionTestGameObject.AwakeCalled);
-        Assert.IsTrue(reflectionTestGameObject.StartCalled);
-        Assert.IsTrue(reflectionTestGameObject.OnEnableCalled);
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("InitializeTestGameObject");
+        TestHelperMethods.InitializeTestGameObject(testReflectionBehaviour.gameObject);
+        Assert.IsTrue(testReflectionBehaviour.AwakeCalled);
+        Assert.IsTrue(testReflectionBehaviour.StartCalled);
+        Assert.IsTrue(testReflectionBehaviour.OnEnableCalled);
         return;
     }
 
-    /*[Test]
-    public void TestHelperMethodsTestSimplePasses() {
-        // Use the Assert class to test conditions.
+    [Test]
+    public void CreatesInitializedTestScriptInGameObject()
+    {
+        ReflectionBehaviour testReflectionBehaviourInstanceInGameObject = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<ReflectionBehaviour>("CreatesInitializedTestScriptInGameObject");
+        Assert.IsTrue(testReflectionBehaviourInstanceInGameObject.AwakeCalled);
+        Assert.IsTrue(testReflectionBehaviourInstanceInGameObject.StartCalled);
+        Assert.IsTrue(testReflectionBehaviourInstanceInGameObject.OnEnableCalled);
+        return;
     }
 
-    // A UnityTest behaves like a coroutine in PlayMode
-    // and allows you to yield null to skip a frame in EditMode
-    [UnityTest]
-    public IEnumerator TestHelperMethodsTestWithEnumeratorPasses() {
-        // Use the Assert class to test conditions.
-        // yield to skip a frame
-        yield return null;
-    }*/
+    [Test]
+    public void CreatesInitializedTestScriptInGameObjectWithCustomName()
+    {
+        ReflectionBehaviour testReflectionBehaviourInstanceInGameObject = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<ReflectionBehaviour>("CreatesInitializedTestScriptInGameObjectWithCustomName");
+        Assert.AreEqual(testReflectionBehaviourInstanceInGameObject.gameObject.name, "Test_ScriptInstance_ReflectionBehaviour_CreatesInitializedTestScriptInGameObjectWithCustomName");
+        return;
+    }
 }

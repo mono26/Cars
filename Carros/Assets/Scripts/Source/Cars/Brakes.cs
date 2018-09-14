@@ -12,8 +12,11 @@ public class Brakes : EntityComponent
         return;
     }
 
-    public float GetFootBrakeForceToApply(float _footBrakeInput)
+    public float GetFootBrakeTorqueToApply(float _footBrakeInput)
     {
+        if(_footBrakeInput < 0) {
+            _footBrakeInput = 0;
+        }
         float footBrakeTorqueToApply = 0;
         footBrakeTorqueToApply = maxReverseTorque * _footBrakeInput;
         return footBrakeTorqueToApply;
@@ -21,6 +24,9 @@ public class Brakes : EntityComponent
 
     public float GetHandBrakeForceToApply(float _handBrakeInput)
     {
+        if (_handBrakeInput < 0) {
+            _handBrakeInput = 0;
+        }
         float handBrakeTorqueToApply = 0;
         handBrakeTorqueToApply = maxHandBrakeTorque * _handBrakeInput;
         return handBrakeTorqueToApply;

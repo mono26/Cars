@@ -1,25 +1,20 @@
 ﻿using System.Reflection;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class TestHelperMethods
 {
-    private static List<GameObject> testObjects = new List<GameObject>();
-
-    public static GameObject CreateTestGameObject()
+    public static T CreateInitializedScriptInstanceInGameObject<T>(string _nameOfTest) where T : MonoBehaviour
     {
-        GameObject testGameObject = new GameObject("Test");
-        testObjects.Add(testGameObject);
-        return testGameObject;
+        T scriptTestInstanceInitialized = CreateTestScriptInstanceInGameObject<T>(_nameOfTest);
+        InitializeTestGameObject(scriptTestInstanceInitialized.gameObject);
+        return scriptTestInstanceInitialized;
     }
 
-    public static void ClearTestObjects()
+    public static T CreateTestScriptInstanceInGameObject<T>(string _nameOfTest) where T : MonoBehaviour
     {
-        foreach(GameObject testObject in testObjects) {
-            GameObject.Destroy(testObject);
-        }
-        testObjects.Clear();
-        return;
+        GameObject testGameObject = new GameObject("Test_ScriptInstance_" + typeof(T).Name+ "_" + _nameOfTest);
+        T testScriptInstance = testGameObject.AddComponent<T>();
+        return testScriptInstance;
     }
 
     public static void InitializeTestGameObject(GameObject _gameObjectToInitialize)
@@ -38,11 +33,13 @@ public static class TestHelperMethods
         return;
     }
 
-    public static void CallMethod(Object _objectToCallMethod, string _methodName)
+    public static void CallMethod(Object _behaviourToCallMethodFrom, string _methodName)
     {
         BindingFlags methodFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-        var methodToCall = _objectToCallMethod.GetType().GetMethod(_methodName, methodFlag);
-        methodToCall.Invoke(_objectToCallMethod, null);
+        MethodInfo methodToCall = _behaviourToCallMethodFrom.GetType().GetMethod(_methodName, methodFlag);
+        if(methodToCall != null) {
+            methodToCall.Invoke(_behaviourToCallMethodFrom, null);
+        }
         return;
     }
 
