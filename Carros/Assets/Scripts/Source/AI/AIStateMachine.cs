@@ -3,31 +3,53 @@
 public class AIStateMachine : MonoBehaviour
 {
     [Header("AIState Machine components")]
-    [SerializeField] protected Entity aiEntity;
+    [SerializeField] private Entity aIEntity = null;
 
-    [Header("Editor debugging")]
-    [SerializeField] protected AIState currentState;
+    [Header("AIState Machine editor debugging")]
+    [SerializeField] private AIState currentState = null;
 
-    protected void Awake()
+    public AIState GetCurrentState { get { return currentState; } }
+
+    private void Awake()
     {
-        if (aiEntity == null)
+        if (aIEntity == null)
             GetComponent<Entity>();
 
         return;   
     }
 
-    public void ChangeState(AIState _newState)
+    private bool HasAIEntityToUpdateState()
     {
-        if(_newState != null && !_newState.GetStateName.Equals("RemainInState"))
-            currentState = _newState;
-
-        return;
+        bool hasAIEntity = true;
+        if (aIEntity == null)
+        {
+            hasAIEntity = false;
+            throw new MissingComponentException("The state machine has no Entity to Update.", typeof(Entity));
+        }
+        return hasAIEntity;
     }
 
     public void UpdateState()
     {
-        currentState.UpdateState(aiEntity);
+        try
+        {
+            if (HasAIEntityToUpdateState()) {
+                currentState.UpdateState(aIEntity);
+            }
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+        }
 
+        return;
+    }
+
+    public void ChangeState(AIState _newState)
+    {
+        if (_newState != null && !_newState.GetStateName.Equals("RemainInState")) {
+            currentState = _newState;
+        }
         return;
     }
 }

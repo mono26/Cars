@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Reflection;
+using UnityEngine;
 using NUnit.Framework;
 
 public class WheelTest
@@ -6,7 +7,7 @@ public class WheelTest
     [Test]
     public void CreatesTestWheel()
     {
-        Wheel testBrakes = TestHelperMethods.CreateTestScriptInstanceInGameObject<Wheel>("CreatesTestWheel");
+        Wheel testBrakes = TestHelperMethods.CreateScriptInstanceInGameObject<Wheel>(MethodBase.GetCurrentMethod().Name);
         Assert.NotNull(testBrakes);
         return;
     }
@@ -14,7 +15,7 @@ public class WheelTest
     [Test]
     public void InitializeTestWheel()
     {
-        Wheel testBrakes = TestHelperMethods.CreateTestScriptInstanceInGameObject<Wheel>("InitializeTestWheel");
+        Wheel testBrakes = TestHelperMethods.CreateScriptInstanceInGameObject<Wheel>(MethodBase.GetCurrentMethod().Name);
         ReflectionBehaviour testReflection = testBrakes.gameObject.AddComponent<ReflectionBehaviour>();
         TestHelperMethods.InitializeTestGameObject(testBrakes.gameObject);
         Assert.IsTrue(testReflection.AwakeCalled);

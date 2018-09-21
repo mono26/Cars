@@ -270,8 +270,9 @@ GameObject:
   - component: {fileID: 114683437778673810}
   - component: {fileID: 114689919894975214}
   - component: {fileID: 114944531277518676}
+  - component: {fileID: 114371457431361006}
   m_Layer: 8
-  m_Name: MDL_0.1_Chomper
+  m_Name: MDL_Chomper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3109,7 +3110,7 @@ Rigidbody:
   m_Mass: 35
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -3262,8 +3263,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82727059b60ea134f93a90872c1eb780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aiEntity: {fileID: 114465413062336926}
+  aIEntity: {fileID: 114465413062336926}
   currentState: {fileID: 0}
+--- !u!114 &114371457431361006
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1131782393478256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b0fd14c046f49d46a2f9216eca057a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entity: {fileID: 114465413062336926}
 --- !u!114 &114465413062336926
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3276,8 +3289,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
-  animatorComponent: {fileID: 0}
-  audioComponent: {fileID: 0}
+  animatorComponent: {fileID: 95127303393065252}
+  audioComponent: {fileID: 82585627710067760}
   body: {fileID: 54661212036368316}
   hitBox:
   - {fileID: 65226593446134164}
@@ -3289,16 +3302,13 @@ MonoBehaviour:
   returnState: {fileID: 11400000, guid: 291a9bd454433af428542ed14c5d4aed, type: 2}
   startingState: {fileID: 11400000, guid: b1d918f057b934441930358644f948c5, type: 2}
   stats:
-    movementStats:
-      runningAcceleration: 1.5
-      runningSpeed: 6
-      walkingAcceleration: 0.5
-      walkingSpeed: 3
     maxHealth: 10
   stateUpdateRate: 4
-  movement: {fileID: 114683437778673810}
-  stateMachine: {fileID: 114105862974429730}
-  targetter: {fileID: 114582308149608636}
+  groundCheckRayLenght: 1
+  aiStateMachineComponent: {fileID: 114105862974429730}
+  enemyAnimationComponent: {fileID: 114371457431361006}
+  enemyMovementComponent: {fileID: 114683437778673810}
+  targetterComponent: {fileID: 114582308149608636}
   abilities: []
   initialPosition: {x: 0, y: 0, z: 0}
   nextAbility: {fileID: 0}
@@ -3316,7 +3326,7 @@ MonoBehaviour:
   entity: {fileID: 114465413062336926}
   detectionRange: 20
   detectionRate: 2
-  detectionTrigger: {fileID: 0}
+  detectionTrigger: {fileID: 135937266025569388}
   targetableTags:
   - Player
   currentTarget: {fileID: 0}
@@ -3338,9 +3348,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 114465413062336926}
-  groundCheckRayLenght: 0.5
+  movementStats:
+    runningAcceleration: 3
+    runningSpeed: 6
+    walkingAcceleration: 1
+    walkingSpeed: 2
   navigationComponent: {fileID: 195802425642049254}
-  currentMode: 0
 --- !u!114 &114689919894975214
 MonoBehaviour:
   m_ObjectHideFlags: 1

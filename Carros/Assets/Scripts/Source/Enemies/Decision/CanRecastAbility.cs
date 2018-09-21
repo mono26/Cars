@@ -15,7 +15,7 @@ public class CanRecastAbility : AIDecision
         Enemy enemy = _entity as Enemy;
         if (enemy == null) { return false; }
 
-        if (enemy.NextAbility != null)
+        if (enemy.GetNextAbility != null)
             return true;
 
         return false;

@@ -6,7 +6,7 @@ public class TestHelperMethodsTest {
     [Test]
     public void CreatesTestGameObject()
     {
-        ReflectionBehaviour testScriptInstanceGameObject = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CreatesGameObject");
+        ReflectionBehaviour testScriptInstanceGameObject = TestHelperMethods.CreateScriptInstanceInGameObject<ReflectionBehaviour>("CreatesGameObject");
         Assert.NotNull(testScriptInstanceGameObject);
         return;
     }
@@ -14,7 +14,7 @@ public class TestHelperMethodsTest {
     [Test]
     public void CreatesTestGameObjectWithCustomName()
     {
-        ReflectionBehaviour testScriptInstanceGameObject = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CreatesGameObjectWithCustomName");
+        ReflectionBehaviour testScriptInstanceGameObject = TestHelperMethods.CreateScriptInstanceInGameObject<ReflectionBehaviour>("CreatesGameObjectWithCustomName");
         Assert.AreEqual(testScriptInstanceGameObject.gameObject.name, "Test_ScriptInstance_ReflectionBehaviour_CreatesGameObjectWithCustomName");
         return;
     }
@@ -22,7 +22,7 @@ public class TestHelperMethodsTest {
     [Test]
     public void CallAwakeMethods()
     {
-        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CallAwakeMethods");
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateScriptInstanceInGameObject<ReflectionBehaviour>("CallAwakeMethods");
         TestHelperMethods.CallAllAwake(testReflectionBehaviour.gameObject);
         Assert.IsTrue(testReflectionBehaviour.AwakeCalled);
         return;
@@ -31,7 +31,7 @@ public class TestHelperMethodsTest {
     [Test]
     public void CallStartMethods()
     {
-        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CallStartMethods");
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateScriptInstanceInGameObject<ReflectionBehaviour>("CallStartMethods");
         TestHelperMethods.CallAllStart(testReflectionBehaviour.gameObject);
         Assert.IsTrue(testReflectionBehaviour.StartCalled);
         return;
@@ -40,7 +40,7 @@ public class TestHelperMethodsTest {
     [Test]
     public void CallOnEnableMethodsInTestGameObject()
     {
-        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CallOnEnableMethodsInTestGameObject");
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateScriptInstanceInGameObject<ReflectionBehaviour>("CallOnEnableMethodsInTestGameObject");
         TestHelperMethods.CallAllOnEnable(testReflectionBehaviour.gameObject);
         Assert.IsTrue(testReflectionBehaviour.OnEnableCalled);
         return;
@@ -49,8 +49,8 @@ public class TestHelperMethodsTest {
     [Test]
     public void CallCustomMethodInTestGameObject()
     {
-        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("CallCustomMethodInTestGameObject");
-        TestHelperMethods.CallMethod(testReflectionBehaviour, "CustomMethod");
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateScriptInstanceInGameObject<ReflectionBehaviour>("CallCustomMethodInTestGameObject");
+        TestHelperMethods.CallMethod(testReflectionBehaviour, "CustomMethod", null);
         Assert.IsTrue(testReflectionBehaviour.CustomCalled);
         return;
     }
@@ -58,7 +58,7 @@ public class TestHelperMethodsTest {
     [Test]
     public void InitializeTestGameObject()
     {
-        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateTestScriptInstanceInGameObject<ReflectionBehaviour>("InitializeTestGameObject");
+        ReflectionBehaviour testReflectionBehaviour = TestHelperMethods.CreateScriptInstanceInGameObject<ReflectionBehaviour>("InitializeTestGameObject");
         TestHelperMethods.InitializeTestGameObject(testReflectionBehaviour.gameObject);
         Assert.IsTrue(testReflectionBehaviour.AwakeCalled);
         Assert.IsTrue(testReflectionBehaviour.StartCalled);

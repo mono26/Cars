@@ -3,13 +3,27 @@
 public abstract class Ability : EntityComponent
 {
     [Header("Ability settings")]
-    [SerializeField]
-    protected float cooldown;
-    [SerializeField]
-    protected float range;
-    public float Range { get { return range; } }
+    [SerializeField] private float cooldown;
+    [SerializeField] private float range;
 
-    protected float lastCast = 0;
+    private float lastCast = 0;
+
+    public float GetRange { get { return range; } }
+
+    protected virtual void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(entity.transform.position, range);
+
+        return;
+    }
+
+    protected virtual void Start()
+    {
+        lastCast = Time.timeSinceLevelLoad - cooldown;
+
+        return;
+    }
 
     public virtual void Cast()
     {
@@ -27,46 +41,16 @@ public abstract class Ability : EntityComponent
         return isInCooldown;
     }
 
-    public bool IsInRange(Transform _target)
+    public bool IsInRange(Vector3 _targetPosition)
     {
-        bool isInRange = false;
-
+        bool isInRange = true;
         float distance = Vector3.Distance(
             entity.transform.position, 
-            _target.position
+            _targetPosition
             );
-        if (distance <= range)
-            isInRange = true;
-
+        if (distance > range) {
+            isInRange = false;
+        }
         return isInRange; 
-    }
-
-    public bool IsInRange(SlotManager _slotTarget)
-    {
-        bool isInRange = false;
-
-        float distance = Vector3.Distance(
-            entity.transform.position,
-            _slotTarget.transform.position
-            );
-        if (distance - _slotTarget.AttackingDistaceToEntity <= range)
-            isInRange = true;
-
-        return isInRange;
-    }
-
-    protected virtual void OnDrawGizmos()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(entity.transform.position, range);
-
-        return;
-    }
-
-    protected virtual void Start()
-    {
-        lastCast = Time.timeSinceLevelLoad - cooldown;
-
-        return;
     }
 }

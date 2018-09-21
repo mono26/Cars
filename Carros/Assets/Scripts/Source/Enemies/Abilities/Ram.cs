@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Ram : Ability
 {
@@ -11,34 +9,42 @@ public class Ram : Ability
     public override void Cast()
     {
         RamTowardsTarget();
-
         base.Cast();
-
         return;
     }
 
     protected void RamTowardsTarget()
     {
-        // TODO refactorization
-
         Vector3 initialPosition = entity.transform.position;
-        Vector3 targetPosition = Vector3.zero;
-        Vector3 targetDirection = Vector3.zero;
-
-        Enemy castinEntity = entity as Enemy;
-        SlotTargetter slotTargetter = castinEntity.Targetter as SlotTargetter;
-        Targetter targetter = castinEntity.Targetter;
-        if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null) { targetPosition = slotTargetter.CurrentSlotTarget.transform.position; }
-        else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position;}
-
-        entity.GetBody.velocity = Vector3.zero;
-        castinEntity.Movement.NavigationSetActive(false);
-
-        targetDirection = (targetPosition - initialPosition);
+        Vector3 targetPosition = GetTargetPosition();
+        Vector3 targetDirection = (targetPosition - initialPosition);
+        // The direction must be flat in XZ plane.
         targetDirection.y = 0;
-        targetDirection = targetDirection.normalized;
-        entity.GetBody.AddForce(targetDirection * ramForce, ForceMode.Impulse);
+        Vector3 normalizedDirection = targetDirection.normalized;
+        entity.GetBody.AddForce(normalizedDirection * ramForce, ForceMode.Impulse);
+        return;
+    }
 
+    private Vector3 GetTargetPosition()
+    {
+        Vector3 targetPosition = entity.transform.position;
+        if (entity is Enemy)
+        {
+            Enemy castingEnemy = entity as Enemy;
+            targetPosition = castingEnemy.GetTargetPosition();
+        }
+        return targetPosition;
+    }
+
+    private void ReadyToRam()
+    {
+        entity.SetBodyVelocity(Vector3.zero);
+        entity.BodyAffectedByGravity(true);
+        if (entity is Enemy)
+        {
+            Enemy enemy = entity as Enemy;
+            enemy.ActivateNavigation(false);
+        }
         return;
     }
 }

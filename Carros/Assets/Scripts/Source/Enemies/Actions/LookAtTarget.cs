@@ -15,10 +15,10 @@ public class LookAtTarget : AIAction
         Enemy enemy = _entity as Enemy;
         if (enemy == null) { return; }
 
-        Targetter targetter = enemy.Targetter;
-        if (targetter == null || targetter.CurrentTarget == null) { return; }
+        Targetter targetter = enemy.GetTargetterComponent;
+        if (targetter == null || targetter.GetCurrentTarget == null) { return; }
 
-        Vector3 directionToTarget = targetter.CurrentTarget.transform.position - enemy.transform.position;
+        Vector3 directionToTarget = targetter.GetCurrentTarget.transform.position - enemy.transform.position;
         directionToTarget.y = 0;
         enemy.transform.rotation = Quaternion.LookRotation(directionToTarget.normalized);
 

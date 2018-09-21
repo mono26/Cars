@@ -7,49 +7,28 @@ public class CanCastAbility : AIDecision
     {
         bool decision = false;
         decision = CanCast(_entity);
-
         return decision; 
     }
 
     protected bool CanCast(Entity _entity)
     {
-        // TODO refactorization
-        Enemy enemy = _entity as Enemy;
-        if(enemy == null) { return false; }
-
-        SlotTargetter slotTargetter = enemy.Targetter as SlotTargetter;
-        if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null && slotTargetter.CurrentSlot != null)
+        bool canCast = false;
+        if (_entity is Enemy)
         {
-            if (!slotTargetter.CurrentSlot.type.Equals(SlotManager.Slot.Type.Waiting))
+            Enemy enemy = _entity as Enemy;
+            if(enemy.CanAttackTarget())
             {
-                foreach (Ability ability in enemy.Abilities)
+                foreach (Ability ability in enemy.GetAbilitiesComponent)
                 {
-                    if (ability.IsInRange(slotTargetter.CurrentSlotTarget) && !ability.IsInCooldown())
+                    if (ability.IsInRange(enemy.GetTargetPosition()) && !ability.IsInCooldown())
                     {
-                        Debug.Log(enemy.gameObject.name + " Can cast" + ability.ToString());
+                        Debug.Log(enemy.gameObject.name + " Can cast: " + ability.ToString());
                         enemy.SetNextAbility(ability);
-                        return true;
+                        canCast = true;
                     }
                 }
             }
-            return false;
         }
-
-        Targetter targetter = enemy.Targetter;
-        if(targetter != null && targetter.CurrentTarget != null)
-        {
-            foreach (Ability ability in enemy.Abilities)
-            {
-                if (ability.IsInRange(slotTargetter.CurrentTarget) && !ability.IsInCooldown())
-                {
-                    Debug.Log(enemy.gameObject.name + " Can cast" + ability.ToString());
-                    enemy.SetNextAbility(ability);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        return false;
+        return canCast;
     }
 }

@@ -1,22 +1,25 @@
 ﻿using UnityEngine;
 
+public enum SlotType { Waiting, Attacking }
+
+[System.Serializable]
+public class Slot
+{
+    private SlotType type = SlotType.Waiting;
+    private int index = -1;
+
+    public SlotType GetSlotType { get { return type; } }
+    public int GetIndex { get { return index; } }
+
+    public Slot(SlotType _type, int _index)
+    {
+        type = _type;
+        index = _index;
+    }
+}
+
 public class SlotManager : EntityComponent
 {
-    [System.Serializable]
-    public class Slot
-    {
-        public enum Type { Waiting, Attacking }
-
-        public Type type = Type.Waiting;
-        public int index = -1;
-
-        public Slot(Type _type = Type.Waiting, int _index = -1)
-        {
-            type = _type;
-            index = _index;
-        }
-    }
-
     [Header("Slot Manager settings")]
     [SerializeField]
     protected float attackingDistaceToEntity = 1.5f;
@@ -34,7 +37,7 @@ public class SlotManager : EntityComponent
     [SerializeField]
     protected GameObject[] waitingSlots;
 
-    protected void OnDrawGizmosSelected()
+    private void OnDrawGizmosSelected()
     {
         for (int index = 0; index < numberOfWaitingSlots; ++index)
         {
@@ -57,7 +60,7 @@ public class SlotManager : EntityComponent
         return;
     }
 
-    protected void Start()
+    private void Start()
     {
         attackingSlots = new GameObject[numberOfAttackingSlots];
         for (int i = 0; i < numberOfAttackingSlots; i++)
@@ -72,24 +75,7 @@ public class SlotManager : EntityComponent
         return;
     }
 
-    public Vector3 GetSlotPosition(Slot _slot)
-    {
-        Vector3 position = transform.position;
-        switch(_slot.type)
-        {
-            case Slot.Type.Attacking:
-                position = GetAttackingSlotPosition(_slot.index);
-                break;
-            case Slot.Type.Waiting:
-                position = GetWaitingSlotPosition(_slot.index);
-                break;
-            default:
-                break;
-        }
-        return position;
-    }
-
-	protected Vector3 GetWaitingSlotPosition(int index)
+	private Vector3 GetWaitingSlotPosition(int index)
     {
         float degreesPerIndex = 360f / numberOfWaitingSlots;
         Vector3 posistion = transform.position;
@@ -97,7 +83,7 @@ public class SlotManager : EntityComponent
         return posistion + (Quaternion.Euler(new Vector3(0f, degreesPerIndex * index, 0f)) * offset);
     }
 
-    protected Vector3 GetAttackingSlotPosition(int index)
+    private Vector3 GetAttackingSlotPosition(int index)
     {
         float degreesPerIndex = 360f / numberOfAttackingSlots;
         Vector3 posistion = transform.position;
@@ -105,7 +91,7 @@ public class SlotManager : EntityComponent
         return posistion + (Quaternion.Euler(new Vector3(0f, degreesPerIndex * index, 0f)) * offset);
     }
 
-    protected bool IsThereAFreeAtackingSlot()
+    private bool HasAFreeAtackingSlot()
     {
         bool isfree = false;
         if(attackingSlots.Length > 0)
@@ -129,55 +115,96 @@ public class SlotManager : EntityComponent
         Vector3 offset = (attacker.transform.position - bestPosition).normalized * waitingDistaceToEntity;
         bestPosition += offset;
         Slot bestSlot = null;
-        float bestDist = 99999f;
-        if(IsThereAFreeAtackingSlot())
+        if (HasAFreeAtackingSlot())
         {
-            for (int index = 0; index < attackingSlots.Length; ++index)
-            {
-                if (attackingSlots[index] != null)
-                    continue;
-                var dist = (GetAttackingSlotPosition(index) - bestPosition).sqrMagnitude;
-                if (dist < bestDist)
-                {
-                    bestSlot = new Slot(Slot.Type.Attacking, index);
-                    bestDist = dist;
-                }
-            }
-            if (bestSlot.index != -1)
-                attackingSlots[bestSlot.index] = attacker;
+            bestSlot = ReserveAttackingSlot(attacker, bestPosition);
         }
         else
         {
-            for (int index = 0; index < waitingSlots.Length; ++index)
-            {
-                if (waitingSlots[index] != null)
-                    continue;
-                var dist = (GetWaitingSlotPosition(index) - bestPosition).sqrMagnitude;
-                if (dist < bestDist)
-                {
-                    bestSlot = new Slot(Slot.Type.Waiting, index);
-                    bestDist = dist;
-                }
-            }
-            if (bestSlot.index != -1)
-                waitingSlots[bestSlot.index] = attacker;
+            bestSlot = ReserveWaitingSlot(attacker, bestPosition);
         }
         return bestSlot;
     }
 
-	public void Release(Slot _slot)
+    private Slot ReserveWaitingSlot(GameObject _attacker, Vector3 _bestPosition)
     {
-        switch (_slot.type)
+        Slot bestSlot = null;
+        float bestDist = 99999f;
+        int bestSlotIndex = -1;
+        for (int index = 0; index < waitingSlots.Length; ++index)
         {
-            case Slot.Type.Attacking:
-                attackingSlots[_slot.index] = null;
+            if (waitingSlots[index] != null)
+                continue;
+            var dist = (GetWaitingSlotPosition(index) - _bestPosition).sqrMagnitude;
+            if (dist < bestDist)
+            {
+                bestSlotIndex = index;
+                bestDist = dist;
+            }
+        }
+        if (bestSlotIndex != -1)
+        {
+            waitingSlots[bestSlotIndex] = _attacker;
+            bestSlot = new Slot(SlotType.Waiting, bestSlotIndex);
+        }
+        return bestSlot;
+    }
+
+    private Slot ReserveAttackingSlot(GameObject _attacker, Vector3 _bestPosition)
+    {
+        Slot bestSlot = null;
+        float bestDist = 99999f;
+        int bestSlotIndex = -1;
+        for (int index = 0; index < attackingSlots.Length; ++index)
+        {
+            if (attackingSlots[index] == null)
+            {
+                float dist = (GetAttackingSlotPosition(index) - _bestPosition).sqrMagnitude;
+                if (dist < bestDist)
+                {
+                    bestSlotIndex = index;
+                    bestDist = dist;
+                }
+            }
+        }
+        if (bestSlotIndex != -1) {
+            attackingSlots[bestSlot.GetIndex] = _attacker;
+            bestSlot = new Slot(SlotType.Attacking, bestSlotIndex);
+        }
+        return bestSlot;
+    }
+
+    public void Release(Slot _slot)
+    {
+        switch (_slot.GetSlotType)
+        {
+            case SlotType.Attacking:
+                attackingSlots[_slot.GetIndex] = null;
                 break;
-            case Slot.Type.Waiting:
-                waitingSlots[_slot.index] = null; ;
+            case SlotType.Waiting:
+                waitingSlots[_slot.GetIndex] = null; ;
                 break;
             default:
                 break;
         }
+        _slot = null;
         return;
+    }
+
+    public Vector3 GetSlotPosition(Slot _slot)
+    {
+        Vector3 position = transform.position;
+        switch (_slot.GetSlotType)
+        {
+            case SlotType.Attacking:
+                position = GetAttackingSlotPosition(_slot.GetIndex);
+                break;
+            case SlotType.Waiting:
+                position = GetWaitingSlotPosition(_slot.GetIndex);
+                break;
+            default:
+                break;
+        }
+        return position;
     }
 }

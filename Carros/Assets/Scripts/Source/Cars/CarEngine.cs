@@ -10,9 +10,6 @@ public class CarEngine : EntityComponent
 
     [Header("Editor debugging")]
     [SerializeField] private float currentTorque;
-    [SerializeField] private float currentRevolutions;
-
-    public float GetCurrentEngineRevolutions { get { return currentRevolutions; } }
 
     private void Start()
     {
@@ -65,12 +62,12 @@ public class CarEngine : EntityComponent
         return capedVelocity;
     }
 
-    public void CalculateEngineRevolutions(float _currentSpeed)
+    public float CalculateEngineRevolutions(float _currentSpeed)
     {
         // calculate engine revs (for display / sound)
         // (this is done in retrospect - revs are not used in force/power calculations)
         float revsFactor = _currentSpeed / maxSpeed;
-        currentRevolutions = Mathf.Lerp(0, 1, revsFactor);
-        return;
+        float currentRevolutions = Mathf.Lerp(0, 1, revsFactor);
+        return currentRevolutions;
     }
 }

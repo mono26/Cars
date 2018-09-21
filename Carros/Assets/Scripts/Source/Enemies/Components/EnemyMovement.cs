@@ -1,60 +1,56 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
+public enum EnemyMovementMode { Patrolling, Running }
+public enum EnemyMovemenState { Idle, Running, Walking}
+
 public class EnemyMovementEvent : CarEvent
 {
     public Enemy enemy;
-    public EnemyMovement.MovementMode movementType;
+    public EnemyMovementMode movementType;
 
-    public EnemyMovementEvent(Enemy _enemy, EnemyMovement.MovementMode _movementType)
+    public EnemyMovementEvent(Enemy _enemy, EnemyMovementMode _movementType)
     {
         enemy = _enemy;
         movementType = _movementType;
+        return;
+    }
+}
+
+[System.Serializable]
+public class MovementStats
+{
+    [SerializeField] private float runningAcceleration;
+    [SerializeField] private float runningSpeed;
+    [SerializeField] private float walkingAcceleration;
+    [SerializeField] private float walkingSpeed;
+
+    public float GetRunningAcceleration { get { return runningAcceleration; } }
+    public float GetRunningSpeed { get { return runningSpeed; } }
+    public float GetWalkingAcceleration { get { return walkingAcceleration; } }
+    public float GetWalkingSpeed { get { return walkingSpeed; } }
+
+    public MovementStats(int _runningAcceleration, int _runningSpeed, int _walkingAcceleration, int _walkingSpeed)
+    {
+        runningAcceleration = _runningAcceleration;
+        runningSpeed = _runningSpeed;
+        walkingAcceleration = _walkingAcceleration;
+        walkingSpeed = _walkingSpeed;
+        return;
     }
 }
 
 public class EnemyMovement : EntityComponent
 {
-    public enum MovementMode { Running, Patrolling, Idle }
-
-    [System.Serializable]
-    public class MovementStats
-    {
-        [SerializeField]
-        protected float runningAcceleration;
-        public float RunningAcceleration { get { return runningAcceleration; } }
-        [SerializeField]
-        protected float runningSpeed;
-        public float RunningSpeed { get { return runningSpeed; } }
-        [SerializeField]
-        protected float walkingAcceleration;
-        public float WalkingAcceleration { get { return walkingAcceleration; } }
-        [SerializeField]
-        protected float walkingSpeed;
-        public float WalkingSpeed { get { return walkingSpeed; } }
-
-        public MovementStats(float _runningAcceleration, float _runningSpeed, float _walkingAcceleration, float _walkingSpeed)
-        {
-            runningAcceleration = _runningAcceleration;
-            runningSpeed = _runningSpeed;
-            walkingAcceleration = _walkingAcceleration;
-            walkingSpeed = _walkingSpeed;
-        }
-    }
-
     [Header("Enemy Movement settings")]
-    [SerializeField] private float groundCheckRayLenght = 1.0f;
+    [SerializeField] private MovementStats movementStats;
 
     [Header("Enemy Movement Components")]
     [SerializeField] private NavMeshAgent navigationComponent;
 
-    [Header("Editor debugging")]
-    [SerializeField] private MovementMode currentMode;
-
-    protected Vector3 lastPosition;
-
-    public MovementMode GetCurrentMode { get { return currentMode; } }
+    public MovementStats GetMovementStats { get { return movementStats; } }
     public NavMeshAgent GetNavigationComponent { get { return navigationComponent; } }
+    public float GetNavigationSpeed { get { return navigationComponent.velocity.magnitude; } }
 
     protected override void Awake()
     {
@@ -67,13 +63,9 @@ public class EnemyMovement : EntityComponent
 
     private void Start()
     {
-        navigationComponent.updatePosition = false;
-        return;
-    }
-
-    public override void FixedFrame()
-    {
-        HandleAnimations();
+        if(HasNavigationComponent()) {
+            navigationComponent.updatePosition = false;
+        }
         return;
     }
 
@@ -86,61 +78,13 @@ public class EnemyMovement : EntityComponent
         return;
     }
 
-    private void HandleAnimations()
-    {
-        if (entity.GetAnimatorComponent == null) { return; }
-        HandleAnimationStates();
-        HandleAnimationSpeed();
-        lastPosition = transform.position;
-        return;
-    }
-
-    private void HandleAnimationStates()
-    {
-        Animator animatorToHandle = entity.GetAnimatorComponent;
-        if (animatorToHandle == null) { return; }
-        animatorToHandle.SetBoolWithParameterCheck(
-            "IsGrounded",
-            AnimatorControllerParameterType.Bool,
-            CheckGrounded()
-            );
-        animatorToHandle.SetBoolWithParameterCheck(
-            "IsIdle",
-            AnimatorControllerParameterType.Bool,
-            CheckIfStandingStill()
-            );
-        animatorToHandle.SetBoolWithParameterCheck(
-            "IsRunning",
-            AnimatorControllerParameterType.Bool,
-            (currentMode == MovementMode.Running)
-            );
-        animatorToHandle.SetBoolWithParameterCheck(
-            "IsWalking",
-            AnimatorControllerParameterType.Bool,
-            (currentMode == MovementMode.Patrolling)
-            );
-        return;
-    }
-
-    private bool CheckGrounded()
-    {
-        RaycastHit hit;
-        Ray ray = new Ray(transform.position + Vector3.up * groundCheckRayLenght * 0.5f, -Vector3.up);
-        bool isGrounded = Physics.Raycast (ray, out hit, groundCheckRayLenght, Physics.AllLayers,
-            QueryTriggerInteraction.Ignore);
-        return isGrounded;
-    }
-
-    private bool CheckIfStandingStill()
+    private bool CheckIfEnemyIsStandingStill()
     {
         bool isStandingStill = true;
         try
         {
-            if (HasNavigationComponent())
-            {
+            if (HasNavigationComponent()) {
                 isStandingStill = navigationComponent.desiredVelocity.sqrMagnitude <= 0.1f * 0.1f ? true : false;
-                if (isStandingStill)
-                    currentMode = MovementMode.Idle;
             }
         }
         catch (MissingComponentException missingComponentException) {
@@ -160,43 +104,17 @@ public class EnemyMovement : EntityComponent
         return hasNavigation;
     }
 
-    private void HandleAnimationSpeed()
-    {
-        try
-        {
-            Animator animatorToHandle = entity.GetAnimatorComponent;
-            if (animatorToHandle != null && HasNavigationComponent())
-            {
-                if (currentMode == MovementMode.Idle) { animatorToHandle.speed = 1.0f; }
-                else
-                {
-                    float currentSpeed = navigationComponent.velocity.magnitude;
-                    if (currentSpeed < 1.0f) { animatorToHandle.speed = currentSpeed; }
-                    else
-                    {
-                        if (navigationComponent.height < 1.0f) { animatorToHandle.speed = navigationComponent.velocity.magnitude / (navigationComponent.height + 1); }
-                        else { animatorToHandle.speed = navigationComponent.velocity.magnitude / (navigationComponent.height + navigationComponent.height); }
-                    }
-                }
-            }
-        }
-        catch (MissingComponentException missingComponentException) {
-            missingComponentException.DisplayException();
-        }
-        return;
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Terrain"))
         {
-            NavigationSetActive(true);
+            ActivateNavMeshNavigation(true);
             entity.BodyAffectedByGravity(false);
         }
         return;
     }
 
-    public void NavigationSetActive(bool _state)
+    public void ActivateNavMeshNavigation(bool _state)
     {
         try
         {
@@ -223,7 +141,6 @@ public class EnemyMovement : EntityComponent
         {
             if (HasNavigationComponent() && navigationComponent.isOnNavMesh) {
                 navigationComponent.destination = _destination;
-                Debug.Log(Time.timeSinceLevelLoad + "New navigation destination: " + navigationComponent.destination);
             }
 
         }
@@ -233,12 +150,21 @@ public class EnemyMovement : EntityComponent
         return;
     }
 
-    public void SetMovementValues(float _acceleration, float _speed, MovementMode _mode)
+    public void SetNavigationValuesDependingOnMode(EnemyMovementMode _mode)
     {
-        if (navigationComponent == null) { return; }
-        currentMode = _mode;
-        navigationComponent.acceleration = _acceleration;
-        navigationComponent.speed = _speed;
+        if (HasNavigationComponent())
+        {
+            if(_mode == EnemyMovementMode.Patrolling)
+            {
+                navigationComponent.acceleration = movementStats.GetWalkingAcceleration;
+                navigationComponent.speed = movementStats.GetWalkingSpeed;
+            }
+            else
+            {
+                navigationComponent.acceleration = movementStats.GetRunningAcceleration;
+                navigationComponent.speed = movementStats.GetRunningSpeed;
+            }
+        }
         return;
     }
 

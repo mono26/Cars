@@ -14,18 +14,21 @@ public class JumpAttack : Ability
 
     private void JumpTowardsTarget()
     {
-        // TODO refactorization,check conditions and early exit.
         Vector3 initialPosition = entity.transform.position;
         Vector3 targetPosition = GetTargetPosition();
         ReadyToJump();
-        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(initialPosition, targetPosition, jumpSpeed);
-        entity.SetBodyVelocity (jumpVelocity);
+        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(
+            initialPosition, 
+            targetPosition, 
+            jumpSpeed
+            );
+        entity.SetBodyVelocity(jumpVelocity);
         return;
     }
 
     private void ReadyToJump()
     {
-        entity.SetBodyVelocity (Vector3.zero);
+        entity.SetBodyVelocity(Vector3.zero);
         entity.BodyAffectedByGravity(true);
         if (entity is Enemy)
         {
@@ -37,14 +40,11 @@ public class JumpAttack : Ability
 
     private Vector3 GetTargetPosition()
     {
-        Vector3 targetPosition = Vector3.zero;
+        Vector3 targetPosition = entity.transform.position;
         if (entity is Enemy)
         {
             Enemy castingEnemy = entity as Enemy;
-            SlotTargetter slotTargetter = castingEnemy.Targetter as SlotTargetter;
-            Targetter targetter = castingEnemy.Targetter;
-            if (slotTargetter != null && slotTargetter.CurrentSlotTarget != null) { targetPosition = slotTargetter.CurrentSlotTarget.transform.position; }
-            else if (targetter != null && targetter.CurrentTarget != null) { targetPosition = targetter.CurrentTarget.position; }
+            targetPosition = castingEnemy.GetTargetPosition();
         }
         return targetPosition;
     }

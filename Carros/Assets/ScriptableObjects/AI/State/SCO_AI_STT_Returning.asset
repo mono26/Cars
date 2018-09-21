@@ -9,12 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5080e473b531e1140bdc131a255204cb, type: 3}
-  m_Name: SCO_0.1_AI_STT_Patrolling
+  m_Name: SCO_AI_STT_Returning
   m_EditorClassIdentifier: 
-  stateName: Waiting
+  stateName: Returning
   actions:
-  - {fileID: 11400000, guid: ce8fb12ecec4f1e428ee2f4e2b8f9c61, type: 2}
+  - {fileID: 11400000, guid: ab5ea708e00b31548a9732d5d2ff87f7, type: 2}
   transitions:
-  - decision: {fileID: 11400000, guid: f468a5349ef33f445b24a95442874ee5, type: 2}
-    trueState: {fileID: 11400000, guid: 2a1717594b4814c4083b5cf48ee18d6e, type: 2}
+  - decision: {fileID: 11400000, guid: 19e6edadc3069fa4ba48ea6343d770f8, type: 2}
+    trueState: {fileID: 11400000, guid: b1d918f057b934441930358644f948c5, type: 2}
     falseState: {fileID: 11400000, guid: 19ab18f277b8491419235f0fcdc58f1c, type: 2}

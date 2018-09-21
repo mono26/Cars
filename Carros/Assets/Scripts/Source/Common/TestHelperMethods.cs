@@ -5,15 +5,15 @@ public static class TestHelperMethods
 {
     public static T CreateInitializedScriptInstanceInGameObject<T>(string _nameOfTest) where T : MonoBehaviour
     {
-        T scriptTestInstanceInitialized = CreateTestScriptInstanceInGameObject<T>(_nameOfTest);
-        InitializeTestGameObject(scriptTestInstanceInitialized.gameObject);
-        return scriptTestInstanceInitialized;
+        T scriptInstanceToInitialize = CreateScriptInstanceInGameObject<T>(_nameOfTest);
+        InitializeTestGameObject(scriptInstanceToInitialize.gameObject);
+        return scriptInstanceToInitialize;
     }
 
-    public static T CreateTestScriptInstanceInGameObject<T>(string _nameOfTest) where T : MonoBehaviour
+    public static T CreateScriptInstanceInGameObject<T>(string _nameOfTest) where T : MonoBehaviour
     {
-        GameObject testGameObject = new GameObject("Test_ScriptInstance_" + typeof(T).Name+ "_" + _nameOfTest);
-        T testScriptInstance = testGameObject.AddComponent<T>();
+        GameObject gameObject = new GameObject("Test_ScriptInstance_" + typeof(T).Name+ "_" + _nameOfTest);
+        T testScriptInstance = gameObject.AddComponent<T>();
         return testScriptInstance;
     }
 
@@ -28,17 +28,17 @@ public static class TestHelperMethods
     public static void CallAllAwake(GameObject _gameObjectToAwake)
     {
         foreach(MonoBehaviour behaviour in _gameObjectToAwake.GetComponentsInChildren<MonoBehaviour>()) {
-            CallMethod(behaviour, "Awake");
+            CallMethod(behaviour, "Awake", null);
         }
         return;
     }
 
-    public static void CallMethod(Object _behaviourToCallMethodFrom, string _methodName)
+    public static void CallMethod(MonoBehaviour _behaviourToCallMethodFrom, string _methodName, object[] _parameters)
     {
         BindingFlags methodFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         MethodInfo methodToCall = _behaviourToCallMethodFrom.GetType().GetMethod(_methodName, methodFlag);
         if(methodToCall != null) {
-            methodToCall.Invoke(_behaviourToCallMethodFrom, null);
+            methodToCall.Invoke(_behaviourToCallMethodFrom, _parameters);
         }
         return;
     }
@@ -46,7 +46,7 @@ public static class TestHelperMethods
     public static void CallAllStart(GameObject _gameObjectToStart)
     {
         foreach (MonoBehaviour behaviour in _gameObjectToStart.GetComponentsInChildren<MonoBehaviour>()) {
-            CallMethod(behaviour, "Start");
+            CallMethod(behaviour, "Start", null);
         }
         return;
     }
@@ -54,7 +54,7 @@ public static class TestHelperMethods
     public static void CallAllOnEnable(GameObject _gameObjectToOnEnable)
     {
         foreach (MonoBehaviour behaviour in _gameObjectToOnEnable.GetComponentsInChildren<MonoBehaviour>()) {
-            CallMethod(behaviour, "OnEnable");
+            CallMethod(behaviour, "OnEnable", null);
         }
         return;
     }

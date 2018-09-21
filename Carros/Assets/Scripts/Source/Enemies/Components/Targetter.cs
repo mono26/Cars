@@ -19,30 +19,32 @@ public class TargetterEvent : CarEvent
 public class Targetter : EntityComponent
 {
     [Header("Targetter settings")]
-    [SerializeField]
-    protected float detectionRange = 5.0f;
-    [SerializeField]
-    protected float detectionRate = 2.0f; // Detection rate per second
-    [SerializeField]
-    protected SphereCollider detectionTrigger;
-    [SerializeField]
-    protected string[] targetableTags;
+    [SerializeField] private float detectionRange = 5.0f;
+    [SerializeField] protected float detectionRate = 2.0f; // Detection rate per second
+    [SerializeField] private SphereCollider detectionTrigger;
+    [SerializeField] protected string[] targetableTags = new string[] { "Player" };
 
-    [Header("Editor debugging")]
-    [SerializeField]
-    protected Transform currentTarget;
-    public Transform CurrentTarget { get { return currentTarget; } }
-    [SerializeField]
-    protected List<Transform> nearTargets;
-    [SerializeField]
-    protected Coroutine updateTargetRoutine;
+    [Header("Targetter editor debugging")]
+    [SerializeField] private Transform currentTarget;
+    [SerializeField] private List<Transform> nearTargets;
+
+    private Coroutine updateTargetRoutine;
+
+    public Transform GetCurrentTarget { get { return currentTarget; } }
 
     protected override void Awake()
     {
-        if (detectionTrigger == null)
+        if (entity == null)
+        {
+            entity = GetComponent<Entity>();
+            if(entity == null) {
+                entity = GetComponentInParent<Entity>();
+            }
+        }
+        if (detectionTrigger == null) {
             detectionTrigger = GetComponent<SphereCollider>();
-        if (detectionTrigger == null)
-            throw new MissingComponentException("There is no component attached to the object: ", typeof(SphereCollider));
+        }
+        return;
     }
 
     protected virtual void Start()
@@ -63,21 +65,6 @@ public class Targetter : EntityComponent
         return hasTrigger;
     }
 
-    protected Transform GetNearestActiveTarget()
-    {
-        if(nearTargets.Count.Equals(0)) { return null; }
-        HelperMethods.ClearInactiveElementsInCollection(ref nearTargets);
-        Transform nearestTarget = HelperMethods.GetElementAtMinimumDistanceInColection(nearTargets, entity.transform);
-        return nearestTarget;
-    }
-
-    protected void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
-        return;
-    }
-
     protected virtual void OnTriggerEnter(Collider other)
     {
         foreach (string tag in targetableTags)
@@ -87,6 +74,33 @@ public class Targetter : EntityComponent
             if (posibleTarget != null && !nearTargets.Contains(posibleTarget))
                 AddTarget(posibleTarget);
         }
+        return;
+    }
+
+    protected virtual void OnTriggerExit(Collider other)
+    {
+        foreach (string tag in targetableTags)
+        {
+            if (!other.CompareTag(tag)) { return; }
+            Transform realisingTarget = other.transform;
+            if (realisingTarget == null || !nearTargets.Contains(realisingTarget)) { return; }
+            RemoveTarget(realisingTarget);
+        }
+        return;
+    }
+
+    private Transform GetNearestActiveTarget()
+    {
+        if(nearTargets.Count.Equals(0)) { return null; }
+        HelperMethods.ClearInactiveElementsInCollection(ref nearTargets);
+        Transform nearestTarget = HelperMethods.GetElementAtMinimumDistanceInColection(nearTargets, entity.transform);
+        return nearestTarget;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
         return;
     }
 
@@ -110,19 +124,7 @@ public class Targetter : EntityComponent
         updateTargetRoutine = StartCoroutine(UpdateTarget());
     }
 
-    protected virtual void OnTriggerExit(Collider other)
-    {
-        foreach (string tag in targetableTags)
-        {
-            if (!other.CompareTag(tag)) { return; }
-            Transform realisingTarget = other.transform;
-            if (realisingTarget  == null || !nearTargets.Contains(realisingTarget)) { return; }
-            RemoveTarget(realisingTarget);
-        }
-        return;
-    }
-
-    protected void RemoveTarget(Transform _target)
+    private void RemoveTarget(Transform _target)
     {
         nearTargets.Remove(_target);
         if (currentTarget.Equals(_target))
@@ -145,5 +147,24 @@ public class Targetter : EntityComponent
         float x = randomRadius * Mathf.Cos(randomAngle);
         float z = randomRadius * Mathf.Sin(randomAngle);
         return new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
+    }
+
+    public virtual Vector3 GetCurrentTargetPosition()
+    {
+        // Default value if there is no target.
+        Vector3 targetPosition = entity.transform.position;
+        if (currentTarget != null) {
+            targetPosition = currentTarget.position;
+        }
+        return targetPosition;
+    }
+
+    public virtual bool HasAValidCurrentTarget()
+    {
+        bool hasAValidCurrentTarget = true;
+        if(currentTarget == null) {
+            hasAValidCurrentTarget = false;
+        }
+        return hasAValidCurrentTarget;
     }
 }
