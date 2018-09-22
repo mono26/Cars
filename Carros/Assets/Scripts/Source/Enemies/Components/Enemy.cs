@@ -68,6 +68,24 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
         return;
     }
 
+    private bool HasStateMachineComponent()
+    {
+        bool hasStatemachine = true;
+        try
+        {
+            if (aiStateMachineComponent == null)
+            {
+                hasStatemachine = false;
+                throw new MissingComponentException("The enemy has a missing component: ", typeof(AIStateMachine));
+            }
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
+        }
+        return hasStatemachine;
+    }
+
     private IEnumerator UpdateState()
     {
         aiStateMachineComponent.UpdateState();
@@ -135,10 +153,17 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     private bool HasTargetterComponent()
     {
         bool hasTargetter = true;
-        if (targetterComponent == null)
+        try
         {
-            hasTargetter = false;
-            throw new MissingComponentException("The enemy has a missing component: ", typeof(Targetter));
+            if (targetterComponent == null)
+            {
+                hasTargetter = false;
+                throw new MissingComponentException("The enemy has a missing component: ", typeof(Targetter));
+            }
+        }
+        catch (MissingComponentException missingComponentException)
+        {
+            missingComponentException.DisplayException();
         }
         return hasTargetter;
     }
@@ -146,24 +171,16 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     private EnemyMovemenState GetMovementStateBaseOnSpeed()
     {
         EnemyMovemenState currentMovementState = EnemyMovemenState.Idle;
-        try
+        if (HasMovementComponent())
         {
-            if (HasMovementComponent())
-            {
-                float currentSpeed = enemyMovementComponent.GetNavigationSpeed;
-                MovementStats movementStats = enemyMovementComponent.GetMovementStats;
-                if (currentSpeed <= movementStats.GetWalkingSpeed)
-                {
-                    currentMovementState = EnemyMovemenState.Walking;
-                }
-                else if (currentSpeed > movementStats.GetRunningSpeed)
-                {
-                    currentMovementState = EnemyMovemenState.Running;
-                }
+            float currentSpeed = enemyMovementComponent.GetNavigationSpeed;
+            MovementStats movementStats = enemyMovementComponent.GetMovementStats;
+            if (currentSpeed <= movementStats.GetWalkingSpeed) {
+                currentMovementState = EnemyMovemenState.Walking;
             }
-        }
-        catch (MissingComponentException missingComponentException){
-            missingComponentException.DisplayException();
+            else if (currentSpeed > movementStats.GetRunningSpeed) {
+                currentMovementState = EnemyMovemenState.Running;
+            }
         }
         return currentMovementState;
     }
@@ -171,22 +188,16 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     private float CalculateMovementSpeedPercent()
     {
         float speeedPercent = 0;
-        try
+        if (HasMovementComponent())
         {
-            if (HasMovementComponent())
-            {
-                float currentSpeed = enemyMovementComponent.GetNavigationSpeed;
-                MovementStats movementStats = enemyMovementComponent.GetMovementStats;
-                if(currentSpeed <= movementStats.GetWalkingSpeed) {
-                    speeedPercent = currentSpeed / movementStats.GetWalkingSpeed;
-                }
-                else {
-                    speeedPercent = currentSpeed / movementStats.GetRunningSpeed;
-                }
+            float currentSpeed = enemyMovementComponent.GetNavigationSpeed;
+            MovementStats movementStats = enemyMovementComponent.GetMovementStats;
+            if(currentSpeed <= movementStats.GetWalkingSpeed) {
+                speeedPercent = currentSpeed / movementStats.GetWalkingSpeed;
             }
-        }
-        catch (MissingComponentException missingComponentException) {
-            missingComponentException.DisplayException();
+            else {
+                speeedPercent = currentSpeed / movementStats.GetRunningSpeed;
+            }
         }
         return speeedPercent;
     }
@@ -194,51 +205,34 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     private bool HasMovementComponent()
     {
         bool hasMovement = true;
-        if (enemyMovementComponent == null)
-        {
-            hasMovement = false;
-            throw new MissingComponentException("The enemy has a missing component: ", typeof(EnemyMovement));
-        }
-        return hasMovement;
-    }
-
-    private bool HasStateMachineComponent()
-    {
-        bool hasStatemachine = true;
-        if (aiStateMachineComponent == null)
-        {
-            hasStatemachine = false;
-            throw new MissingComponentException("The enemy has a missing component: ", typeof(AIStateMachine));
-        }
-        return hasStatemachine;
-    }
-
-    private void StartPatrolling()
-    {
         try
         {
-            if (HasMovementComponent())
+            if (enemyMovementComponent == null)
             {
-                enemyMovementComponent.SetNavigationValuesDependingOnMode(EnemyMovementMode.Patrolling);
+                hasMovement = false;
+                throw new MissingComponentException("The enemy has a missing component: ", typeof(EnemyMovement));
             }
         }
         catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
+        }
+        return hasMovement;
+    }
+
+    private void StartPatrolling()
+    {
+        if (HasMovementComponent())
+        {
+            enemyMovementComponent.SetNavigationValuesDependingOnMode(EnemyMovementMode.Patrolling);
         }
         return;
     }
 
     private void StartRunning()
     {
-        try
+        if (HasMovementComponent())
         {
-            if (HasMovementComponent())
-            {
-                enemyMovementComponent.SetNavigationValuesDependingOnMode(EnemyMovementMode.Running);
-            }
-        }
-        catch (MissingComponentException missingComponentException) {
-            missingComponentException.DisplayException();
+            enemyMovementComponent.SetNavigationValuesDependingOnMode(EnemyMovementMode.Running);
         }
         return;
     }
@@ -246,13 +240,8 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     public void RunTowardsPoint(Vector3 _destinationPoint)
     {
         StartRunning();
-        try
-        {
-            if (HasMovementComponent())
-                enemyMovementComponent.SetNavigationDestination(_destinationPoint);
-        }
-        catch (MissingComponentException missingComponentException) {
-            missingComponentException.DisplayException();
+        if (HasMovementComponent()) {
+            enemyMovementComponent.SetNavigationDestination(_destinationPoint);
         }
         return;
     }
@@ -260,16 +249,9 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     public void PatrolTowardsPoint(Vector3 _destinationPoint)
     {
         StartPatrolling();
-        try
+        if (HasMovementComponent() && !enemyMovementComponent.IsAlreadyInAPath())
         {
-            if (HasMovementComponent() && !enemyMovementComponent.IsAlreadyInAPath())
-            {
-                enemyMovementComponent.SetNavigationDestination(_destinationPoint);
-            }
-        }
-        catch (MissingComponentException missingComponentException)
-        {
-            missingComponentException.DisplayException();
+            enemyMovementComponent.SetNavigationDestination(_destinationPoint);
         }
         return;
     }
@@ -283,15 +265,15 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     public bool CanAttackTarget()
     {
         bool canAttack = false;
-        if(HasTargetterComponent() && targetterComponent is SlotTargetter)
+        if(targetterComponent is SlotTargetter)
         {
             SlotTargetter slotTargetter = targetterComponent as SlotTargetter;
-            if(slotTargetter.HasAValidCurrentTarget() && slotTargetter.GetCurrentSlotType() == SlotType.Attacking) {
+            if(HasValidTarget() && slotTargetter.GetCurrentSlotType() == SlotType.Attacking) {
                 canAttack = true;
             }
         }
         else {
-            canAttack = targetterComponent.HasAValidCurrentTarget();
+            canAttack = HasValidTarget();
         }
         return canAttack;
     }
@@ -304,24 +286,16 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     public Vector3 CalculateRandomPatrolPoint()
     {
         Vector3 patrolPoint = transform.position;
-        try
+        if (HasTargetterComponent())
         {
-            if (HasTargetterComponent())
-            {
-                patrolPoint = targetterComponent.CalculateRandomPointInsideTrigger();
-            }
-        }
-        catch (MissingComponentException missingComponentException)
-        {
-            missingComponentException.DisplayException();
+            patrolPoint = targetterComponent.CalculateRandomPointInsideTrigger();
         }
         return patrolPoint;
     }
 
     public void ChangeState(AIState _stateToChangeTo)
     {
-        if (HasStateMachineComponent())
-        {
+        if (HasStateMachineComponent()) {
             aiStateMachineComponent.ChangeState(_stateToChangeTo);
         }
         return;
@@ -330,11 +304,19 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     public Vector3 GetTargetPosition()
     {
         Vector3 targetPosition = transform.position;
-        if (HasTargetterComponent())
-        {
+        if (HasTargetterComponent()) {
             targetPosition = targetterComponent.GetCurrentTargetPosition();
         }
         return targetPosition;
+    }
+
+    public bool HasValidTarget()
+    {
+        bool canAttack = false;
+        if (HasTargetterComponent()) {
+            canAttack = targetterComponent.HasAValidCurrentTarget();
+        }
+        return canAttack;
     }
 
     public void OnEvent(TargetterEvent _targetterEvent)
@@ -346,7 +328,6 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
             case TargetterEventType.TargetLost:
                 aiStateMachineComponent.ChangeState(returnState);
                 break;
-
             default:
                 break;
         }

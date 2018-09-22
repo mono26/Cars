@@ -15,21 +15,16 @@ public class AIState : ScriptableObject
     {
         DoActions(_entity);
         CheckTransitions(_entity);
+        return;
     }
 
     private void DoActions(Entity _entity)
     {
-        try
+        if (StateHasActions())
         {
-            if (StateHasActions())
-            {
-                for (int i = 0; i < actions.Length; i++)
-                    actions[i].DoAction(_entity);
+            for (int i = 0; i < actions.Length; i++) {
+                actions[i].DoAction(_entity);
             }
-        }
-        catch (AIStateException stateException)
-        {
-            stateException.NoActionException();
         }
         return;
     }
@@ -37,36 +32,35 @@ public class AIState : ScriptableObject
     private bool StateHasActions()
     {
         bool hasActions = true;
-        if (actions.Length == 0)
+        try
         {
-            hasActions = false;
-            throw new AIStateException(this, AIStateException.AIStateExceptionType.NoAction);
+            if (actions.Length == 0)
+            {
+                hasActions = false;
+                throw new AIStateException(this, AIStateException.AIStateExceptionType.NoAction);
+            }
+        }
+        catch (AIStateException stateException) {
+            stateException.NoActionException();
         }
         return hasActions;
     }
 
     private void CheckTransitions(Entity _entity)
     {
-        try
+        if (StateHasTransition() && _entity is Enemy)
         {
-            if (StateHasTransition() && _entity is Enemy)
+            Enemy enemy = _entity as Enemy;
+            for (int i = 0; i < transitions.Length; i++)
             {
-                Enemy enemy = _entity as Enemy;
-                for (int i = 0; i < transitions.Length; i++)
-                {
-                    bool decisionState = transitions[i].GetDecision.Decide(_entity);
-                    if (decisionState == true) {
-                        enemy.ChangeState(transitions[i].GetTrueState);
-                    }
-                    else {
-                        enemy.ChangeState(transitions[i].GetFalseState);
-                    }
+                bool decisionState = transitions[i].GetDecision.Decide(_entity);
+                if (decisionState == true) {
+                    enemy.ChangeState(transitions[i].GetTrueState);
+                }
+                else {
+                    enemy.ChangeState(transitions[i].GetFalseState);
                 }
             }
-        }
-        catch (AIStateException stateException)
-        {
-            stateException.LaunchException();
         }
         return;
     }
@@ -74,10 +68,16 @@ public class AIState : ScriptableObject
     private bool StateHasTransition()
     {
         bool hasTransitions = true;
-        if (transitions.Length == 0)
+        try
         {
-            hasTransitions = false;
-            throw new AIStateException(this, AIStateException.AIStateExceptionType.NoTransition);
+            if (transitions.Length == 0)
+            {
+                hasTransitions = false;
+                throw new AIStateException(this, AIStateException.AIStateExceptionType.NoTransition);
+            }
+        }
+        catch (AIStateException stateException) {
+            stateException.LaunchException();
         }
         return hasTransitions;
     }

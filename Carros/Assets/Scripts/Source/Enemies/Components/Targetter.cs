@@ -21,8 +21,10 @@ public class Targetter : EntityComponent
     [Header("Targetter settings")]
     [SerializeField] private float detectionRange = 5.0f;
     [SerializeField] protected float detectionRate = 2.0f; // Detection rate per second
-    [SerializeField] private SphereCollider detectionTrigger;
     [SerializeField] protected string[] targetableTags = new string[] { "Player" };
+
+    [Header("Targetter components")]
+    [SerializeField] private SphereCollider detectionTrigger;
 
     [Header("Targetter editor debugging")]
     [SerializeField] private Transform currentTarget;
@@ -49,8 +51,14 @@ public class Targetter : EntityComponent
 
     protected virtual void Start()
     {
-        if (HasDetectionTrigger())
-            detectionTrigger.radius = detectionRange;
+        try
+        {
+            if (HasDetectionTrigger())
+                detectionTrigger.radius = detectionRange;
+        }
+        catch(MissingComponentException missingComponentExecption) {
+            missingComponentExecption.DisplayException();
+        }
         return;
     }
 
@@ -69,24 +77,48 @@ public class Targetter : EntityComponent
     {
         foreach (string tag in targetableTags)
         {
-            if (!other.CompareTag(tag)) { return; }
-            Transform posibleTarget = other.transform;
-            if (posibleTarget != null && !nearTargets.Contains(posibleTarget))
-                AddTarget(posibleTarget);
+            if (other.CompareTag(tag))
+            {
+                Transform posibleTarget = other.transform;
+                if (CanAddTarget(posibleTarget)) {
+                    AddTarget(posibleTarget);
+                }
+            }
         }
         return;
+    }
+
+    private bool CanAddTarget(Transform _targetToAdd)
+    {
+        bool canAdd = true;
+        if (_targetToAdd == null && nearTargets.Contains(_targetToAdd)) {
+            canAdd = false;
+        }
+        return canAdd;
     }
 
     protected virtual void OnTriggerExit(Collider other)
     {
         foreach (string tag in targetableTags)
         {
-            if (!other.CompareTag(tag)) { return; }
-            Transform realisingTarget = other.transform;
-            if (realisingTarget == null || !nearTargets.Contains(realisingTarget)) { return; }
-            RemoveTarget(realisingTarget);
+            if (other.CompareTag(tag))
+            {
+                Transform targetToRemove = other.transform;
+                if (CanRemoveTarget(targetToRemove)) {
+                    RemoveTarget(targetToRemove);
+                }
+            }
         }
         return;
+    }
+
+    private bool CanRemoveTarget(Transform _targetToRelease)
+    {
+        bool canRelease = true;
+        if (_targetToRelease == null || !nearTargets.Contains(_targetToRelease)) {
+            canRelease = false;
+        }
+        return canRelease;
     }
 
     private Transform GetNearestActiveTarget()

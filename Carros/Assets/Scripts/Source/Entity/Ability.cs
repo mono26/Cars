@@ -14,21 +14,18 @@ public abstract class Ability : EntityComponent
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(entity.transform.position, range);
-
         return;
     }
 
     protected virtual void Start()
     {
         lastCast = Time.timeSinceLevelLoad - cooldown;
-
         return;
     }
 
     public virtual void Cast()
     {
         lastCast = Time.timeSinceLevelLoad;
-
         return;
     }
 
@@ -37,7 +34,6 @@ public abstract class Ability : EntityComponent
         bool isInCooldown = true;
         if (Time.timeSinceLevelLoad > lastCast + cooldown)
             isInCooldown = false;
-
         return isInCooldown;
     }
 

@@ -6,7 +6,6 @@ public class PatrolAround : AIAction
     public override void DoAction(Entity _entity)
     {
         Patrol(_entity);
-
         return;
     }
 
@@ -15,7 +14,6 @@ public class PatrolAround : AIAction
         if(_entity is Enemy)
         {
             Enemy enemy = _entity as Enemy;
-            enemy.StartPatrolling();
             Vector3 positionToPatrolTo = enemy.CalculateRandomPatrolPoint();
             enemy.PatrolTowardsPoint(positionToPatrolTo);
         }

@@ -25,21 +25,49 @@ public class SlotManagerTest
     }
 
     [Test]
-    public void ReserveSlot()
+    public void ReserveAttackingSlot()
     {
         SlotManager testSlotManager = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
         GameObject testAttacker = new GameObject();
-        SlotManager.Slot testSlot = testSlotManager.Reserve(testAttacker);
-        Assert.NotNull(testSlot);
+        Slot testAttackerSlot = testSlotManager.Reserve(testAttacker);
+        Assert.NotNull(testAttackerSlot);
+        Assert.AreEqual(testAttackerSlot.GetSlotType, SlotType.Attacking);
+        Assert.NotNull(testSlotManager.GetAttackingSlots[testAttackerSlot.GetIndex]);
+        return;
     }
 
     [Test]
-    public void ReleaseSlot()
+    public void ReserveWaitingSlot()
+    {
+        SlotManager testSlotManager = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
+        // Default number of slots.
+        Slot[] attackerSlots = new Slot[5];
+        for (int i = 0; i < 5; i++) {
+            GameObject testAttacker = new GameObject();
+            attackerSlots[i] = testSlotManager.Reserve(testAttacker);
+        }
+        GameObject testWaiter = new GameObject();
+        Slot testWaiterSlot = testSlotManager.Reserve(testWaiter);
+        foreach(Slot attackerSlot in attackerSlots)
+        {
+            Assert.NotNull(attackerSlot);
+            Assert.AreEqual(attackerSlot.GetSlotType, SlotType.Attacking);
+            Assert.NotNull(testSlotManager.GetAttackingSlots[attackerSlot.GetIndex]);
+        }
+        Assert.NotNull(testWaiterSlot);
+        Assert.AreEqual(testWaiterSlot.GetSlotType, SlotType.Waiting);
+        Assert.NotNull(testSlotManager.GetWaitingSlots[testWaiterSlot.GetIndex]);
+        return;
+    }
+
+    [Test]
+    public void ReleaseAttackingSlot()
     {
         SlotManager testSlotManager = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
         GameObject testAttacker = new GameObject();
-        SlotManager.Slot testSlot = testSlotManager.Reserve(testAttacker);
-        testSlotManager.Release(ref testSlot);
-        Assert.Null(testSlot);
+        Slot testSlot = testSlotManager.Reserve(testAttacker);
+        testSlotManager.Release(testSlot);
+        Assert.IsNull(testSlotManager.GetAttackingSlots[testSlot.GetIndex]);
+        return;
     }
 }
