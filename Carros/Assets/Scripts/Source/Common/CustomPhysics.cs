@@ -2,6 +2,7 @@
 
 public static class CustomPhysics
 {
+    // TODO pass the angle of preference. Refactorization.
     public static float CalculateLaunchAngleForParabolicMovement(Vector3 _initialPosition, Vector3 _targetPosition, float _speed)
     {
         // angle = arctan(v2 +- Sqr(v4 - g(gx2+2yv2))/gx)

@@ -12,12 +12,14 @@ public class CanRecastAbility : AIDecision
 
     protected bool CanRecast(Entity _entity)
     {
+        bool canRecast = false;
         Enemy enemy = _entity as Enemy;
-        if (enemy == null) { return false; }
-
-        if (enemy.GetNextAbility != null)
-            return true;
-
-        return false;
+        if (_entity is Enemy)
+        {
+            if (enemy.GetNextAbility != null) {
+                canRecast = true;
+            }
+        }
+        return canRecast;
     }
 }

@@ -7,31 +7,20 @@ public class EntityComponent : MonoBehaviour
 
     protected virtual void Awake()
     {
-        /*if (entity == null)
+        if (entity == null) {
             entity = GetComponent<Entity>();
-        if (entity == null)
-            entity = GetComponentInParent<Entity>();*/
-
+        }
+        if (entity == null) {
+            entity = GetComponentInParent<Entity>();
+        }
         return;
     }
 
-    public virtual void EveryFrame()
-    {
+    public virtual void EveryFrame() { }
 
-    }
+    public virtual void FixedFrame() { }
 
-    public virtual void FixedFrame()
-    {
+    public virtual void LateFrame() { }
 
-    }
-
-    public virtual void LateFrame()
-    {
-
-    }
-
-    protected virtual void HandleAnimation()
-    {
-
-    }
+    protected virtual void HandleAnimation() { }
 }

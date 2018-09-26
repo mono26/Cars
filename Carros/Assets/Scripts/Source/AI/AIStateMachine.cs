@@ -1,47 +1,34 @@
 ﻿using UnityEngine;
 
-public class AIStateMachine : MonoBehaviour
+public class AIStateMachine : EntityComponent
 {
-    [Header("AIState Machine components")]
-    [SerializeField] private Entity aIEntity = null;
-
     [Header("AIState Machine editor debugging")]
     [SerializeField] private AIState currentState = null;
 
     public AIState GetCurrentState { get { return currentState; } }
 
-    private void Awake()
-    {
-        if (aIEntity == null)
-            GetComponent<Entity>();
-
-        return;   
-    }
-
-    private bool HasAIEntityToUpdateState()
+    private bool HasEntityToUpdateState()
     {
         bool hasAIEntity = true;
-        if (aIEntity == null)
+        try
         {
-            hasAIEntity = false;
-            throw new MissingComponentException("The state machine has no Entity to Update.", typeof(Entity));
+            if (entity == null)
+            {
+                hasAIEntity = false;
+                throw new MissingComponentException("The state machine has no Entity to Update.", typeof(Entity));
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return hasAIEntity;
     }
 
     public void UpdateState()
     {
-        try
-        {
-            if (HasAIEntityToUpdateState()) {
-                currentState.UpdateState(aIEntity);
-            }
+        if (HasEntityToUpdateState()) {
+            currentState.UpdateState(entity);
         }
-        catch (MissingComponentException missingComponentException)
-        {
-            missingComponentException.DisplayException();
-        }
-
         return;
     }
 

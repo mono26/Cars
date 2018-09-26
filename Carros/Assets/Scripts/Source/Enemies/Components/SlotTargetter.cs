@@ -2,44 +2,63 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SlotManagerTarget
+[System.Serializable]
+public class SlotTargetetterTarget
 {
-    private SlotManager currentSlotManagerTarget;
-    private Slot currentSlotManagerTargetSlot;
+    [Header("Slot Targetter Target editor debugging")]
+    [SerializeField] private SlotManager currentSlotManagerTarget;
+    [SerializeField] private Slot currentSlotManagerTargetSlot;
 
     public SlotManager GetCurrentSlotManagerTarget { get { return currentSlotManagerTarget; } }
     public Slot GetCurrentSlotManagerTargetSlot { get { return currentSlotManagerTargetSlot; } }
 
-    public SlotManagerTarget(SlotManager _currentSlotManagerTarget, Slot _currentSlotManagerTargetSlot)
+    public SlotTargetetterTarget(SlotManager _currentSlotManagerTarget = null, Slot _currentSlotManagerTargetSlot = null)
     {
         currentSlotManagerTarget = _currentSlotManagerTarget;
         currentSlotManagerTargetSlot = _currentSlotManagerTargetSlot;
         return;
+    }
+
+    public void ReleaseSlotFromTargetSlotManager()
+    {
+        if (HasValisTargetAndSlot()) {
+            currentSlotManagerTarget.Release(currentSlotManagerTargetSlot);
+        }
+        return;
+    }
+
+    public bool HasValisTargetAndSlot()
+    {
+        bool hasValidTargetAndslot = true;
+        if(currentSlotManagerTarget == null || currentSlotManagerTargetSlot == null) {
+            hasValidTargetAndslot = false;
+        }
+        return hasValidTargetAndslot;
     }
 }
 
 public class SlotTargetter : Targetter
 {
     [Header("SlotTargetter editor debugging")]
-    [SerializeField] private SlotManagerTarget currentSlotManagerTarget;
+    [SerializeField] private SlotTargetetterTarget currentSlotTarget;
     [SerializeField] private List<SlotManager> nearSlotManagerTargets = new List<SlotManager>();
 
     private Coroutine updateSlotTargetRoutine;
 
-    public SlotManagerTarget GetCurrentSlotManagerTarget { get { return currentSlotManagerTarget; } }
+    public SlotTargetetterTarget GetCurrentSlotManagerTarget { get { return currentSlotTarget; } }
 
     protected override void OnTriggerEnter(Collider other)
     {
         foreach (string tag in targetableTags)
         {
-            if (!other.CompareTag(tag))
+            if (other.CompareTag(tag))
             {
-                SlotManager possibleSlotManagerTarget = HasASlotManagerComponent(other.gameObject);
-                if (possibleSlotManagerTarget != null && !nearSlotManagerTargets.Contains(possibleSlotManagerTarget)) {
-                    AddSlotedTarget(possibleSlotManagerTarget);
+                SlotManager possibleSlotManagerToAdd = HasASlotManagerComponent(other.gameObject);
+                if (possibleSlotManagerToAdd != null && !nearSlotManagerTargets.Contains(possibleSlotManagerToAdd)) {
+                    AddSlotedTargetAndStartUpdateProcess(possibleSlotManagerToAdd);
                 }
                 // If there is no posible SlotManager we execute our parent.
-                else if (possibleSlotManagerTarget == null) {
+                else if (possibleSlotManagerToAdd == null) {
                     base.OnTriggerEnter(other);
                 }
             }
@@ -47,29 +66,15 @@ public class SlotTargetter : Targetter
         return;
     }
 
-    protected override void OnTriggerExit(Collider other)
+    private void AddSlotedTargetAndStartUpdateProcess(SlotManager _slotManagerTarget)
     {
-        foreach (string tag in targetableTags)
-        {
-            if (!other.CompareTag(tag)) { return; }
-            SlotManager possibleSlot = HasASlotManagerComponent(other.gameObject);
-            if (possibleSlot != null && nearSlotManagerTargets.Contains(possibleSlot)) {
-                RemoveSlotedTarget(possibleSlot);
-            }
-            else { base.OnTriggerExit(other); }
-        }
-        return;
-    }
-
-    private void AddSlotedTarget(SlotManager _slotManagerTarget)
-    {
-        if (nearSlotManagerTargets.Count.Equals(0)) {
-            updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget());
-        }
-        if (currentSlotManagerTarget == null)
+        if (currentSlotTarget.GetCurrentSlotManagerTarget == null)
         {
             Slot targetSlot = _slotManagerTarget.Reserve(entity.gameObject);
-            currentSlotManagerTarget = new SlotManagerTarget(_slotManagerTarget, targetSlot);
+            currentSlotTarget = new SlotTargetetterTarget(_slotManagerTarget, targetSlot);
+        }
+        if (nearSlotManagerTargets.Count.Equals(0)) {
+            updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget());
         }
         nearSlotManagerTargets.Add(_slotManagerTarget);
         return;
@@ -77,58 +82,54 @@ public class SlotTargetter : Targetter
 
     private IEnumerator UpdateSlotTarget()
     {
-        SlotManager nearestTarget = GetNearestActiveSlotManagerTarget();
-        if (nearestTarget == null) {
-            yield return new WaitForSeconds(1 / detectionRate);
-        }
-        else
+        SlotTargetetterTarget newSlotManagerTarget = GetNearestActiveSlotManagerTargetAndSlot();
+        if (!currentSlotTarget.Equals(newSlotManagerTarget))
         {
-            SlotManager currentTarget = currentSlotManagerTarget.GetCurrentSlotManagerTarget;
-            if (!currentTarget.Equals(nearestTarget))
-            {
-                currentTarget.Release(currentSlotManagerTarget.GetCurrentSlotManagerTargetSlot);
-                Slot nearestTargetSlot = nearestTarget.Reserve(entity.gameObject);
-                currentSlotManagerTarget = new SlotManagerTarget(nearestTarget, nearestTargetSlot);
-            }
-            yield return new WaitForSeconds(1 / detectionRate);
+            currentSlotTarget.ReleaseSlotFromTargetSlotManager();
+            currentSlotTarget = newSlotManagerTarget;
         }
+        yield return new WaitForSeconds(1 / detectionRate);
         updateSlotTargetRoutine = StartCoroutine(UpdateSlotTarget());
         yield break;
     }
 
-    private SlotManager GetNearestActiveSlotManagerTarget()
+    private SlotTargetetterTarget GetNearestActiveSlotManagerTargetAndSlot()
     {
-        if (nearSlotManagerTargets.Count.Equals(0)) { return null; }
-        HelperMethods.ClearInactiveElementsInCollection(ref nearSlotManagerTargets);
-        SlotManager nearestTarget = HelperMethods.GetElementAtMinimumDistanceInColection(nearSlotManagerTargets, entity.transform);
-        return nearestTarget;
+        SlotManager nearestTarget = null;
+        Slot nearestSlot = null;
+        if (nearSlotManagerTargets.Count > 0)
+        {
+            nearSlotManagerTargets = HelperMethods.ClearInactiveComponentsInCollection(nearSlotManagerTargets);
+            nearestTarget = HelperMethods.GetComponentAtMinimumDistanceInColection(nearSlotManagerTargets, entity.transform);
+            nearestSlot = nearestTarget.Reserve(entity.gameObject);
+        }
+        SlotTargetetterTarget targetToReturn = new SlotTargetetterTarget(nearestTarget, nearestSlot);
+        return targetToReturn;
     }
 
-    private SlotManager HasASlotManagerComponent(GameObject _object)
+    protected override void OnTriggerExit(Collider other)
     {
-        SlotManager isSlot = _object.GetComponent<SlotManager>();
-        if (isSlot == null) {
-            isSlot = _object.GetComponentInParent<SlotManager>();
+        foreach (string tag in targetableTags)
+        {
+            if (other.CompareTag(tag))
+            {
+                SlotManager possibleSlotManagerToRemove = HasASlotManagerComponent(other.gameObject);
+                if (possibleSlotManagerToRemove != null && nearSlotManagerTargets.Contains(possibleSlotManagerToRemove)) {
+                    RemoveSlotedTarget(possibleSlotManagerToRemove);
+                }
+                else if (possibleSlotManagerToRemove == null) {
+                    base.OnTriggerExit(other);
+                }
+            }
         }
-        return isSlot;
+        return;
     }
 
     private void RemoveSlotedTarget(SlotManager _slotedTarget)
     {
+        CheckIfRemovedIsCurrentSlotManagerTargetAndAssignNew(_slotedTarget);
         nearSlotManagerTargets.Remove(_slotedTarget);
-        SlotManager currentTarget = currentSlotManagerTarget.GetCurrentSlotManagerTarget;
-        if (currentTarget.Equals(_slotedTarget))
-        {
-            currentTarget.Release(currentSlotManagerTarget.GetCurrentSlotManagerTargetSlot);
-            SlotManager newTarget = GetNearestActiveSlotManagerTarget();
-            currentSlotManagerTarget = null;
-            if (newTarget != null)
-            {
-                Slot newSlot = newTarget.Reserve(entity.gameObject);
-                currentSlotManagerTarget = new SlotManagerTarget(newTarget, newSlot);
-            }
-        }
-        if (currentSlotManagerTarget == null && nearSlotManagerTargets.Count.Equals(0))
+        if (NoSlotManagerTargetsNear())
         {
             EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(entity as Enemy, TargetterEventType.TargetLost));
             StopCoroutine(updateSlotTargetRoutine);
@@ -136,13 +137,39 @@ public class SlotTargetter : Targetter
         return;
     }
 
+    private void CheckIfRemovedIsCurrentSlotManagerTargetAndAssignNew(SlotManager _slotedTarget)
+    {
+        if (currentSlotTarget.GetCurrentSlotManagerTarget.Equals(_slotedTarget))
+        {
+            currentSlotTarget.ReleaseSlotFromTargetSlotManager();
+            SlotTargetetterTarget newNearestSlotManagerTarget = GetNearestActiveSlotManagerTargetAndSlot();
+            currentSlotTarget = newNearestSlotManagerTarget;
+        }
+        return;
+    }
+
+    private bool NoSlotManagerTargetsNear()
+    {
+        return currentSlotTarget.GetCurrentSlotManagerTarget == null && nearSlotManagerTargets.Count.Equals(0);
+    }
+
+    private SlotManager HasASlotManagerComponent(GameObject _object)
+    {
+        SlotManager isSlot = _object.GetComponent<SlotManager>();
+        if (isSlot == null)
+        {
+            isSlot = _object.GetComponentInParent<SlotManager>();
+        }
+        return isSlot;
+    }
+
     public override Vector3 GetCurrentTargetPosition()
     {
         // Default value if there is no target.
         Vector3 targetPosition = entity.transform.position;
-        if(currentSlotManagerTarget != null) {
-            targetPosition = currentSlotManagerTarget.GetCurrentSlotManagerTarget.GetSlotPosition(
-                currentSlotManagerTarget.GetCurrentSlotManagerTargetSlot
+        if(currentSlotTarget.GetCurrentSlotManagerTarget != null) {
+            targetPosition = currentSlotTarget.GetCurrentSlotManagerTarget.GetSlotPosition(
+                currentSlotTarget.GetCurrentSlotManagerTargetSlot
                 );
         }
         else {
@@ -154,23 +181,24 @@ public class SlotTargetter : Targetter
     public SlotType GetCurrentSlotType()
     {
         SlotType currentType = SlotType.Waiting;
-        if(currentSlotManagerTarget != null)
+        if(currentSlotTarget.GetCurrentSlotManagerTargetSlot != null)
         {
-            currentType = currentSlotManagerTarget.GetCurrentSlotManagerTargetSlot.GetSlotType;
+            currentType = currentSlotTarget.GetCurrentSlotManagerTargetSlot.GetSlotType;
         }
         return currentType;
     }
 
     public override bool HasAValidCurrentTarget()
     {
-        bool hasAValidCurrentTarget = true;
-        if (currentSlotManagerTarget == null) {
-            hasAValidCurrentTarget = false;
+        bool hasAValidCurrentTarget = false;
+        //HelperMethods.DebugMessageWithObjectAndTimeStamp("Has current target", currentSlotTarget.GetCurrentSlotManagerTarget);
+        if (currentSlotTarget.HasValisTargetAndSlot()) {
+            hasAValidCurrentTarget = true;
         }
         else {
             hasAValidCurrentTarget = base.HasAValidCurrentTarget();
         }
-        return base.HasAValidCurrentTarget();
+        return hasAValidCurrentTarget;
     }
 }
     

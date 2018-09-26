@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class PickEvent : GameEvent
+{
+
+}
+
 public class AmmoCrate : MonoBehaviour {
 
     [SerializeField]
     private int bulletsAmount;
-
-	void Start () {
-		
-	}
 
     private void OnTriggerEnter(Collider col)
     {

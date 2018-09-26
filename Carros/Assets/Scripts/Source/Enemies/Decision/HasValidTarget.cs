@@ -18,6 +18,7 @@ public class HasValidTarget : AIDecision
         {
             Enemy enemy = _entity as Enemy;
             hasTarget = enemy.HasValidTarget();
+            HelperMethods.DebugMessageWithObjectAndTimeStamp("Has valid target: ", hasTarget);
         }
         return hasTarget;
     }

@@ -73,7 +73,7 @@ public class Player : MonoBehaviour
 
     public void ReceiveAmmo(int ammo)
     {
-        machineGun.ReceiveAmmo(ammo);
+        //machineGun.ReceiveAmmo(ammo);
     }
 
     public void ReceiveDamage(float damage)

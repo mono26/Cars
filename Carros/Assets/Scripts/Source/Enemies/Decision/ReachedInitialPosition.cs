@@ -7,19 +7,20 @@ public class ReachedInitialPosition : AIDecision
     {
         bool decision = false;
         decision = InIinitialPosition(_entity);
-
         return decision;
     }
 
     protected bool InIinitialPosition(Entity _entity)
     {
-        Enemy enemy = _entity as Enemy;
-        if (enemy == null) { return false; }
-
-        float stopDistance = enemy.GetMovementComponent.GetNavigationComponent.stoppingDistance;
-        if (Vector3.Distance(enemy.transform.position, enemy.GetInitialPosition) - stopDistance < stopDistance)
-            return true;
-
-        return false;
+        bool reachedInitialPosition = false;
+        if(_entity is Enemy)
+        {
+            Enemy enemy = _entity as Enemy;
+            float stopDistance = enemy.GetMovementComponent.GetNavigationComponent.stoppingDistance;
+            if (Vector3.Distance(enemy.transform.position, enemy.GetInitialPosition) - stopDistance < stopDistance) {
+                reachedInitialPosition = true;
+            }
+        }
+        return reachedInitialPosition;
     }
 }

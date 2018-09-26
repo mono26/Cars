@@ -17,24 +17,18 @@ public class LevelManager : Singleton<LevelManager>
     public void GameOver()
     {
         gameIsOver = true;
-
-        if (loseSfx != null)
-        {
+        if (loseSfx != null) {
             //SoundManager.Instance.PlaySfx(GetComponent<AudioSource>(), loseSfx);
         }
-
         //LevelUIManager.Instance.ActivateGameOverUI(true);
         return;
     }
     public void WinLevel()
     {
         gameIsOver = true;
-
-        if (winSfx != null)
-        {
+        if (winSfx != null) {
             //SoundManager.Instance.PlaySfx(GetComponent<AudioSource>(), winSfx);
         }
-
         //LevelUIManager.Instance.ActivateWinUI(true);
         return;
     }

@@ -32,18 +32,16 @@ public abstract class Ability : EntityComponent
     public bool IsInCooldown()
     {
         bool isInCooldown = true;
-        if (Time.timeSinceLevelLoad > lastCast + cooldown)
+        if (Time.timeSinceLevelLoad > lastCast + cooldown) {
             isInCooldown = false;
+        }
         return isInCooldown;
     }
 
     public bool IsInRange(Vector3 _targetPosition)
     {
         bool isInRange = true;
-        float distance = Vector3.Distance(
-            entity.transform.position, 
-            _targetPosition
-            );
+        float distance = Vector3.Distance(entity.transform.position, _targetPosition);
         if (distance > range) {
             isInRange = false;
         }

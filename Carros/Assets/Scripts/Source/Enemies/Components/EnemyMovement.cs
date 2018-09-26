@@ -4,7 +4,7 @@ using UnityEngine.AI;
 public enum EnemyMovementMode { Patrolling, Running }
 public enum EnemyMovemenState { Idle, Running, Walking}
 
-public class EnemyMovementEvent : CarEvent
+public class EnemyMovementEvent : GameEvent
 {
     public Enemy enemy;
     public EnemyMovementMode movementType;

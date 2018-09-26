@@ -12,15 +12,15 @@ public class ExecuteAbility : AIAction
 
     protected void CastAbility(Entity _entity)
     {
-        Enemy enemy = _entity as Enemy;
-        if (enemy == null) { return; }
-
-        if(enemy.GetNextAbility)
+        if(_entity is Enemy)
         {
-            enemy.GetNextAbility.Cast();
-            enemy.SetNextAbility(null);
+            Enemy enemy = _entity as Enemy;
+            if (enemy.GetNextAbility)
+            {
+                enemy.GetNextAbility.Cast();
+                enemy.SetNextAbility(null);
+            }
         }
-
         return;
     }
 }

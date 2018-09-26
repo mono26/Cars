@@ -5,7 +5,7 @@ public class Entity : MonoBehaviour
     public enum EntityType { Playable, AIControlled}
 
     [Header("Entity settings")]
-    [SerializeField] protected EntityType type = EntityType.AIControlled;
+    [SerializeField] private EntityType type = EntityType.AIControlled;
 
     [Header("Entity components")]
     [SerializeField] private Animator animatorComponent;
@@ -44,18 +44,11 @@ public class Entity : MonoBehaviour
 
     protected virtual void Update()
     {
-        try
+        if (HasEntitytComponents())
         {
-            if (HasEntitytComponents())
-            {
-                foreach (EntityComponent component in components)
-                {
-                    component.EveryFrame();
-                }
+            foreach (EntityComponent component in components) {
+                component.EveryFrame();
             }
-        }
-        catch (MissingComponentException missingComponentException) {
-            missingComponentException.DisplayException();
         }
         return;
     }
@@ -63,46 +56,38 @@ public class Entity : MonoBehaviour
     private bool HasEntitytComponents()
     {
         bool hasComponents = true;
-        if(components == null || components.Length == 0)
+        try
         {
-            hasComponents = false;
-            throw new MissingComponentException("The entity has a missing components: ", typeof(EntityComponent));
+            if (components == null || components.Length == 0)
+            {
+                hasComponents = false;
+                throw new MissingComponentException("The entity has a missing components: ", typeof(EntityComponent));
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return hasComponents;
     }
 
     protected virtual void FixedUpdate()
     {
-        try
+        if (HasEntitytComponents())
         {
-            if (HasEntitytComponents())
-            {
-                foreach (EntityComponent component in components)
-                {
-                    component.FixedFrame();
-                }
+            foreach (EntityComponent component in components) {
+                component.FixedFrame();
             }
-        }
-        catch (MissingComponentException missingComponentException) {
-            missingComponentException.DisplayException();
         }
         return;
     }
 
     protected virtual void LateUpdate()
     {
-        try
+        if (HasEntitytComponents())
         {
-            if (HasEntitytComponents())
-            {
-                foreach (EntityComponent component in components)
-                {
-                    component.LateFrame();
-                }
+            foreach (EntityComponent component in components) {
+                component.LateFrame();
             }
-        }
-        catch (MissingComponentException missingComponentException) {
-            missingComponentException.DisplayException();
         }
         return;
     }

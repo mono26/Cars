@@ -3263,7 +3263,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82727059b60ea134f93a90872c1eb780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aIEntity: {fileID: 114465413062336926}
+  entity: {fileID: 114465413062336926}
   currentState: {fileID: 0}
 --- !u!114 &114371457431361006
 MonoBehaviour:
@@ -3326,16 +3326,17 @@ MonoBehaviour:
   entity: {fileID: 114465413062336926}
   detectionRange: 20
   detectionRate: 2
-  detectionTrigger: {fileID: 135937266025569388}
   targetableTags:
   - Player
+  detectionTrigger: {fileID: 135937266025569388}
   currentTarget: {fileID: 0}
   nearTargets: []
-  currentSlotTarget: {fileID: 0}
-  currentSlot:
-    type: 0
-    index: 0
-  nearSlotTargets: []
+  currentSlotTarget:
+    currentSlotManagerTarget: {fileID: 0}
+    currentSlotManagerTargetSlot:
+      type: 0
+      index: 0
+  nearSlotManagerTargets: []
 --- !u!114 &114683437778673810
 MonoBehaviour:
   m_ObjectHideFlags: 1

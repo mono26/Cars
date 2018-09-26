@@ -76,7 +76,7 @@ public class Car : Entity
 
     private bool HasAllWheelsGrounded()
     {
-        bool hasAllWheelsGrounded = false;
+        bool hasAllWheelsGrounded = true;
         if (HasAllWheels())
         {
             foreach (Wheel wheelToCheck in wheels)
@@ -94,7 +94,7 @@ public class Car : Entity
     private bool HasAllWheels()
     {
         bool hasAllWheels = false;
-        if (HasBackWheels() || HasFrontWheels())
+        if (HasBackWheels() && HasFrontWheels())
         {
             hasAllWheels = true;
         }
@@ -120,7 +120,7 @@ public class Car : Entity
                     if (wheels[i] == null)
                     {
                         hasBackWheels = false;
-                        throw new MissingComponentException("The car has a missing rear wheel: ", typeof(Wheel));
+                        throw new MissingComponentException(gameObject, typeof(Wheel));
                     }
                 }
             }
@@ -149,7 +149,7 @@ public class Car : Entity
                     if (wheels[i] == null)
                     {
                         hasFrontWheels = false;
-                        throw new MissingComponentException("The car has a missing front wheel: ", typeof(Wheel));
+                        throw new MissingComponentException(gameObject, typeof(Wheel));
                     }
                 }
             }
@@ -199,7 +199,7 @@ public class Car : Entity
             if (engine == null)
             {
                 hasEngine = false;
-                throw new MissingComponentException("The car has a missing engine: ", typeof(CarEngine));
+                throw new MissingComponentException(gameObject, typeof(CarEngine));
             }
         }
         catch (MissingComponentException missingComponentException) {
@@ -237,7 +237,7 @@ public class Car : Entity
             if (brakes == null)
             {
                 hasBrakes = false;
-                throw new MissingComponentException("The car has missing brakes: ", typeof(Brakes));
+                throw new MissingComponentException(gameObject, typeof(Brakes));
             }
         }
         catch (MissingComponentException missingComponentException) {
@@ -300,10 +300,12 @@ public class Car : Entity
 
     private void HandleInput()
     {
-        if (!CanApplyExternalInputToEntity()) { return; }
-        HandleAccelerationInput();
-        HandleBrakesInput();
-        HandleSteeringInput();
+        if (CanApplyExternalInputToEntity())
+        {
+            HandleAccelerationInput();
+            HandleBrakesInput();
+            HandleSteeringInput();
+        }
         return;
     }
 
@@ -319,7 +321,7 @@ public class Car : Entity
 
     private void HandleBrakesInput()
     {
-        if (!CanApplyExternalInputToEntity())
+        if (CanApplyExternalInputToEntity())
         {
             // TODO refactor input access.
             footBrakeInput = GetInputcomponent.GetFootBrakesInput;
@@ -332,7 +334,7 @@ public class Car : Entity
 
     private void HandleSteeringInput()
     {
-        if (!CanApplyExternalInputToEntity())
+        if (CanApplyExternalInputToEntity())
         {
             steeringInput = GetInputcomponent.GetSteeringInput;
             steeringInput = Mathf.Clamp(steeringInput, -1, 1);

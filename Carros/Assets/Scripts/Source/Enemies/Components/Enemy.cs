@@ -6,9 +6,9 @@ public enum EnemyStateInTheWorld { Dead , Falling, Grounded }
 [System.Serializable]
 public class EnemyStats
 {
-    [SerializeField]
-    private int maxHealth;
-    public int MaxHealth { get { return maxHealth; } }
+    [SerializeField] private int maxHealth;
+
+    public int GetMaxHealth { get { return maxHealth; } }
 }
 
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine), typeof(EnemyAnimationComponent))]
@@ -79,8 +79,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
                 throw new MissingComponentException("The enemy has a missing component: ", typeof(AIStateMachine));
             }
         }
-        catch (MissingComponentException missingComponentException)
-        {
+        catch (MissingComponentException missingComponentException) {
             missingComponentException.DisplayException();
         }
         return hasStatemachine;
@@ -94,9 +93,10 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
         yield break;
     }
 
-    private void OnDisable()
+    protected override void FixedUpdate()
     {
-        EventManager.RemoveListener<TargetterEvent>(this);
+        base.FixedUpdate();
+        HandleAnimations();
         return;
     }
 
@@ -106,10 +106,9 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
         return;
     }
 
-    protected override void FixedUpdate()
+    private void OnDisable()
     {
-        base.FixedUpdate();
-        HandleAnimations();
+        EventManager.RemoveListener<TargetterEvent>(this);
         return;
     }
 
@@ -142,12 +141,6 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
             Physics.AllLayers,
             QueryTriggerInteraction.Ignore);
         return isGrounded;
-    }
-
-    protected override void LateUpdate()
-    {
-        base.LateUpdate();
-        return;
     }
 
     private bool HasTargetterComponent()
@@ -321,16 +314,18 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
 
     public void OnEvent(TargetterEvent _targetterEvent)
     {
-        if (!_targetterEvent.enemy.Equals(this)) { return; }
-
-        switch (_targetterEvent.eventType)
+        if (_targetterEvent.enemy.Equals(this))
         {
-            case TargetterEventType.TargetLost:
-                aiStateMachineComponent.ChangeState(returnState);
-                break;
-            default:
-                break;
+            switch (_targetterEvent.eventType)
+            {
+                case TargetterEventType.TargetLost:
+                    ChangeState(returnState);
+                    break;
+                default:
+                    break;
+            }
         }
+        return;
     }
 
     /// <summary>

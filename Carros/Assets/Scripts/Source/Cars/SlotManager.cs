@@ -5,13 +5,14 @@ public enum SlotType { Waiting, Attacking }
 [System.Serializable]
 public class Slot
 {
-    private SlotType type = SlotType.Waiting;
-    private int index = -1;
+    [Header("Slot editor debugging")]
+    [SerializeField] private SlotType type = SlotType.Waiting;
+    [SerializeField] private int index = -1;
 
     public SlotType GetSlotType { get { return type; } }
     public int GetIndex { get { return index; } }
 
-    public Slot(SlotType _type, int _index)
+    public Slot(SlotType _type = SlotType.Waiting, int _index = -1)
     {
         type = _type;
         index = _index;

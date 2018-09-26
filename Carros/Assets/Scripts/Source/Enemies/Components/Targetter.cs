@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum TargetterEventType { TargetLost, TargetAcquired }
 
-public class TargetterEvent : CarEvent
+public class TargetterEvent : GameEvent
 {
     public Enemy enemy;
     public TargetterEventType eventType;
@@ -51,13 +51,8 @@ public class Targetter : EntityComponent
 
     protected virtual void Start()
     {
-        try
-        {
-            if (HasDetectionTrigger())
-                detectionTrigger.radius = detectionRange;
-        }
-        catch(MissingComponentException missingComponentExecption) {
-            missingComponentExecption.DisplayException();
+        if (HasDetectionTrigger()) {
+            detectionTrigger.radius = detectionRange;
         }
         return;
     }
@@ -65,10 +60,16 @@ public class Targetter : EntityComponent
     protected bool HasDetectionTrigger()
     {
         bool hasTrigger = true;
-        if (detectionTrigger == null)
+        try
         {
-            hasTrigger = false;
-            throw new MissingComponentException("The enemy has a missing component: ", typeof(SphereCollider));
+            if (detectionTrigger == null)
+            {
+                hasTrigger = false;
+                throw new MissingComponentException("The enemy has a missing component: ", typeof(SphereCollider));
+            }
+        }
+        catch (MissingComponentException missingComponentExecption) {
+            missingComponentExecption.DisplayException();
         }
         return hasTrigger;
     }
@@ -124,8 +125,8 @@ public class Targetter : EntityComponent
     private Transform GetNearestActiveTarget()
     {
         if(nearTargets.Count.Equals(0)) { return null; }
-        HelperMethods.ClearInactiveElementsInCollection(ref nearTargets);
-        Transform nearestTarget = HelperMethods.GetElementAtMinimumDistanceInColection(nearTargets, entity.transform);
+        nearTargets = HelperMethods.ClearInactiveComponentsInCollection(nearTargets);
+        Transform nearestTarget = HelperMethods.GetComponentAtMinimumDistanceInColection(nearTargets, entity.transform);
         return nearestTarget;
     }
 
@@ -159,15 +160,21 @@ public class Targetter : EntityComponent
     private void RemoveTarget(Transform _target)
     {
         nearTargets.Remove(_target);
-        if (currentTarget.Equals(_target))
-        {
-            Transform newTarget = GetNearestActiveTarget();
-            currentTarget = newTarget;
-        }
+        CheckIfRemovingTargetIsEqualsToCurrentAndAssignfNew(_target);
         if (currentTarget == null && nearTargets.Count.Equals(0))
         {
             EventManager.TriggerEvent<TargetterEvent>(new TargetterEvent(entity as Enemy, TargetterEventType.TargetLost));
             StopCoroutine(updateTargetRoutine);
+        }
+        return;
+    }
+
+    private void CheckIfRemovingTargetIsEqualsToCurrentAndAssignfNew(Transform _target)
+    {
+        if (currentTarget.Equals(_target))
+        {
+            Transform newTarget = GetNearestActiveTarget();
+            currentTarget = newTarget;
         }
         return;
     }
