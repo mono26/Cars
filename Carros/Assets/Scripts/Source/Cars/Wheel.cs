@@ -48,10 +48,16 @@ public class Wheel : EntityComponent
     private bool HasWheelColliderComponent()
     {
         bool hasWheelCollider = true;
-        if (wheelColliderComponent == null)
+        try
         {
-            hasWheelCollider = false;
-            throw new MissingComponentException("The wheel has a missing collider: ", typeof(WheelCollider));
+            if (wheelColliderComponent == null)
+            {
+                hasWheelCollider = false;
+                throw new MissingComponentException(gameObject, typeof(WheelCollider));
+            }
+        }
+        catch (MissingComponentException missingComponentException) {
+            missingComponentException.DisplayException();
         }
         return hasWheelCollider;
     }
@@ -99,8 +105,12 @@ public class Wheel : EntityComponent
     {
         if (HasWheelColliderComponent())
         {
-            if (_typeOfTorque == TorqueType.Acceleration) { wheelColliderComponent.motorTorque = _torqueToApply; }
-            else if (_typeOfTorque == TorqueType.Braking) { wheelColliderComponent.brakeTorque = _torqueToApply; }
+            if (_typeOfTorque == TorqueType.Acceleration) {
+                wheelColliderComponent.motorTorque = _torqueToApply;
+            }
+            else if (_typeOfTorque == TorqueType.Braking) {
+                wheelColliderComponent.brakeTorque = _torqueToApply;
+            }
         }
         return;
     }

@@ -4,36 +4,26 @@ using UnityEngine;
 
 public abstract class Bullet : MonoBehaviour
 {
-    [Header("Bullet settings")]
-    protected int damage;
-
     [Header("Bullet components")]
-    protected ParticleSystem hitParticle;
+    [SerializeField] protected DamageOnHit damageComponent;
+    [SerializeField] protected ParticleSystem hitParticlePrefab;
 
-    [Header("Bullet editor debugging")]
-    private Weapon shooter;
-
-    private void WhoShot(Weapon _shooter)
+    private void Awake()
     {
-        shooter = _shooter;
-        return;
-    }
-
-    protected void DealDamageIfPosible(GameObject _gameObjectToDamage)
-    {
-        if(_gameObjectToDamage != null)
-        {
-            HealthComponent health = _gameObjectToDamage.GetComponent<HealthComponent>();
-            if (health != null) {
-                health.ReceiveDamage(damage);
-            }
+        if(damageComponent == null) {
+            damageComponent = GetComponent<DamageOnHit>();
+        }
+        if(hitParticlePrefab == null) {
+            hitParticlePrefab = GetComponent<ParticleSystem>();
         }
         return;
     }
 
     protected void PlayHitParticleInLocation(Vector3 _particleLocation)
     {
-        if(HasHitParticle()) {
+        if(HasHitParticle())
+        {
+            ParticleSystem hitParticle = Instantiate(hitParticlePrefab).GetComponent<ParticleSystem>();
             hitParticle.transform.position = _particleLocation;
             hitParticle.Play();
         }
@@ -45,7 +35,7 @@ public abstract class Bullet : MonoBehaviour
         bool hasHitParticle = true;
         try
         {
-            if (hitParticle == null)
+            if (hitParticlePrefab == null)
             {
                 hasHitParticle = false;
                 throw new MissingComponentException(gameObject, typeof(ParticleSystem));
@@ -57,9 +47,11 @@ public abstract class Bullet : MonoBehaviour
         return hasHitParticle;
     }
 
-    public virtual void Fire(Weapon _shootFrom)
+    public abstract void Fire(Weapon _shootFrom);
+
+    public void DealDamageTo(GameObject _gameObjectToDamage)
     {
-        WhoShot(_shootFrom);
+        damageComponent.DealDamageIfPosible(_gameObjectToDamage);
         return;
     }
 }

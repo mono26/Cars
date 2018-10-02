@@ -29,7 +29,7 @@ public class JumpAttack : Ability
     private void ReadyToJump()
     {
         entity.SetBodyVelocity(Vector3.zero);
-        entity.BodyAffectedByGravity(true);
+        entity.SetIfBodyAffectedByGravity(true);
         if (entity is Enemy)
         {
             Enemy enemy = entity as Enemy;

@@ -3,21 +3,12 @@ using UnityEngine;
 
 public enum EnemyStateInTheWorld { Dead , Falling, Grounded }
 
-[System.Serializable]
-public class EnemyStats
-{
-    [SerializeField] private int maxHealth;
-
-    public int GetMaxHealth { get { return maxHealth; } }
-}
-
 [RequireComponent(typeof(EnemyMovement), typeof(AIStateMachine), typeof(EnemyAnimationComponent))]
 public class Enemy : Entity, EventHandler<TargetterEvent>
 {
     [Header("Enemy settings")]
     [SerializeField] private AIState returnState;
     [SerializeField] private AIState startingState;
-    [SerializeField] private EnemyStats stats; // Set in the editor. public EnemyStats Stats { get { return stats; } }
     [SerializeField] private float stateUpdateRate = 2.0f; // Updates per second
     [SerializeField] private float groundCheckRayLenght = 1.0f;
 
@@ -76,7 +67,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
             if (aiStateMachineComponent == null)
             {
                 hasStatemachine = false;
-                throw new MissingComponentException("The enemy has a missing component: ", typeof(AIStateMachine));
+                throw new MissingComponentException(gameObject, typeof(AIStateMachine));
             }
         }
         catch (MissingComponentException missingComponentException) {
@@ -151,7 +142,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
             if (targetterComponent == null)
             {
                 hasTargetter = false;
-                throw new MissingComponentException("The enemy has a missing component: ", typeof(Targetter));
+                throw new MissingComponentException(gameObject, typeof(Targetter));
             }
         }
         catch (MissingComponentException missingComponentException)
@@ -203,7 +194,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
             if (enemyMovementComponent == null)
             {
                 hasMovement = false;
-                throw new MissingComponentException("The enemy has a missing component: ", typeof(EnemyMovement));
+                throw new MissingComponentException(gameObject, typeof(EnemyMovement));
             }
         }
         catch (MissingComponentException missingComponentException) {
@@ -242,8 +233,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
     public void PatrolTowardsPoint(Vector3 _destinationPoint)
     {
         StartPatrolling();
-        if (HasMovementComponent() && !enemyMovementComponent.IsAlreadyInAPath())
-        {
+        if (HasMovementComponent() && !enemyMovementComponent.IsAlreadyInAPath()) {
             enemyMovementComponent.SetNavigationDestination(_destinationPoint);
         }
         return;
@@ -314,9 +304,9 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
 
     public void OnEvent(TargetterEvent _targetterEvent)
     {
-        if (_targetterEvent.enemy.Equals(this))
+        if (_targetterEvent.GetEnemy.Equals(this))
         {
-            switch (_targetterEvent.eventType)
+            switch (_targetterEvent.GetEventType)
             {
                 case TargetterEventType.TargetLost:
                     ChangeState(returnState);

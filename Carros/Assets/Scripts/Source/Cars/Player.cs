@@ -1,83 +1,73 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour
+public class Player : EntityComponent
 {
+    // TODO create special attack class.
+    [SerializeField] private float specialMeter;
 
-    [SerializeField]
-    private float health;
-    private float specialMeter;
+    [Header("Player components")]
+    [SerializeField] private ExternalInput inputComponent;
+    [SerializeField] private GameObject targetImg;
 
-    [SerializeField]
-    private bool drivingState;
-    [SerializeField]
-    private bool shootingState;
-
-    [SerializeField]
-    private Animator pAnimator;
-
-    private MachineGun machineGun;
-
-    public GameObject targetImg;
-
-    // Use this for initialization
-    void Start ()
+    private void Start ()
     {
         targetImg.SetActive(false);
-        pAnimator = GetComponent<Animator>();
-        machineGun = GetComponentInChildren<MachineGun>();
-        health = 100;
         specialMeter = 10;
-        drivingState = true;
+        return;
 	}
-	
-	// Update is called once per frame
-	void Update ()
+
+    private void HandlePlayerAnimations()
     {
-       /* if (Input.GetKey(KeyCode.LeftShift))
+        Animator animatorToHandle = entity.GetAnimatorComponent;
+        if (inputComponent.GetAimInput > 0)
         {
             targetImg.SetActive(true);
-            pAnimator.SetBool("isShooting", true);
-            pAnimator.SetBool("isDriving", false);
-            shootingState = true;
-            drivingState = false;
-        } else if (Input.GetKeyUp(KeyCode .LeftShift))
+            animatorToHandle.SetBoolParameterIfExisting("isShooting", AnimatorControllerParameterType.Bool, true);
+            animatorToHandle.SetBoolParameterIfExisting("isDriving", AnimatorControllerParameterType.Bool, false);
+        }
+        else if (inputComponent.GetAimInput == 0)
         {
             targetImg.SetActive(false);
-            pAnimator.SetBool("isShooting", false);
-            pAnimator.SetBool("isDriving", true);
-            shootingState = false;
-            drivingState = true;
-        }*/
-       if (Input.GetAxis("Aim") != 0)
-        {
-            targetImg.SetActive(true);
-            pAnimator.SetBool("isShooting", true);
-            pAnimator.SetBool("isDriving", false);
-            shootingState = true;
-            drivingState = false;
+            animatorToHandle.SetBoolParameterIfExisting("isShooting", AnimatorControllerParameterType.Bool, false);
+            animatorToHandle.SetBoolParameterIfExisting("isDriving", AnimatorControllerParameterType.Bool, true);
         }
-        else if (Input.GetAxis("Aim") == 0)
-        {
-           targetImg.SetActive(false);
-            pAnimator.SetBool("isShooting", false);
-            pAnimator.SetBool("isDriving", true);
-            shootingState = false;
-            drivingState = true;
-        }
-
-
+        return;
     }
 
-    public void ReceiveAmmo(int ammo)
+    private void HandleInput()
     {
-        //machineGun.ReceiveAmmo(ammo);
+        if(CanApplyExternalInput())
+        {
+            CarInput inputToPass = new CarInput(
+                inputComponent.GetMovementInput, 
+                inputComponent.GetFootBrakesInput, 
+                inputComponent.GetHandBrakeInput, 
+                inputComponent.GetSteeringInput
+                );
+            entity.ReceiveInput(inputToPass);
+        }
+        return;
     }
 
-    public void ReceiveDamage(float damage)
+    public override void EveryFrame()
     {
-        health = -damage;
+        HandleInput();
+        return;
+    }
+
+    public override void FixedFrame()
+    {
+        HandlePlayerAnimations();
+        return;
+    }
+
+    public bool CanApplyExternalInput()
+    {
+        bool canApply = true;
+        if (entity.GetEntityType != EntityType.Playable && inputComponent == null) {
+            canApply = false;
+        }
+        return canApply;
     }
 }

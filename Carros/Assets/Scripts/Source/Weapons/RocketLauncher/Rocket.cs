@@ -20,6 +20,12 @@ public class Rocket : Bullet
         return;
     }
 
+    public override void Fire(Weapon _shooterWeapon)
+    {
+        LaucnhInDirection(_shooterWeapon.GetAimDirection);
+        return;
+    }
+
     private void LaucnhInDirection(Vector3 _launchDirection)
     {
         if (HasBodyComponent())
@@ -57,13 +63,14 @@ public class Rocket : Bullet
 
     private void ExplosionDamage()
     {
-        //GameObject explosion = VfxPool.Instance.GetVFX();
+        /*//GameObject explosion = VfxPool.Instance.GetVFX();
         //explosion.transform.position = this.transform.position;
         Collider[] colliders = Physics.OverlapSphere(this.transform.position, explosionRadius);
         for (int i = 0; i < colliders.Length; i++)
         {
             if (colliders[i].CompareTag("Enemy"))
                 colliders[i].SendMessage("ReceiveDamage", damage);
-        }
+        }*/
+
     }
 }

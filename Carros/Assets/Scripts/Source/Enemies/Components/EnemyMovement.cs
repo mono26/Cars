@@ -99,7 +99,7 @@ public class EnemyMovement : EntityComponent
         if (navigationComponent == null)
         {
             hasNavigation = false;
-            throw new MissingComponentException("The enemy has a missing component: ", typeof(NavMeshAgent));
+            throw new MissingComponentException(gameObject, typeof(NavMeshAgent));
         }
         return hasNavigation;
     }
@@ -109,7 +109,7 @@ public class EnemyMovement : EntityComponent
         if (collision.collider.CompareTag("Terrain"))
         {
             ActivateNavMeshNavigation(true);
-            entity.BodyAffectedByGravity(false);
+            entity.SetIfBodyAffectedByGravity(false);
         }
         return;
     }

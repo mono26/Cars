@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RocketLauncher : MonoBehaviour {
-
-    public float bulletDamage;
+public class RocketLauncher : MonoBehaviour
+{
+    public int bulletDamage;
     public int ammoCapacity = 180;
     public int actualAmmo;
     public int magazineBullets;

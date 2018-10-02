@@ -39,6 +39,7 @@ public class MissingComponentException : GameException
 
     public MissingComponentException() : base("Missing component exception.") { }
     public MissingComponentException(string _message) : base(_message) { }
+    // TODO refactorization when we only pass a gameObject.
     public MissingComponentException(GameObject _gameObjectWithException, Type _missingComponent) : base()
     {
         missingComponent = _missingComponent;

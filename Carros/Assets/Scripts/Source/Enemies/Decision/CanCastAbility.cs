@@ -22,7 +22,6 @@ public class CanCastAbility : AIDecision
                 {
                     if (ability.IsInRange(enemy.GetTargetPosition()) && !ability.IsInCooldown())
                     {
-                        Debug.Log(enemy.gameObject.name + " Can cast: " + ability.ToString());
                         enemy.SetNextAbility(ability);
                         canCast = true;
                     }

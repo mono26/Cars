@@ -15,7 +15,7 @@ public class AIStateMachine : EntityComponent
             if (entity == null)
             {
                 hasAIEntity = false;
-                throw new MissingComponentException("The state machine has no Entity to Update.", typeof(Entity));
+                throw new MissingComponentException(gameObject, typeof(Entity));
             }
         }
         catch (MissingComponentException missingComponentException) {

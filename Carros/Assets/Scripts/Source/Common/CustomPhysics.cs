@@ -77,7 +77,6 @@ public static class CustomPhysics
     public static Vector3 CalculateVelocityVectorForParabolicMovement(Vector3 _initialPosition, Vector3 _targetPosition, float _speed = 10.0f)
     {
         float theta = CalculateLaunchAngleForParabolicMovement(_initialPosition, _targetPosition, _speed);
-        Debug.Log(theta);
         // If our angle is impossible, we early-out.
         if (float.IsNaN(theta)) { return Vector3.zero; }
 

@@ -62,9 +62,15 @@ public static class HelperMethods
         return _collection;
     }
 
-    public static void DebugMessageWithObjectAndTimeStamp(string _message, object _elementToDebug)
+    public static void DebugMessageWithTimeStamp(string _message)
     {
-        Debug.Log(Time.timeSinceLevelLoad + _message + _elementToDebug.ToString());
+        Debug.Log(Time.timeSinceLevelLoad + " " + _message);
+        return;
+    }
+
+    public static void DebugMessageWithTimeStamp(string _message, object _elementToDebug)
+    {
+        Debug.Log(Time.timeSinceLevelLoad + " " + _message + " " + _elementToDebug.ToString());
         return;
     }
 

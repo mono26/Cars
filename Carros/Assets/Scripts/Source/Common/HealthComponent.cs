@@ -1,28 +1,33 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class HealthComponent : MonoBehaviour {
+public class HealthComponent : MonoBehaviour
+{
+    [Header("Health Component settings")]
+    [SerializeField] private int maxHealth;
 
-    [SerializeField]
-    private float health;
+    [Header("Health Component components")]
+    [SerializeField] private HealthBar healthDisplay; 
+
+    [Header("Health Component editor debugging")]
+    [SerializeField] private int currentHealth;
 
 	// Use this for initialization
-	void Start () {
-		
+	void Start ()
+    {
+        currentHealth = maxHealth;
+        healthDisplay.UpdateHealthBar(currentHealth / maxHealth);
+        return;
 	}
 
-    public void SendScore()
+    public void ReceiveDamage(int damage)
     {
-
-    }
-
-    public void ReceiveDamage(float damage)
-    {
-        health -= damage;
-        if (health <= 0)
-        {
+        currentHealth -= damage;
+        if (currentHealth <= 0) {
+            // TODO proper kill or release.
             Destroy(this.gameObject);
         }
+        healthDisplay.UpdateHealthBar(currentHealth / maxHealth);
+        return;
     }
+
 }

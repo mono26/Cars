@@ -39,7 +39,7 @@ public class Ram : Ability
     private void ReadyToRam()
     {
         entity.SetBodyVelocity(Vector3.zero);
-        entity.BodyAffectedByGravity(true);
+        entity.SetIfBodyAffectedByGravity(true);
         if (entity is Enemy)
         {
             Enemy enemy = entity as Enemy;

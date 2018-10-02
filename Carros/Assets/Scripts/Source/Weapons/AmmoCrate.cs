@@ -2,9 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PickableType { Ammo }
+
 public class PickEvent : GameEvent
 {
+    private Entity whoPicks;
+    private PickableType pickableType;
+    private int ammoPicked;
 
+    public Entity GetWhoPicks { get { return whoPicks; } }
+    public PickableType GetPickableType { get { return pickableType; } }
+    public int GetAmmoPicked { get { return ammoPicked; } }
+
+    public PickEvent(Entity _whoPicks, PickableType _pickableType)
+    {
+        whoPicks = _whoPicks;
+        pickableType = _pickableType;
+        return;
+    }
 }
 
 public class AmmoCrate : MonoBehaviour {
@@ -14,13 +29,12 @@ public class AmmoCrate : MonoBehaviour {
 
     private void OnTriggerEnter(Collider col)
     {
-        Debug.Log("Ammo received");
-        col.SendMessageUpwards("ReceiveAmmo", bulletsAmount);
-        Destroy(this.gameObject);
         if (col.gameObject.CompareTag("Player")) 
         {
             Debug.Log("Ammo received");
-            col.SendMessageUpwards("ReceiveAmmo", bulletsAmount);
+            EventManager.TriggerEvent<PickEvent>(new PickEvent(col.GetComponent<Entity>(), PickableType.Ammo));
+            Destroy(this.gameObject);
         }
+        return;
     }
 }

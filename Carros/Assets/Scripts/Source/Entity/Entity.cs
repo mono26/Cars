@@ -1,36 +1,43 @@
 ﻿using UnityEngine;
 
+public enum EntityType { Playable, AIControlled }
+
+// Empty class for al the posible entity inputs that we could need: car, enemies, etc.
+public class EntityInput
+{
+
+}
+
 public class Entity : MonoBehaviour
 {
-    public enum EntityType { Playable, AIControlled}
-
     [Header("Entity settings")]
-    [SerializeField] private EntityType type = EntityType.AIControlled;
+    [SerializeField] private EntityType entityType = EntityType.AIControlled;
 
     [Header("Entity components")]
     [SerializeField] private Animator animatorComponent;
     [SerializeField] private AudioSource audioComponent;
-    [SerializeField] private Rigidbody body;
+    [SerializeField] private Rigidbody bodyComponent;
     [SerializeField] private Collider[] hitBox;
-    [SerializeField] private ExternalInput inputcomponent;
     [SerializeField] private SkinnedMeshRenderer[] model;
 
-    [Header("Editor debugging")]
+    [Header("Entity editor debugging")]
     [SerializeField]
     protected EntityComponent[] components;
 
     public Animator GetAnimatorComponent { get { return animatorComponent; } }
-    public Rigidbody GetBody { get { return body; } }
-    public T GetControlledEntity<T>() where T : Entity { { return this as T; } }
-    public ExternalInput GetInputcomponent { get { return inputcomponent; } }
+    public Rigidbody GetBody { get { return bodyComponent; } }
+    public EntityType GetEntityType { get { return entityType; } }
 
     protected virtual void Awake()
     {
+        if(animatorComponent == null) {
+            animatorComponent = GetComponent<Animator>();
+        }
         if (audioComponent == null) {
             audioComponent = GetComponent<AudioSource>();
         }
-        if (body == null) {
-            body = GetComponent<Rigidbody>();
+        if (bodyComponent == null) {
+            bodyComponent = GetComponent<Rigidbody>();
         }
         if (hitBox == null) {
             hitBox = GetComponentsInChildren<Collider>();
@@ -61,7 +68,7 @@ public class Entity : MonoBehaviour
             if (components == null || components.Length == 0)
             {
                 hasComponents = false;
-                throw new MissingComponentException("The entity has a missing components: ", typeof(EntityComponent));
+                throw new MissingComponentException(gameObject, typeof(EntityComponent));
             }
         }
         catch (MissingComponentException missingComponentException) {
@@ -92,26 +99,24 @@ public class Entity : MonoBehaviour
         return;
     }
 
-    protected bool CanApplyExternalInputToEntity()
+    public virtual void ReceiveInput(EntityInput _inputToReceive)
     {
-        bool canApply = false;
-        canApply = (type == EntityType.Playable && inputcomponent != null) ? true : false;
-        return canApply;
+
+    }
+
+    public void SetIfBodyAffectedByGravity(bool _value)
+    {
+        bodyComponent.useGravity = _value;
+        return;
     }
 
     /// <summary>
-    /// Applies raw velocity vector. The method doesn't normalize the velocity.
+    /// Applies a raw velocity vector. The method doesn't normalize the vector.
     /// </summary>
     /// <param name="_newVelocity"> New velocity for the body.</param>
     public void SetBodyVelocity(Vector3 _newVelocity)
     {
-        body.velocity = _newVelocity;
-        return;
-    }
-
-    public void BodyAffectedByGravity(bool _value)
-    {
-        body.useGravity = _value;
+        bodyComponent.velocity = _newVelocity;
         return;
     }
 }

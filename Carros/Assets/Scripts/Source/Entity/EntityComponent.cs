@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class EntityComponent : MonoBehaviour
+public abstract class EntityComponent : MonoBehaviour
 {
     [Header("Entity Component settings")]
     [SerializeField] protected Entity entity = null;
@@ -21,6 +21,4 @@ public class EntityComponent : MonoBehaviour
     public virtual void FixedFrame() { }
 
     public virtual void LateFrame() { }
-
-    protected virtual void HandleAnimation() { }
 }

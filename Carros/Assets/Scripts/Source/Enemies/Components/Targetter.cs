@@ -6,13 +6,17 @@ public enum TargetterEventType { TargetLost, TargetAcquired }
 
 public class TargetterEvent : GameEvent
 {
-    public Enemy enemy;
-    public TargetterEventType eventType;
+    private Enemy enemy;
+    private TargetterEventType eventType;
+
+    public Enemy GetEnemy { get { return enemy; } }
+    public TargetterEventType GetEventType { get { return eventType; } }
 
     public TargetterEvent(Enemy _enemy, TargetterEventType _eventType)
     {
         enemy = _enemy;
         eventType = _eventType;
+        return;
     }
 }
 
@@ -65,7 +69,7 @@ public class Targetter : EntityComponent
             if (detectionTrigger == null)
             {
                 hasTrigger = false;
-                throw new MissingComponentException("The enemy has a missing component: ", typeof(SphereCollider));
+                throw new MissingComponentException(gameObject, typeof(SphereCollider));
             }
         }
         catch (MissingComponentException missingComponentExecption) {

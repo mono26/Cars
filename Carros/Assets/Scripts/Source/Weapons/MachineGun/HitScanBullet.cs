@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HitScanBullet : Bullet
 {
@@ -13,8 +11,8 @@ public class HitScanBullet : Bullet
             );
         if(bulletHit.collider != null)
         {
-            DealDamageIfPosible(bulletHit.collider.gameObject);
-            PlayHitParticleInLocation(bulletHit.point);
+            DealDamageTo(bulletHit.collider.gameObject);
+            //PlayHitParticleInLocation(bulletHit.point);
         }
         return;
     }

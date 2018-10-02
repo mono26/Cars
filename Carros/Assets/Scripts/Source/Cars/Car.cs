@@ -1,5 +1,32 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+
+[System.Serializable]
+public class CarInput : EntityInput
+{
+    [SerializeField] private float accelerationInput = 0;
+    [SerializeField] private float footBrakeInput = 0;
+    [SerializeField] private float handBrakeInput = 0;
+    [SerializeField] private float steeringInput = 0;
+
+    public float GetAccelerationInput { get { return accelerationInput; } }
+    public float GetFootBrakeInput { get { return footBrakeInput; } }
+    public float GetHandBrakeInput { get { return handBrakeInput; } }
+    public float GetSteeringInput { get { return steeringInput; } }
+
+    public CarInput()
+    {
+
+    }
+
+    public CarInput(float _accelerationInput, float _footBrakeInput, float _handBrakeInput, float _steeringInput)
+    {
+        accelerationInput = Mathf.Clamp(_accelerationInput, 0, 1);
+        footBrakeInput = -1 * Mathf.Clamp(_footBrakeInput, -1, 0);
+        handBrakeInput = Mathf.Clamp(_handBrakeInput, 0, 1);
+        steeringInput = Mathf.Clamp(_steeringInput, -1, 1);
+        return;
+    }
+}
 
 [RequireComponent(typeof(CarEngine), typeof(Brakes))]
 public class Car : Entity
@@ -13,12 +40,9 @@ public class Car : Entity
     [SerializeField] private CarEngine engine;
     [SerializeField] private Wheel[] wheels;  // Assuming 0 and 1 are the front wheels and 2 and 3 the back wheels.
 
-    [Header("Editor debugging")]
-    [SerializeField] private float accelerationInput;
-    [SerializeField] private float footBrakeInput;
-    [SerializeField] private float handBrakeInput;
+    [Header("Car editor debugging")]
     [SerializeField] private float oldRotation;
-    [SerializeField] private float steeringInput;
+    [SerializeField] private CarInput currentInput = new CarInput();
 
     public CarEngine GetEngine { get { return engine; } }
     public Wheel[] GetWheels { get { return wheels; } }
@@ -172,8 +196,8 @@ public class Car : Entity
     {
         if (HasFrontWheels())
         {
-            wheels[0].ApplySteer(steeringInput);
-            wheels[1].ApplySteer(steeringInput);
+            wheels[0].ApplySteer(currentInput.GetSteeringInput);
+            wheels[1].ApplySteer(currentInput.GetSteeringInput);
         }
         return;
     }
@@ -182,9 +206,8 @@ public class Car : Entity
     {
         if (HasEngine() && HasAllWheels())
         {
-            float accelerationTorque = engine.GetCarEngineTorqueToApply(accelerationInput) / wheels.Length;
-            foreach (Wheel wheel in wheels)
-            {
+            float accelerationTorque = engine.GetCarEngineTorqueToApply(currentInput.GetAccelerationInput) / wheels.Length;
+            foreach (Wheel wheel in wheels) {
                 wheel.SetTorque(accelerationTorque, Wheel.TorqueType.Acceleration);
             }
         }
@@ -219,12 +242,9 @@ public class Car : Entity
     {
         if (HasFrontWheels() && HasBrakes())
         {
-            if (handBrakeInput > 0)
-            {
-                float handBrakeTorque = brakes.GetHandBrakeForceToApply(handBrakeInput);
-                wheels[0].SetTorque(handBrakeTorque, Wheel.TorqueType.Braking);
-                wheels[1].SetTorque(handBrakeTorque, Wheel.TorqueType.Braking);
-            }
+            float handBrakeTorque = brakes.GetHandBrakeForceToApply(currentInput.GetHandBrakeInput);
+            wheels[0].SetTorque(handBrakeTorque, Wheel.TorqueType.Braking);
+            wheels[1].SetTorque(handBrakeTorque, Wheel.TorqueType.Braking);
         }
         return;
     }
@@ -250,11 +270,10 @@ public class Car : Entity
     {
         if (HasBrakes() && HasAllWheels())
         {
-            if (footBrakeInput > 0)
+            if (currentInput.GetFootBrakeInput > 0)
             {
-                float footBrakeTorque = -brakes.GetFootBrakeTorqueToApply(footBrakeInput);
-                foreach (Wheel wheel in wheels)
-                {
+                float footBrakeTorque = -brakes.GetFootBrakeTorqueToApply(currentInput.GetFootBrakeInput);
+                foreach (Wheel wheel in wheels) {
                     wheel.SetTorque(footBrakeTorque, Wheel.TorqueType.Acceleration);
                 }
             }
@@ -293,51 +312,14 @@ public class Car : Entity
 
     protected override void Update()
     {
-        HandleInput();
         base.Update();
         return;
     }
 
-    private void HandleInput()
+    public override void ReceiveInput(EntityInput _inputToRecieve)
     {
-        if (CanApplyExternalInputToEntity())
-        {
-            HandleAccelerationInput();
-            HandleBrakesInput();
-            HandleSteeringInput();
-        }
-        return;
-    }
-
-    private void HandleAccelerationInput()
-    {
-        if (CanApplyExternalInputToEntity())
-        {
-            accelerationInput = GetInputcomponent.GetMovementInput;
-            accelerationInput = Mathf.Clamp(accelerationInput, 0, 1);
-        }
-        return;
-    }
-
-    private void HandleBrakesInput()
-    {
-        if (CanApplyExternalInputToEntity())
-        {
-            // TODO refactor input access.
-            footBrakeInput = GetInputcomponent.GetFootBrakesInput;
-            footBrakeInput = -1 * Mathf.Clamp(footBrakeInput, -1, 0);
-            handBrakeInput = GetInputcomponent.GetHandBrakeInput;
-            handBrakeInput = Mathf.Clamp(handBrakeInput, 0, 1);
-        }
-        return;
-    }
-
-    private void HandleSteeringInput()
-    {
-        if (CanApplyExternalInputToEntity())
-        {
-            steeringInput = GetInputcomponent.GetSteeringInput;
-            steeringInput = Mathf.Clamp(steeringInput, -1, 1);
+        if (_inputToRecieve is CarInput) {
+            currentInput = _inputToRecieve as CarInput;
         }
         return;
     }

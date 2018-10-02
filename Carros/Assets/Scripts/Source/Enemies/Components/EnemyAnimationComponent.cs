@@ -27,17 +27,17 @@ public class EnemyAnimationComponent : EntityComponent
     {
         Animator animatorToHandle = entity.GetAnimatorComponent;
         if (animatorToHandle == null) { return; }
-        animatorToHandle.SetBoolWithParameterCheck(
+        animatorToHandle.SetBoolParameterIfExisting(
             "IsIdle",
             AnimatorControllerParameterType.Bool,
             _enemyMovementState == EnemyMovemenState.Idle
             );
-        animatorToHandle.SetBoolWithParameterCheck(
+        animatorToHandle.SetBoolParameterIfExisting(
             "IsRunning",
             AnimatorControllerParameterType.Bool,
             _enemyMovementState == EnemyMovemenState.Running
             );
-        animatorToHandle.SetBoolWithParameterCheck(
+        animatorToHandle.SetBoolParameterIfExisting(
             "IsWalking",
             AnimatorControllerParameterType.Bool,
             _enemyMovementState == EnemyMovemenState.Walking
@@ -49,7 +49,7 @@ public class EnemyAnimationComponent : EntityComponent
     {
         Animator animatorToHandle = entity.GetAnimatorComponent;
         if (animatorToHandle == null) { return; }
-        animatorToHandle.SetBoolWithParameterCheck(
+        animatorToHandle.SetBoolParameterIfExisting(
             "IsGrounded",
             AnimatorControllerParameterType.Bool,
             _enemyStateInTheWorld == EnemyStateInTheWorld.Grounded
