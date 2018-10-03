@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// Copyright (c) What a Box Creative Studio. All rights reserved.
+
+using UnityEngine;
 
 [System.Serializable]
 public class CarInput : EntityInput

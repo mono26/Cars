@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// Copyright (c) What a Box Creative Studio. All rights reserved.
+
+using UnityEngine;
 
 [RequireComponent(typeof(WheelCollider))]
 public class Wheel : EntityComponent

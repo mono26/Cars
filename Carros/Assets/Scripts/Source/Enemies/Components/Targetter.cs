@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Copyright (c) What a Box Creative Studio. All rights reserved.
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

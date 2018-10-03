@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) What a Box Creative Studio. All rights reserved.
+
+using System.Collections.Generic;
 using UnityEngine;
 
 public struct RayParameters

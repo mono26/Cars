@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿// Copyright (c) What a Box Creative Studio. All rights reserved.
+
+using System.Reflection;
 using UnityEngine;
 
 public static class TestHelperMethods

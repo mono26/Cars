@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) What a Box Creative Studio. All rights reserved.
+
+using System;
 using UnityEngine;
 
 public static class ExtensionMethods

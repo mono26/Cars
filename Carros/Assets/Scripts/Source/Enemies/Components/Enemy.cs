@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Copyright (c) What a Box Creative Studio. All rights reserved.
+
+using System.Collections;
 using UnityEngine;
 
 public enum EnemyStateInTheWorld { Dead , Falling, Grounded }

@@ -1,8 +1,11 @@
-﻿using System;
+﻿// Copyright (c) What a Box Creative Studio. All rights reserved.
+
+using System;
 using System.Collections.Generic;
 
 public class GameEvent { }
 
+// TODO refactorizate class and eliminate event router shit!
 public static class EventManager
 {
     private static Dictionary<Type, List<EventHandlerBase>> events;
