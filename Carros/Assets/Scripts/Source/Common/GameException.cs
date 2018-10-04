@@ -55,8 +55,35 @@ public class MissingComponentException : GameException
         if (Message == null || Message == "")
             message = "The GameObject " + gameObjectWithException.name + " has a missing component: " + missingComponent.ToString();
         else
-            message = Message;
-        return message + missingComponent.ToString();
+            message = Message + missingComponent.ToString();
+        return message;
+    }
+}
+
+public class EventException : GameException
+{
+    string eventType;
+
+    public EventException() : base("Event Exception") { }
+    public EventException(string _eventType) : base()
+    {
+        eventType = _eventType;
+        return;
+    }
+    public EventException(string _eventType, string _message) : base(_message)
+    {
+        eventType = _eventType;
+        return;
+    }
+
+    protected override string FormatMessage()
+    {
+        string message;
+        if (Message == null || Message == "")
+            message = "Event of type: " + eventType + " encountered a exception.";
+        else
+            message = Message + eventType;
+        return message;
     }
 }
 
