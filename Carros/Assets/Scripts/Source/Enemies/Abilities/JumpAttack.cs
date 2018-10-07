@@ -16,14 +16,10 @@ public class JumpAttack : Ability
 
     private void JumpTowardsTarget()
     {
-        Vector3 initialPosition = entity.transform.position;
-        Vector3 targetPosition = GetTargetPosition();
         ReadyToJump();
-        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(
-            initialPosition, 
-            targetPosition, 
-            jumpSpeed
-            );
+        Vector3 initialPosition = entity.transform.position;
+        Vector3 targetPosition = RetrieveTargetPosition();
+        Vector3 jumpVelocity = CalculateJumpVelocity(initialPosition, targetPosition);
         entity.SetBodyVelocity(jumpVelocity);
         return;
     }
@@ -40,14 +36,19 @@ public class JumpAttack : Ability
         return;
     }
 
-    private Vector3 GetTargetPosition()
+    private Vector3 CalculateJumpVelocity(Vector3 initialPosition, Vector3 targetPosition)
     {
-        Vector3 targetPosition = entity.transform.position;
-        if (entity is Enemy)
-        {
-            Enemy castingEnemy = entity as Enemy;
-            targetPosition = castingEnemy.GetTargetPosition();
+        float relativeY = initialPosition.y - targetPosition.y;
+        BallisticArcPreference arcPreference;
+        if (Mathf.Abs(relativeY) <= 0.5) {
+            arcPreference = BallisticArcPreference.ParabolicArc;
         }
-        return targetPosition;
+        else {
+            arcPreference = BallisticArcPreference.DirectArc;
+        }
+        Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(
+            new ParabolicMovementData(initialPosition, targetPosition, jumpSpeed, arcPreference)
+            );
+        return jumpVelocity;
     }
 }

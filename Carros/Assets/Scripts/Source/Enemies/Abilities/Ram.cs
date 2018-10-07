@@ -17,25 +17,15 @@ public class Ram : Ability
 
     protected void RamTowardsTarget()
     {
+        ReadyToRam();
         Vector3 initialPosition = entity.transform.position;
-        Vector3 targetPosition = GetTargetPosition();
+        Vector3 targetPosition = RetrieveTargetPosition();
         Vector3 targetDirection = (targetPosition - initialPosition);
         // The direction must be flat in XZ plane.
         targetDirection.y = 0;
         Vector3 normalizedDirection = targetDirection.normalized;
         entity.GetBody.AddForce(normalizedDirection * ramForce, ForceMode.Impulse);
         return;
-    }
-
-    private Vector3 GetTargetPosition()
-    {
-        Vector3 targetPosition = entity.transform.position;
-        if (entity is Enemy)
-        {
-            Enemy castingEnemy = entity as Enemy;
-            targetPosition = castingEnemy.GetTargetPosition();
-        }
-        return targetPosition;
     }
 
     private void ReadyToRam()

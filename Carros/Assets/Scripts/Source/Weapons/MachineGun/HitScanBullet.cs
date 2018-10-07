@@ -26,7 +26,7 @@ public class HitScanBullet : Bullet
         // This would cast rays only against colliders in layer 8.
         // But instead we want to collide against everything except layer 8. The ~ operator does this, it inverts a bitmask.
         layerMask = ~layerMask;
-        RayParameters rayInfo = new RayParameters(
+        RayData rayInfo = new RayData(
             layerMask,
             _firePosition,
             _fireDirection,

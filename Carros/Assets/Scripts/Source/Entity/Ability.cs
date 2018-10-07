@@ -25,6 +25,17 @@ public abstract class Ability : EntityComponent
         return;
     }
 
+    protected Vector3 RetrieveTargetPosition()
+    {
+        Vector3 targetPosition = entity.transform.position;
+        if (entity is Enemy)
+        {
+            Enemy castingEnemy = entity as Enemy;
+            targetPosition = castingEnemy.GetTargetPosition();
+        }
+        return targetPosition;
+    }
+
     public virtual void Cast()
     {
         lastCast = Time.timeSinceLevelLoad;

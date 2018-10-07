@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct RayParameters
+public struct RayData
 {
     private LayerMask targetLayer;
     private Vector3 initialPoint;
@@ -15,7 +15,7 @@ public struct RayParameters
     public Vector3 GetDirection { get { return direction; } }
     public float GetRange { get { return range; } }
 
-    public RayParameters(LayerMask _targetLayer, Vector3 _initialPoint, Vector3 _direction, float _range)
+    public RayData(LayerMask _targetLayer, Vector3 _initialPoint, Vector3 _direction, float _range)
     {
         targetLayer = _targetLayer;
         initialPoint = _initialPoint;
@@ -81,7 +81,7 @@ public static class HelperMethods
     /// </summary>
     /// <param name="_parameters"></param>
     /// <returns></returns>
-    public static GameObject GetFirstGameObjectHitByRay(RayParameters _parameters)
+    public static GameObject GetFirstGameObjectHitByRay(RayData _parameters)
     {
         GameObject objectHitByRay = null;
         RaycastHit hit;
@@ -104,7 +104,7 @@ public static class HelperMethods
     /// </summary>
     /// <param name="_parameters"></param>
     /// <returns></returns>
-    public static RaycastHit GetFirstHitInformation(RayParameters _parameters)
+    public static RaycastHit GetFirstHitInformation(RayData _parameters)
     {
         RaycastHit hitToReturn;
         // Does the ray intersect any objects excluding the player layer
