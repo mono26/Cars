@@ -7,7 +7,7 @@ public class CarEngineTest
     [Test]
     public void CreatesTestCarEngine()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         Assert.NotNull(testCarEngine);
         return;
     }
@@ -15,9 +15,9 @@ public class CarEngineTest
     [Test]
     public void InitializeTestCarEngine()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         ReflectionBehaviour testReflection = testCarEngine.gameObject.AddComponent<ReflectionBehaviour>();
-        TestHelperMethods.InitializeTestGameObject(testCarEngine.gameObject);
+        TestsHelperMethods.InitializeTestGameObject(testCarEngine.gameObject);
         Assert.IsTrue(testReflection.AwakeCalled);
         Assert.IsTrue(testReflection.StartCalled);
         Assert.IsTrue(testReflection.OnEnableCalled);
@@ -27,7 +27,7 @@ public class CarEngineTest
     [Test]
     public void GetRealEngineTorqueValue()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         float testTorque = testCarEngine.GetCarEngineTorqueToApply(0);
         Assert.NotNull(testTorque);
         return;
@@ -36,7 +36,7 @@ public class CarEngineTest
     [Test]
     public void ZeroEngineTorqueWhenNoInputApplied()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         float testTorque = testCarEngine.GetCarEngineTorqueToApply(0);
         Assert.IsTrue(testTorque.Equals(0));
         return;
@@ -45,7 +45,7 @@ public class CarEngineTest
     [Test]
     public void GreaterThanZeroEngineTorqueWhenInputApplied()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         float testTorque = testCarEngine.GetCarEngineTorqueToApply(0);
         Assert.IsTrue(testTorque.Equals(0));
         return;
@@ -54,7 +54,7 @@ public class CarEngineTest
     [Test]
     public void NeverNegativeCarEngineTorqueWhenNegativeInputApplied()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         float testFootBrakeTorque = testCarEngine.GetCarEngineTorqueToApply(-1);
         Assert.IsTrue(testFootBrakeTorque.Equals(0));
         return;
@@ -63,7 +63,7 @@ public class CarEngineTest
     [Test]
     public void EngineCapsSpeed()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         Vector3 testVelocity = Vector3.forward * 9999f;
         Vector3 capedTestVelocity = testCarEngine.CapVelocityMagnitudeToMaxSpeed(testVelocity);
         Assert.Greater(testVelocity.magnitude, capedTestVelocity.magnitude);
@@ -73,7 +73,7 @@ public class CarEngineTest
     [Test]
     public void EngineCalculateZeroRevolutions()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         float testCarSpeed = 0;
         float testCarEngineRevolutions = testCarEngine.CalculateEngineRevolutions(testCarSpeed);
         Assert.IsTrue(testCarEngineRevolutions.Equals(0));
@@ -83,7 +83,7 @@ public class CarEngineTest
     [Test]
     public void EngineCalculateMaxRevolutionsAtFullSpeed()
     {
-        CarEngine testCarEngine = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
+        CarEngine testCarEngine = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<CarEngine>(MethodBase.GetCurrentMethod().Name);
         float testCarSpeed = 150;
         float testCarEngineRevolutions = testCarEngine.CalculateEngineRevolutions(testCarSpeed);
         Assert.GreaterOrEqual(testCarEngineRevolutions, 1);

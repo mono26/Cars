@@ -9,7 +9,7 @@ public class AIStateMachineTest
     [Test]
     public void CreatesTestAIStateMachine()
     {
-        AIStateMachine testAIStateMachine = TestHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
+        AIStateMachine testAIStateMachine = TestsHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
         Assert.NotNull(testAIStateMachine);
         return;
     }
@@ -17,9 +17,9 @@ public class AIStateMachineTest
     [Test]
     public void InitializeTestAIStateMachine()
     {
-        AIStateMachine testAIStateMachine = TestHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
+        AIStateMachine testAIStateMachine = TestsHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
         ReflectionBehaviour testReflection = testAIStateMachine.gameObject.AddComponent<ReflectionBehaviour>();
-        TestHelperMethods.InitializeTestGameObject(testAIStateMachine.gameObject);
+        TestsHelperMethods.InitializeTestGameObject(testAIStateMachine.gameObject);
         Assert.IsTrue(testReflection.AwakeCalled);
         Assert.IsTrue(testReflection.StartCalled);
         Assert.IsTrue(testReflection.OnEnableCalled);
@@ -29,8 +29,8 @@ public class AIStateMachineTest
     [Test]
     public void StateMachineStartsWithNoCurrentState()
     {
-        AIStateMachine testAIStateMachine = TestHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
-        TestHelperMethods.InitializeTestGameObject(testAIStateMachine.gameObject);
+        AIStateMachine testAIStateMachine = TestsHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
+        TestsHelperMethods.InitializeTestGameObject(testAIStateMachine.gameObject);
         Assert.IsNull(testAIStateMachine.GetCurrentState);
         return;
     }
@@ -38,8 +38,8 @@ public class AIStateMachineTest
     [Test]
     public void StateMachineChangesToNotNullState()
     {
-        AIStateMachine testAIStateMachine = TestHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
-        TestHelperMethods.InitializeTestGameObject(testAIStateMachine.gameObject);
+        AIStateMachine testAIStateMachine = TestsHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
+        TestsHelperMethods.InitializeTestGameObject(testAIStateMachine.gameObject);
         AIState testState = Resources.Load<AIState>("TestResources/" + testSCOAIStateName);
         testAIStateMachine.ChangeState(testState);
         Assert.NotNull(testAIStateMachine.GetCurrentState);
@@ -49,8 +49,8 @@ public class AIStateMachineTest
     [Test]
     public void StateMachineChangesStateAndMatchesNames()
     {
-        AIStateMachine testAIStateMachine = TestHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
-        TestHelperMethods.InitializeTestGameObject(testAIStateMachine.gameObject);
+        AIStateMachine testAIStateMachine = TestsHelperMethods.CreateScriptInstanceInGameObject<AIStateMachine>(MethodBase.GetCurrentMethod().Name);
+        TestsHelperMethods.InitializeTestGameObject(testAIStateMachine.gameObject);
         AIState testState = Resources.Load<AIState>("TestResources/" + testSCOAIStateName);
         testAIStateMachine.ChangeState(testState);
         Assert.AreEqual(testAIStateMachine.GetCurrentState.GetStateName, testState.GetStateName);

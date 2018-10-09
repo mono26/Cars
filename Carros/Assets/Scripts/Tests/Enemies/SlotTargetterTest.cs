@@ -7,7 +7,7 @@ public class SlotTargetterTest
     [Test]
     public void CreatesTestSlotTargetter()
     {
-        SlotTargetter testSlotTargetter = TestHelperMethods.CreateScriptInstanceInGameObject<SlotTargetter>(MethodBase.GetCurrentMethod().Name);
+        SlotTargetter testSlotTargetter = TestsHelperMethods.CreateScriptInstanceInGameObject<SlotTargetter>(MethodBase.GetCurrentMethod().Name);
         Assert.NotNull(testSlotTargetter);
         return;
     }
@@ -15,10 +15,10 @@ public class SlotTargetterTest
     [Test]
     public void InitializeTestSlotTargetter()
     {
-        SlotTargetter testSlotTargetter = TestHelperMethods.CreateScriptInstanceInGameObject<SlotTargetter>(MethodBase.GetCurrentMethod().Name);
+        SlotTargetter testSlotTargetter = TestsHelperMethods.CreateScriptInstanceInGameObject<SlotTargetter>(MethodBase.GetCurrentMethod().Name);
         testSlotTargetter.gameObject.AddComponent<SphereCollider>();
         ReflectionBehaviour testReflection = testSlotTargetter.gameObject.AddComponent<ReflectionBehaviour>();
-        TestHelperMethods.InitializeTestGameObject(testSlotTargetter.gameObject);
+        TestsHelperMethods.InitializeTestGameObject(testSlotTargetter.gameObject);
         Assert.IsTrue(testReflection.AwakeCalled);
         Assert.IsTrue(testReflection.StartCalled);
         Assert.IsTrue(testReflection.OnEnableCalled);

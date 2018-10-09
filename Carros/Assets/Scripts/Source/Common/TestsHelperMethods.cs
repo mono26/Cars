@@ -3,7 +3,7 @@
 using System.Reflection;
 using UnityEngine;
 
-public static class TestHelperMethods
+public static class TestsHelperMethods
 {
     public static T CreateInitializedScriptInstanceInGameObject<T>(string _nameOfTest) where T : MonoBehaviour
     {

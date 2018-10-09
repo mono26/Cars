@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-public enum BallisticArcPreference { DirectArc, ParabolicArc}
+public enum BallisticArcPreference { LowerArc, UpperArc}
 
 public struct ParabolicMovementData
 {
@@ -16,7 +16,7 @@ public struct ParabolicMovementData
     public float GetSpeed { get { return speed; } }
     public BallisticArcPreference GetArcPreference { get { return arcPreference; } }
 
-    public ParabolicMovementData(Vector3 _initialPosition, Vector3 _targetPositon, float _speed, BallisticArcPreference _arcPreference = BallisticArcPreference.ParabolicArc)
+    public ParabolicMovementData(Vector3 _initialPosition, Vector3 _targetPositon, float _speed, BallisticArcPreference _arcPreference = BallisticArcPreference.UpperArc)
     {
         initialPosition = _initialPosition;
         targetPosition = _targetPositon;
@@ -30,29 +30,37 @@ public static class CustomPhysics
 {
     public static float CalculateLaunchAngleForParabolicMovement(ParabolicMovementData _parabolicData)
     {
-        // angle = arctan(v2 +- Sqr(v4 - g(gx2+2yv2))/gx)
-        Vector3 target = _parabolicData.GetTargetPosition;
-        target.y = _parabolicData.GetInitialPosition.y;
-        Vector3 vectorToTarget = target - _parabolicData.GetInitialPosition;
-        float targetDistance = vectorToTarget.magnitude;
-        float relativeY = _parabolicData.GetTargetPosition.y - _parabolicData.GetInitialPosition.y;
-        float vSquared = _parabolicData.GetSpeed * _parabolicData.GetSpeed;
+        // theta = arctan((v2 +- Sqr(v4 - g(gx2+2yv2)))/gx)
+        Vector3 flatTarget = _parabolicData.GetTargetPosition;
+        flatTarget.y = _parabolicData.GetInitialPosition.y;
+        Vector3 vectorToTarget = flatTarget - _parabolicData.GetInitialPosition;
+        float horizontalDistance = vectorToTarget.magnitude;
+        float verticalDistance = _parabolicData.GetTargetPosition.y - _parabolicData.GetInitialPosition.y;
+        float velocitySquared = _parabolicData.GetSpeed * _parabolicData.GetSpeed;
         float gravity = Mathf.Abs(Physics.gravity.y);
+        float angleToReturn = 0;
         // If the distance to our target is zero, we can assume it's right on top of us (or that we're our own target).
-        if (Mathf.Approximately(targetDistance, 0f))
+        if (Mathf.Approximately(horizontalDistance, 0f))
         {
             // If we're doing a low-angle direct shot, we tweak our angle based on relative height of target.
-            if (relativeY > 0) { return 90f; }
-            if (relativeY < 0) { return -90f; }
+            if (verticalDistance > 0) {
+                angleToReturn = 90f;
+            }
+            if (verticalDistance < 0) {
+                angleToReturn = - 90f;
+            }
         }
-        float sqr = Mathf.Sqrt((vSquared * vSquared) - (gravity * ((gravity * (targetDistance * targetDistance)) + (2 * relativeY * vSquared))));
-        float parabolicAngle = Mathf.Atan((vSquared + sqr) / (gravity * targetDistance));
-        float directAngle = Mathf.Atan((vSquared - sqr) / (gravity * targetDistance));
-        float angleToReturn = PickAngle(parabolicAngle, directAngle, _parabolicData.GetArcPreference);
+        else
+        {
+            float root = Mathf.Sqrt((velocitySquared * velocitySquared) - (gravity * ((gravity * (horizontalDistance * horizontalDistance)) + (2 * verticalDistance * velocitySquared))));
+            float parabolicAngle = Mathf.Atan((velocitySquared + root) / (gravity * horizontalDistance));
+            float directAngle = Mathf.Atan((velocitySquared - root) / (gravity * horizontalDistance));
+            angleToReturn = PickAngle(parabolicAngle, directAngle, _parabolicData.GetArcPreference);
+        }
         return angleToReturn;
     }
 
-    private static float PickAngle(float _angle1, float _angle2, BallisticArcPreference _arcPreference = BallisticArcPreference.ParabolicArc)
+    private static float PickAngle(float _angle1, float _angle2, BallisticArcPreference _arcPreference = BallisticArcPreference.UpperArc)
     {
         bool isTheta1Nan = float.IsNaN(_angle1);
         bool isTheta2Nan = float.IsNaN(_angle2);
@@ -60,7 +68,7 @@ public static class CustomPhysics
         if (!isTheta1Nan && !isTheta2Nan)
         {
             // If the difference in heights is too small we want to use the upper arc.
-            if (_arcPreference == BallisticArcPreference.ParabolicArc)
+            if (_arcPreference == BallisticArcPreference.UpperArc)
             {
                 if (isTheta1Nan) {
                     returnTheta = _angle2;
@@ -69,7 +77,7 @@ public static class CustomPhysics
                     returnTheta = _angle1;
                 }
             }
-            else if (_arcPreference == BallisticArcPreference.DirectArc)
+            else if (_arcPreference == BallisticArcPreference.LowerArc)
             {
                 if (isTheta2Nan) {
                     returnTheta = _angle1;

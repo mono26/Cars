@@ -41,10 +41,10 @@ public class JumpAttack : Ability
         float relativeY = initialPosition.y - targetPosition.y;
         BallisticArcPreference arcPreference;
         if (Mathf.Abs(relativeY) <= 0.5) {
-            arcPreference = BallisticArcPreference.ParabolicArc;
+            arcPreference = BallisticArcPreference.UpperArc;
         }
         else {
-            arcPreference = BallisticArcPreference.DirectArc;
+            arcPreference = BallisticArcPreference.LowerArc;
         }
         Vector3 jumpVelocity = CustomPhysics.CalculateVelocityVectorForParabolicMovement(
             new ParabolicMovementData(initialPosition, targetPosition, jumpSpeed, arcPreference)

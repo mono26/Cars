@@ -8,7 +8,7 @@ public class EnemyMovementTest
     [Test]
     public void CreatesTestEnemyMovement()
     {
-        EnemyMovement testEnemyMovement = TestHelperMethods.CreateScriptInstanceInGameObject<EnemyMovement>(MethodBase.GetCurrentMethod().Name);
+        EnemyMovement testEnemyMovement = TestsHelperMethods.CreateScriptInstanceInGameObject<EnemyMovement>(MethodBase.GetCurrentMethod().Name);
         Assert.NotNull(testEnemyMovement);
         return;
     }

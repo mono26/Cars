@@ -7,7 +7,7 @@ public class SlotManagerTest
     [Test]
     public void CreatesTestSlotManager()
     {
-        SlotManager testSlotManager = TestHelperMethods.CreateScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
+        SlotManager testSlotManager = TestsHelperMethods.CreateScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
         Assert.NotNull(testSlotManager);
         return;
     }
@@ -15,9 +15,9 @@ public class SlotManagerTest
     [Test]
     public void InitializeTestSlotManager()
     {
-        SlotManager testSlotManager = TestHelperMethods.CreateScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
+        SlotManager testSlotManager = TestsHelperMethods.CreateScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
         ReflectionBehaviour testReflection = testSlotManager.gameObject.AddComponent<ReflectionBehaviour>();
-        TestHelperMethods.InitializeTestGameObject(testSlotManager.gameObject);
+        TestsHelperMethods.InitializeTestGameObject(testSlotManager.gameObject);
         Assert.IsTrue(testReflection.AwakeCalled);
         Assert.IsTrue(testReflection.StartCalled);
         Assert.IsTrue(testReflection.OnEnableCalled);
@@ -27,7 +27,7 @@ public class SlotManagerTest
     [Test]
     public void ReserveAttackingSlot()
     {
-        SlotManager testSlotManager = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
+        SlotManager testSlotManager = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
         GameObject testAttacker = new GameObject();
         Slot testAttackerSlot = testSlotManager.Reserve(testAttacker);
         Assert.NotNull(testAttackerSlot);
@@ -39,7 +39,7 @@ public class SlotManagerTest
     [Test]
     public void ReserveWaitingSlot()
     {
-        SlotManager testSlotManager = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
+        SlotManager testSlotManager = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
         // Default number of slots.
         Slot[] attackerSlots = new Slot[5];
         for (int i = 0; i < 5; i++) {
@@ -63,7 +63,7 @@ public class SlotManagerTest
     [Test]
     public void ReleaseAttackingSlot()
     {
-        SlotManager testSlotManager = TestHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
+        SlotManager testSlotManager = TestsHelperMethods.CreateInitializedScriptInstanceInGameObject<SlotManager>(MethodBase.GetCurrentMethod().Name);
         GameObject testAttacker = new GameObject();
         Slot testSlot = testSlotManager.Reserve(testAttacker);
         testSlotManager.Release(testSlot);

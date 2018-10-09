@@ -64,15 +64,15 @@ public static class HelperMethods
         return _collection;
     }
 
-    public static void DebugMessageWithTimeStamp(string _message)
+    public static void DebugMessageWithTimeStamp(string _customMessage)
     {
-        Debug.Log(Time.timeSinceLevelLoad + " " + _message);
+        Debug.Log(Time.timeSinceLevelLoad + " " + _customMessage);
         return;
     }
 
-    public static void DebugMessageWithTimeStamp(string _message, object _elementToDebug)
+    public static void DebugMessageWithTimeStamp(object _elementToDebug, string _customMessage = "")
     {
-        Debug.Log(Time.timeSinceLevelLoad + " " + _message + " " + _elementToDebug.ToString());
+        Debug.Log(Time.timeSinceLevelLoad + " " + _customMessage + " " + _elementToDebug.ToString());
         return;
     }
 
