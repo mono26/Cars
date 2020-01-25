@@ -15,11 +15,6 @@ public class CarInput : EntityInput
     public float GetHandBrakeInput { get { return handBrakeInput; } }
     public float GetSteeringInput { get { return steeringInput; } }
 
-    public CarInput()
-    {
-
-    }
-
     public CarInput(float _accelerationInput, float _footBrakeInput, float _handBrakeInput, float _steeringInput)
     {
         accelerationInput = Mathf.Clamp(_accelerationInput, 0, 1);
@@ -44,7 +39,7 @@ public class Car : Entity
 
     [Header("Car editor debugging")]
     [SerializeField] private float oldRotation;
-    [SerializeField] private CarInput currentInput = new CarInput();
+    [SerializeField] private CarInput currentInput;
 
     public CarEngine GetEngine { get { return engine; } }
     public Wheel[] GetWheels { get { return wheels; } }

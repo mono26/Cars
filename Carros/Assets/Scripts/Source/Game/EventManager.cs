@@ -32,34 +32,24 @@ public static class EventManager
         if (!events.ContainsKey(typeof(T))) {
             eventTypeExists = false;
         }
-        else {
-            throw new EventException(typeof(T).Name, " There is no event registered of type: ");
-        }
         return eventTypeExists;
     }
 
     private static bool SubscriptionExists<T>(EventHandler<T> receiver) where T : GameEvent
     {
         bool existsSubscription = false;
-        try
+        if (ExistsEventType<T>())
         {
-            if (ExistsEventType<T>())
+            List<EventHandlerBase> receivers;
+            events.TryGetValue(typeof(T), out receivers);
+            for (int i = 0; i < receivers.Count; i++)
             {
-                List<EventHandlerBase> receivers;
-                events.TryGetValue(typeof(T), out receivers);
-                for (int i = 0; i < receivers.Count; i++)
+                if (receivers[i] == receiver)
                 {
-                    if (receivers[i] == receiver)
-                    {
-                        existsSubscription = true;
-                        break;
-                    }
+                    existsSubscription = true;
+                    break;
                 }
             }
-        }
-        catch (EventException eventException)
-        {
-            eventException.DisplayException();
         }
         return existsSubscription;
     }
@@ -85,7 +75,7 @@ public static class EventManager
                 }
             }
             else {
-                throw new EventException(typeof(T).Name, "Listener not subscribed to the event: ");
+                throw new EventException(typeof(T), string.Format(listener + "not subscribed to the event"));
             }
         }
         catch (EventException eventException) {
@@ -104,8 +94,11 @@ public static class EventManager
                 events.TryGetValue(typeof(T), out subscribersList);
                 for (int i = 0; i < subscribersList.Count; i++)
                 {
-                    (subscribersList[i] as EventHandler<T>).OnEvent(newEvent);
+                    (subscribersList[i] as EventHandler<T>).OnGameEvent(newEvent);
                 }
+            }
+            else{
+                throw new EventException(typeof(T), "Has no listeners.");
             }
         }
         catch (EventException eventException) {
@@ -120,5 +113,5 @@ public interface EventHandlerBase { }
 
 public interface EventHandler<T> : EventHandlerBase
 {
-    void OnEvent(T eventType);
+    void OnGameEvent(T eventType);
 }

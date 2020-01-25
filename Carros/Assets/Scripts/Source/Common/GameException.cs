@@ -62,15 +62,15 @@ public class MissingComponentException : GameException
 
 public class EventException : GameException
 {
-    string eventType;
+    Type eventType;
 
     public EventException() : base("Event Exception") { }
-    public EventException(string _eventType) : base()
+    public EventException(Type _eventType) : base()
     {
         eventType = _eventType;
         return;
     }
-    public EventException(string _eventType, string _message) : base(_message)
+    public EventException(Type _eventType, string _message) : base(_message)
     {
         eventType = _eventType;
         return;
@@ -82,7 +82,7 @@ public class EventException : GameException
         if (Message == null || Message == "")
             message = "Event of type: " + eventType + " encountered a exception.";
         else
-            message = Message + eventType;
+            message = eventType.Name + Message;
         return message;
     }
 }

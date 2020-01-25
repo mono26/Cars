@@ -17,18 +17,26 @@ public class HealthComponent : MonoBehaviour
 	void Start ()
     {
         currentHealth = maxHealth;
-        healthDisplay.UpdateHealthBar(currentHealth / maxHealth);
+        UpdateHealthBar();
         return;
 	}
+
+    private void UpdateHealthBar()
+    {
+        if(healthDisplay != null) {
+            healthDisplay.UpdateHealthBar(currentHealth / maxHealth);
+        }
+        return;
+    }
 
     public void ReceiveDamage(int damage)
     {
         currentHealth -= damage;
-        if (currentHealth <= 0) {
+        if (currentHealth <= 0 && healthDisplay != null) {
             // TODO proper kill or release.
             Destroy(this.gameObject);
         }
-        healthDisplay.UpdateHealthBar(currentHealth / maxHealth);
+        UpdateHealthBar();
         return;
     }
 

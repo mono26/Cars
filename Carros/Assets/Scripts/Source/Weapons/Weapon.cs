@@ -222,7 +222,7 @@ public class Weapon : EntityComponent, EventHandler<PickEvent>
         return;
     }
 
-    public void OnEvent(PickEvent _pickEvent)
+    public void OnGameEvent(PickEvent _pickEvent)
     {
         if (_pickEvent.GetWhoPicks.Equals(this))
         {

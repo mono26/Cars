@@ -304,7 +304,7 @@ public class Enemy : Entity, EventHandler<TargetterEvent>
         return canAttack;
     }
 
-    public void OnEvent(TargetterEvent _targetterEvent)
+    public void OnGameEvent(TargetterEvent _targetterEvent)
     {
         if (_targetterEvent.GetEnemy.Equals(this))
         {
